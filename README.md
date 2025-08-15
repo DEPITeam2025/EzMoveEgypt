@@ -21,8 +21,9 @@ Tech Stack:
 - Other Tools: jsPDF, Cloudinary/S3, SMTP for email notifications
 
 Team Members
-- Safaa Taher
-- Sara Elwaraky
-- Yasmin Hatem
-- Aya Sherif
-- Noura Mamdouh
+- Safaa Taher https://github.com/SafaaTaher
+- Sara Elwaraky https://github.com/saraElwaraky
+- Yasmin Hatem https://github.com/Yasminasoliman
+- Noura Mamdouh https://github.com/Noura201
+- Aya Sherif https://github.com/ayaengsherif13200-commits
+- Mariem Khaled https://github.com/gitmariemkhaled/
