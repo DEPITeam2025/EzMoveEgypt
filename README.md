@@ -3,15 +3,11 @@
 ## Introduction
 With the increasing need for private education, parents and students face difficulties in easily finding trusted tutors. The "Moalemy" project is a simple website that aims to facilitate the search process for private tutors.
 
-***************************************************
-
 ## Project Goals
 - Create an easy-to-use platform to display private tutors’ data.
 - Enable parents to search and filter according to their educational needs.
 - Support independent tutors in showcasing their services professionally.
 - Enhance communication between students and tutors in a safe and direct way.
-
-***************************************************
 
 ## Website Components
 1. Homepage:
@@ -31,15 +27,11 @@ With the increasing need for private education, parents and students face diffic
 5. Contact Page:
 - Simple form to send an inquiry or request a session
 
-***************************************************
-
 ## UI/UX Design
 - Educational, comfortable colors (blue, green, white)
 - Responsive design for all devices
 - Simple and easy-to-navigate interface
 - Use of educational icons to illustrate subjects
-
-***************************************************
 
 ## Technologies Used
 Phase One:
@@ -52,22 +44,16 @@ Phase Two (Future Expansion):
 - Login system for tutors and parents
 - Google Maps API for displaying locations
 
-***************************************************
-
 ## Target Audience
 - Parents and students seeking private education
 - Independent tutors wishing to showcase their services
 - Schools and educational centers offering private lessons
-
-***************************************************
 
 ## Project Features
 - Simple and fast interface
 - Clear categories to ease searching
 - Scalability to include extra features like booking and reviews
 - Non-commercial project that serves the local community
-
-***************************************************
 
 ## Team Members
 - Safaa Taher https://github.com/SafaaTaher
