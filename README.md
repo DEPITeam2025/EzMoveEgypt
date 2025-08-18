@@ -1,7 +1,7 @@
-# Project: Private Tutors Directory – "Moalemy"
+# Project: Private Tutors Directory – "UstaazNow"
 
 ## Introduction
-With the increasing need for private education, parents and students face difficulties in easily finding trusted tutors. The "Moalemy" project is a simple website that aims to facilitate the search process for private tutors.
+With the increasing need for private education, parents and students face difficulties in easily finding trusted tutors. The "UstaazNow" project is a simple website that aims to facilitate the search process for private tutors.
 
 ## Project Goals
 - Create an easy-to-use platform to display private tutors’ data.
