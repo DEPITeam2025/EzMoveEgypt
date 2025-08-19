@@ -1,4 +1,4 @@
-# Project: "EzMove"
+# Project: EzMove
 
 ## Idea:
 ### Problem
