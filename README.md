@@ -107,9 +107,9 @@ The Egypt Transport Guide project aims to solve this challenge by providing a si
 - CI/CD Pipelines → GitHub Actions for automated testing and deployment.
 
 ## Team Members
-Safaa Taher : https://github.com/SafaaTaher
-Noura Mamdouh : https://github.com/Noura201
-Sara Elwaraky : https://github.com/saraElwaraky
-Yasmine Hatim : https://github.com/Yasminasoliman
-Aya Sherif : https://github.com/ayaengsherif13200-commits
-Marem Khaled : https://github.com/gitmariemkhaled/
+- Safaa Taher : https://github.com/SafaaTaher
+- Noura Mamdouh : https://github.com/Noura201
+- Sara Elwaraky : https://github.com/saraElwaraky
+- Yasmine Hatim : https://github.com/Yasminasoliman
+- Aya Sherif : https://github.com/ayaengsherif13200-commits
+- Marem Khaled : https://github.com/gitmariemkhaled/
