@@ -1,10 +1,10 @@
 # Project: EzMove
 
-## Idea:
-### Problem
+## Idea
+### Problem:
 In Egypt, especially in Cairo, public transportation is diverse but scattered across many systems: Metro, buses, BRT, Light Rail, and Monorail. While these services are valuable, newcomers, visitors, students, and even locals often find it difficult to choose the most efficient route due to the lack of a unified platform.
 
-### Solution
+### Solution:
 The Egypt Transport Guide project aims to solve this challenge by providing a simple, intuitive, and centralized application—available as a web or mobile app—that allows users to:
 - Enter their starting point and destination.
 - Instantly see optimized route options.
