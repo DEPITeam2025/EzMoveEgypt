@@ -1,67 +1,59 @@
 import { createBrowserRouter } from "react-router";
-
-// layouts
-import mainLayout from "@/layout/mainLayout/mainLayout";
-import authLayout from "@/layout/authLayout/authLayout";
-
 // Pages
-import home from "@/pages/home/home";
-import login from "@/pages/login/login";
-import SignUp from "@/pages/SignUp/SignUp";
-import details from "@/pages/details/details";
-import cairoMetro from "@/pages/cairoMetro/cairoMetro";
-import intercityTravelHub from "@/pages/intercityTravelHub/intercityTravelHub";
-import settings from "@/pages/settings/settings";
-import transportGuide from "@/pages/transportGuide/transportGuide";
-
+import Home from "@/Pages/Home/Home";
+import MetroGuide from "@/Pages/MetroGuide/MetroGuide";
+import Login from "@/Pages/Login/Login";
+import SignUp from "@/Pages/SignUp/SignUp";
+import FindRoutes from "@/Pages/FindRoutes/FindRoutes";
+import SearchForTransport from "@/Pages/SearchForTransport/SearchForTransport";
+import SavedItems from "@/Pages/SavedItems/SavedItems";
+// Layouts
+import MainLayout from "@/Layout/MainLayout/MainLayout";
+import AuthLayout from "@/Layout/AuthLayout/AuthLayout";
 const router = createBrowserRouter([
   {
     path: "/",
-    Component: mainLayout,
+    Component: MainLayout,
 
     children: [
       {
         index: true,
-        Component: home,
+        Component: Home,
       },
 
       {
-        path: "details",
-        Component: details,
+        path: "findroutes",
+        Component: FindRoutes,
       },
 
       {
-        path: "cairometro",
-        Component: cairoMetro,
+        path: "metroguide",
+        Component: MetroGuide,
       },
       {
-        path: "intercitytravelhub",
-        Component: intercityTravelHub,
+        path: "searchfortransport",
+        Component: SearchForTransport,
       },
       {
-        path: "transportguide",
-        Component: transportGuide,
-      },
+          path: 'saveditems',
+          Component: SavedItems,
+        }
     ],
   },
-  {
-    path: "/",
-    Component: authLayout,
-    children: [
-      {
-        path: "login",
-        Component: login,
-      },
-      {
-        path: "signup",
-        Component: SignUp,
-      },
-      {
-        path: "settings",
-        Component: settings,
-      },
-    ],
-  },
+    {
+      path: "/",
+      Component: AuthLayout,
+      children: [
+        {
+          path: "login",
+          Component: Login,
+        },
+        {
+          path: "signup",
+          Component: SignUp,
+        },
+      ],
+    },
 ]);
 
 export default router;

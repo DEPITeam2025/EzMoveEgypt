@@ -1,8 +1,7 @@
-
 import {Outlet} from 'react-router'
 
 
-function mainLayout() {
+function MainLayout() {
     return (
     <div>
         <main>
@@ -11,4 +10,4 @@ function mainLayout() {
     </div>);
 }
 
-export default mainLayout;
+export default MainLayout;
