@@ -1,12 +1,16 @@
 import { createBrowserRouter } from "react-router";
+
+// layouts
 import mainLayout from "@/layout/mainLayout/mainLayout";
+import authLayout from "@/layout/authLayout/authLayout";
+
+// Pages
 import home from "@/pages/home/home";
+import login from "@/pages/login/login";
+import SignUp from "@/pages/SignUp/SignUp";
 import details from "@/pages/details/details";
 import cairoMetro from "@/pages/cairoMetro/cairoMetro";
 import intercityTravelHub from "@/pages/intercityTravelHub/intercityTravelHub";
-import authLayout from "@/layout/authLayout/authLayout";
-import login from "@/pages/login/login";
-import register from "@/pages/register/register";
 import settings from "@/pages/settings/settings";
 import transportGuide from "@/pages/transportGuide/transportGuide";
 
@@ -35,29 +39,29 @@ const router = createBrowserRouter([
         Component: intercityTravelHub,
       },
       {
-          path: 'transportguide',
-          Component: transportGuide,
-        }
+        path: "transportguide",
+        Component: transportGuide,
+      },
     ],
   },
-    {
-      path: "/",
-      Component: authLayout,
-      children: [
-        {
-          path: "login",
-          Component: login,
-        },
-        {
-          path: "register",
-          Component: register,
-        },
-        {
-          path: 'settings',
-          Component: settings,
-        },
-      ],
-    },
+  {
+    path: "/",
+    Component: authLayout,
+    children: [
+      {
+        path: "login",
+        Component: login,
+      },
+      {
+        path: "signup",
+        Component: SignUp,
+      },
+      {
+        path: "settings",
+        Component: settings,
+      },
+    ],
+  },
 ]);
 
 export default router;
