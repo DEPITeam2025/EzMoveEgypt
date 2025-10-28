@@ -1,6 +1,6 @@
 
-function home() {
-    return (<h1>hello</h1>);
+function Home() {
+    return (<h1>Hello From Home Page</h1>);
 }
 
-export default home;
+export default Home;
