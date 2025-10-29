@@ -1,5 +1,5 @@
 function MetroGuide() {
-    return (<h1>MetroGuide</h1>);
+  return <div>MetroGuide Page</div>;
 }
 
 export default MetroGuide;
