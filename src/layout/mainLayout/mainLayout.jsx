@@ -1,4 +1,5 @@
 import {Outlet} from 'react-router'
+import TheFooter from '@/Components/TheFooter/TheFooter';
 
 
 function MainLayout() {
@@ -7,6 +8,7 @@ function MainLayout() {
         <main>
             <Outlet />
         </main>
+        <TheFooter />
     </div>);
 }
 

@@ -1,10 +1,9 @@
-import React from 'react';
+import React from "react";
 
-function TheFooter () {
+
+function TheFooter() {
   return (
-    <div>
-      <h1>TheFooter Component</h1>
-    </div>
+  <h1>The Footer</h1>
   );
 }
 
