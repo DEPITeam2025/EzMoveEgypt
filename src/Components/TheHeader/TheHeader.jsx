@@ -1,11 +1,12 @@
 import React from "react";
 import { Navbar, Nav, Container, Button } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
-import EzmoveLogo from "./EzmoveLogo";
-import FindRoutesIcon from "./FindRoutesIcon";
-import SearchTransportIcon from "./SearchTransportIcon";
-import MetroGuideIcon from "./MetroGuideIcon";
 import styles from "./TheHeader.module.css";
+
+import EzmoveLogo from "./Icons/EzmoveLogo.svg";
+import FindRoutesIcon from "./Icons/FindRoutesIcon.svg";
+import SearchTransportIcon from "./Icons/SearchTransportIcon.svg";
+import MetroGuideIcon from "./Icons/MetroGuideIcon.svg";
 
 function TheHeader() {
   const navigate = useNavigate();
@@ -24,7 +25,13 @@ function TheHeader() {
           to="/"
           className={`${styles.logoBrand} d-flex align-items-center`}
         >
-          <EzmoveLogo width={40} height={40} />
+          <img
+            src={EzmoveLogo}
+            alt="Ezmove Logo"
+            width="40"
+            height="40"
+            className={styles.logoImg}
+          />
           <span className={styles.logoText}>Ezmove</span>
         </Navbar.Brand>
 
@@ -34,23 +41,46 @@ function TheHeader() {
         />
 
         <Navbar.Collapse id="main-navbar" className="justify-content-between">
-          <Nav className={`${styles.navList}`}>
+          <Nav className={styles.navList}>
             <Nav.Link as={Link} to="/findroutes" className={styles.navLink}>
-              <FindRoutesIcon /> find routes
+              <img
+                src={FindRoutesIcon}
+                alt="Find Routes"
+                width="18"
+                height="18"
+                className={styles.icon}
+              />
+              find routes
             </Nav.Link>
+
             <Nav.Link
               as={Link}
               to="/searchfortransport"
               className={styles.navLink}
             >
-              <SearchTransportIcon /> search transport
+              <img
+                src={SearchTransportIcon}
+                alt="Search Transport"
+                width="18"
+                height="18"
+                className={styles.icon}
+              />
+              search transport
             </Nav.Link>
+
             <Nav.Link as={Link} to="/metroguide" className={styles.navLink}>
-              <MetroGuideIcon /> metro guide
+              <img
+                src={MetroGuideIcon}
+                alt="Metro Guide"
+                width="18"
+                height="18"
+                className={styles.icon}
+              />
+              metro guide
             </Nav.Link>
           </Nav>
 
-          <div className={`${styles.buttonContainer}`}>
+          <div className={styles.buttonContainer}>
             {isLoggedIn ? (
               <Button
                 variant="outline-danger"
