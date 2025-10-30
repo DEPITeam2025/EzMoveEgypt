@@ -5,30 +5,56 @@ import styles from "./SignUp.module.css";
 const BusIcon = () => (
   <div className={styles.iconPlaceholder}>
     {/* Placeholder for a stylized bus icon */}
-    <svg
-      width="40"
-      height="40"
-      viewBox="0 0 24 24"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <rect width="24" height="24" rx="6" fill="url(#busGradient)" />
+    <svg width="39" height="39" viewBox="0 0 39 39" fill="none">
       <path
-        d="M7 12H17M7 16H17M14 8L16 10L14 12"
+        d="M12.9111 9.68348V19.367"
         stroke="white"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
+        stroke-width="2.14936"
+        stroke-linecap="round"
+        stroke-linejoin="round"
       />
-      <defs>
-        <linearGradient id="busGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" style={{ stopColor: "#8A2BE2", stopOpacity: 1 }} />
-          <stop
-            offset="100%"
-            style={{ stopColor: "#4169E1", stopOpacity: 1 }}
-          />
-        </linearGradient>
-      </defs>
+      <path
+        d="M24.2085 9.68348V19.367"
+        stroke="white"
+        stroke-width="2.14936"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M3.22778 19.367H34.8605"
+        stroke="white"
+        stroke-width="2.14936"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M29.0504 29.0504H33.8921C33.8921 29.0504 34.6991 26.3068 35.1833 24.5315C35.3446 23.8859 35.506 23.2403 35.506 22.5948C35.506 21.9492 35.3446 21.3036 35.1833 20.6581L32.9238 12.5885C32.4396 10.9746 30.8257 9.68348 29.0504 9.68348H6.45561C5.59954 9.68348 4.77853 10.0236 4.17319 10.6289C3.56786 11.2342 3.22778 12.0552 3.22778 12.9113V29.0504H8.06952"
+        stroke="white"
+        stroke-width="2.14936"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M11.2974 32.2783C13.0801 32.2783 14.5252 30.8331 14.5252 29.0504C14.5252 27.2678 13.0801 25.8226 11.2974 25.8226C9.51473 25.8226 8.06958 27.2678 8.06958 29.0504C8.06958 30.8331 9.51473 32.2783 11.2974 32.2783Z"
+        stroke="white"
+        stroke-width="2.14936"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M14.5251 29.0504H22.5947"
+        stroke="white"
+        stroke-width="2.14936"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M25.8226 32.2783C27.6052 32.2783 29.0504 30.8331 29.0504 29.0504C29.0504 27.2678 27.6052 25.8226 25.8226 25.8226C24.0399 25.8226 22.5947 27.2678 22.5947 29.0504C22.5947 30.8331 24.0399 32.2783 25.8226 32.2783Z"
+        stroke="white"
+        stroke-width="2.14936"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
     </svg>
   </div>
 );
@@ -176,7 +202,7 @@ const SignUp = () => {
             <a
               href="#"
               className="fw-bold text-decoration-none"
-              style={{ color: "#8A2BE2" }}
+              style={{ color: "#3a2be2ff" }}
             >
               Login
             </a>

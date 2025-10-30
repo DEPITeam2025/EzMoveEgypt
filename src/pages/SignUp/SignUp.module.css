@@ -13,12 +13,14 @@
 
 /* --- Header and Icon --- */
 .iconPlaceholder {
-    width: 48px;
-    height: 48px;
+    width: 63px;
+    height: 63px;
     margin: 0 auto 8px;
     display: flex;
     align-items: center;
     justify-content: center;
+    background: linear-gradient(to right, #8A2BE2, #4169E1);
+    border-radius: 22px;
 }
 
 /* --- Card Styling --- */
@@ -26,8 +28,8 @@
     width: 100%;
     max-width: 500px;
     /* Custom shadow to match the light, modern look */
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
-    border: none;
+    /* box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08); */
+    border: 1px solid hsla(0, 0%, 0%, 0.1);
     /* Remove default Bootstrap border */
     border-radius: 16px;
 }
