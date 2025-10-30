@@ -8,6 +8,8 @@ import {
   Alert,
 } from "react-bootstrap";
 import styles from "./SignUp.module.css";
+import SignUpSuccess from "./SignUpSuccess";
+import { useNavigate } from "react-router";
 
 // Simple email validation regex
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -118,6 +120,9 @@ const SignUp = () => {
   const [errors, setErrors] = useState({});
   const [passwordShown, setPasswordShown] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [isSignedUp, setIsSignedUp] = useState(false);
+
+  const navigate = useNavigate();
 
   const togglePasswordVisibility = () => setPasswordShown(!passwordShown);
 
@@ -140,17 +145,29 @@ const SignUp = () => {
     const newErrors = {};
 
     // Full Name validation
-    if (!fullName || fullName.length < 2) {
+    if (!fullName) {
+      newErrors.fullName = "Full Name is required";
+    } else if (fullName.length < 2) {
       newErrors.fullName = "Full Name must be at least 2 characters long.";
     }
 
     // Email validation
-    if (!email || !EMAIL_REGEX.test(email)) {
+    if (!email) {
+      newErrors.email = "Email is required";
+    } else if (!EMAIL_REGEX.test(email)) {
       newErrors.email = "Please enter a valid email address.";
     }
+    const usersData = JSON.parse(localStorage.getItem("usersData"));
+    usersData.map((user) => {
+      if (user.email === email) {
+        newErrors.email = "This email already exist. Please go to login";
+      }
+    });
 
     // Password validation
-    if (!password || password.length < 8) {
+    if (!password) {
+      newErrors.password = "Password is required";
+    } else if (!password || password.length < 8) {
       newErrors.password = "Password must be at least 8 characters.";
     }
 
@@ -199,7 +216,13 @@ const SignUp = () => {
         password: form.password,
         signUpDate: new Date().toISOString(),
       };
-      localStorage.setItem("ezmove_user_data", JSON.stringify(userData));
+      let usersData = JSON.parse(localStorage.getItem("usersData"));
+      if (usersData) {
+        usersData = [...usersData, userData];
+      } else {
+        usersData = [userData];
+      }
+      localStorage.setItem("usersData", JSON.stringify(usersData));
 
       // 2. Show success message
       setSuccess(true);
@@ -212,8 +235,14 @@ const SignUp = () => {
         confirmPassword: "",
         terms: false,
       });
+
+      setIsSignedUp(true);
     }
   };
+
+  if (isSignedUp) {
+    return <SignUpSuccess />;
+  }
 
   return (
     <Container fluid className={styles.signupPage}>
@@ -284,8 +313,12 @@ const SignUp = () => {
                   onBlur={() => handleBlur("password")}
                   isInvalid={!!errors.password}
                 />
-                <EyeIcon onClick={togglePasswordVisibility} />
-                <Form.Control.Feedback type="invalid" tooltip>
+                {passwordShown ? (
+                  <Eye2Icon onClick={togglePasswordVisibility} />
+                ) : (
+                  <EyeIcon onClick={togglePasswordVisibility} />
+                )}
+                <Form.Control.Feedback type="invalid">
                   {errors.password}
                 </Form.Control.Feedback>
               </InputGroup>
@@ -309,7 +342,7 @@ const SignUp = () => {
                 ) : (
                   <EyeIcon onClick={togglePasswordVisibility} />
                 )}
-                <Form.Control.Feedback type="invalid" tooltip>
+                <Form.Control.Feedback type="invalid">
                   {errors.confirmPassword}
                 </Form.Control.Feedback>
               </InputGroup>
@@ -337,7 +370,7 @@ const SignUp = () => {
                 onChange={(e) => setField("terms", e.target.checked)}
                 isInvalid={!!errors.terms}
                 feedback={errors.terms}
-              />
+              ></Form.Check>
             </Form.Group>
 
             {/* Create Account Button */}
@@ -347,14 +380,15 @@ const SignUp = () => {
           </Form>
 
           <p className="text-center mt-4 mb-0 small text-muted">
-            Already have an account?{" "}
-            <a
-              href="#"
-              className="fw-bold text-decoration-none"
+            Already have an account?
+            <Button
+              variant="text"
+              className="fw-bold"
               style={{ color: "#8A2BE2" }}
+              onClick={() => navigate("/login")}
             >
               Login
-            </a>
+            </Button>
           </p>
         </Card.Body>
       </Card>

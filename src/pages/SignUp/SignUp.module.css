@@ -73,20 +73,6 @@
     border-bottom-right-radius: 0;
 }
 
-/* --- Checkbox Customization --- */
-.formCheckCustom {
-    /* Custom checkmark color and size */
-    --bs-form-check-bg-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 10 3 3 6-6'/%3e%3c/svg%3e");
-    --bs-form-check-checked-bg-color: #8A2BE2;
-    /* Checked color */
-    --bs-form-check-checked-border-color: #8A2BE2;
-    /* Checked border color */
-    --bs-form-check-border-radius: 4px;
-    /* Slightly rounded corners */
-    --bs-form-check-border-width: 1px;
-    --bs-form-check-border-color: #ccc;
-    font-size: 0.85rem;
-}
 
 /* --- Button Styling (Gradient) --- */
 .createAccountBtn {
