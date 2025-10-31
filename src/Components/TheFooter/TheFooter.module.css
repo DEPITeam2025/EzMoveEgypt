@@ -1,0 +1,74 @@
+/* Base footer styles */
+.footer {
+  background: transparent;                 /* removes dark bg  */
+  color: hsla(240, 7%, 48%, 1); 
+    position: fixed;
+  bottom: 0;
+  width: 100%;         
+   margin-inline: 1.02rem; 
+}
+
+
+/* Headings (all h6) */
+.footer h6 {
+  color: hsla(0, 0%, 4%, 1);
+}
+
+/* Links, nav links, Bootstrap “text-white” helpers, etc. */
+.footer a,
+.footer .nav-link,
+.footer .text-white,
+.footer .text-white-50 {
+  color: hsla(240, 7%, 48%, 1) !important; /* override BS       */
+}
+
+/* Optional – make links dark on hover/focus */
+.footer a:hover,
+.footer .nav-link:hover,
+.footer a:focus,
+.footer .nav-link:focus {
+  color: hsla(0, 0%, 4%, 1);
+}
+
+/* Each row inside the contact stack */
+.contactStack > div {
+  color: hsla(240, 7%, 48%, 1) !important;
+  padding: 0.35rem 0.6rem;         /* comfy spacing            */
+  border-radius: 4px;              /* optional rounded corners */
+  color: #fff;                     /* keep text readable       */
+}
+
+/* keep icons visible too */
+.contactStack svg {
+  color: #fff;
+}
+
+/* --------------  footer bottom -------------- */
+
+
+/* keep the grey for ordinary text, but don’t touch SVGs        */
+.footerBottom,
+.footerBottom *:not(svg) {
+  color: hsla(240, 7%, 48%, 1) !important;
+}
+
+/* bring the heart back to red */
+.heartIcon {
+  color: #e25555 !important;
+}
+/* --------------  language badge ------------- */
+.langBadge {
+  /* dark text & dark border */
+  color: hsla(0, 0%, 4%, 1) !important;
+  border-color: hsla(0, 0%, 4%, 1) !important;
+  background-color: #f8f9fa;        /* keep the “light” look */
+}
+
+/* TheFooter.module.css */
+.footerBottom {
+  position: relative;
+  border-color: hsla(0, 0%, 4%, 1) ;
+  border-width: 95%;
+  border-top: #e25555 1px solid;
+  padding-right: 4.2rem;
+}
