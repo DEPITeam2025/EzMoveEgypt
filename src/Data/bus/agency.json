@@ -1,0 +1,68 @@
+[
+  {
+    "agency_id":"CTA",
+    "agency_name":"Cairo Transport Authority",
+    "agency_url":"http:\/\/www.cairo.gov.eg\/ar\/Interactive%20Services\/Transportation\/Pages\/buses.aspx",
+    "agency_timezone":"Africa\/Cairo"
+  },
+  {
+    "agency_id":"CTA_M",
+    "agency_name":"Minibus licensed by CTA",
+    "agency_url":"http:\/\/www.cairo.gov.eg\/ar\/Interactive%20Services\/Transportation\/Pages\/buses.aspx",
+    "agency_timezone":"Africa\/Cairo"
+  },
+  {
+    "agency_id":"BOX",
+    "agency_name":"Box Paratransit",
+    "agency_url":"http:\/\/transportforcairo.com\/",
+    "agency_timezone":"Africa\/Cairo"
+  },
+  {
+    "agency_id":"P_B_8",
+    "agency_name":"Paratransit 8 Seater Suzuki Chevrolet or DMF (Blue Licenseplates)",
+    "agency_url":"http:\/\/transportforcairo.com\/",
+    "agency_timezone":"Africa\/Cairo"
+  },
+  {
+    "agency_id":"P_O_14",
+    "agency_name":"Paratransit 14 Seater Microbus (Orange Licenseplates)",
+    "agency_url":"http:\/\/transportforcairo.com\/",
+    "agency_timezone":"Africa\/Cairo"
+  },
+  {
+    "agency_id":"COOP",
+    "agency_name":"Cooperative paratransit 29 Seater (Grey Licenseplates)",
+    "agency_url":"http:\/\/transportforcairo.com\/",
+    "agency_timezone":"Africa\/Cairo"
+  },
+  {
+    "agency_id":"MM",
+    "agency_name":"Mwasalat Misr",
+    "agency_url":"http:\/\/www.mwasalatmisr.com\/",
+    "agency_timezone":"Africa\/Cairo"
+  },
+  {
+    "agency_id":"NAT",
+    "agency_name":"National Authority for Tunnels",
+    "agency_url":"http:\/\/cairometro.gov.eg\/HomePage.aspx",
+    "agency_timezone":"Africa\/Cairo"
+  },
+  {
+    "agency_id":"GRN",
+    "agency_name":"Green Bus",
+    "agency_url":"http:\/\/transportforcairo.com\/",
+    "agency_timezone":"Africa\/Cairo"
+  },
+  {
+    "agency_id":"LTRA_M",
+    "agency_name":"Minibus licensed by LTRA",
+    "agency_url":"https:\/\/ltra.gov.eg\/",
+    "agency_timezone":"Africa\/Cairo"
+  },
+  {
+    "agency_id":"PGT",
+    "agency_name":"Peugeot",
+    "agency_url":"http:\/\/transportforcairo.com\/",
+    "agency_timezone":"Africa\/Cairo"
+  }
+]
