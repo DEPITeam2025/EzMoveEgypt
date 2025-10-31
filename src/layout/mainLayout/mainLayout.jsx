@@ -1,15 +1,17 @@
-import {Outlet} from 'react-router'
-import TheFooter from '@/Components/TheFooter/TheFooter';
-
+import { Outlet } from "react-router";
+import TheHeader from "@/Components/TheHeader/TheHeader";
+import TheFooter from "@/Components/TheFooter/TheFooter";
 
 function MainLayout() {
-    return (
+  return (
     <div>
-        <main>
-            <Outlet />
-        </main>
-        <TheFooter />
-    </div>);
+      <TheHeader />
+      <main>
+        <Outlet />
+      </main>
+      <TheFooter />
+    </div>
+  );
 }
 
 export default MainLayout;
