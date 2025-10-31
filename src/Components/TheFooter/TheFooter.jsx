@@ -1,130 +1,152 @@
 import React from "react";
-import { Container, Row, Col, Nav, Stack, Badge, Image } from "react-bootstrap";
-import { BiMailSend, BiMap, BiLogoGithub } from "react-icons/bi";
-import { AiFillHeart } from "react-icons/ai";
-import { MdTranslate } from "react-icons/md"; // new icon
-import classes from "./TheFooter.module.css";
+import { Container, Row, Col, ListGroup } from "react-bootstrap";
+import { Envelope, GeoAlt, Github, Translate } from "react-bootstrap-icons";
+import styles from "./TheFooter.module.css";
 
-function TheFooter() {
+const getLinkPath = (text) => {
+  switch (text) {
+    case "Find Routes":
+      return "/findroutes";
+    case "Search Transport":
+      return "/searchfortransport";
+    case "Metro Guide":
+      return "/metroguide";
+    case "Saved List":
+      return "/saveditems";
+    case "Help Center":
+      return "/help-center"; //in the future, create this page
+    case "FAQs":
+      return "/faqs"; //in the future, create this page
+    case "Terms of Service":
+      return "/terms-of-service"; //in the future, create this page
+    case "Privacy Policy":
+      return "/privacy-policy"; //in the future, create this page
+    default:
+      return "#";
+  }
+};
+
+// Placeholder for the Ezmove logo
+const EzmoveLogo = () => (
+  <div className={styles.logoContainer}>
+    <div className={styles.iconBox}>
+      <img src="/src/assets/images/LogoFooter.png" alt="Ezmove Logo" />
+    </div>
+    <span className={styles.logoText}>Ezmove</span>
+  </div>
+);
+
+const FooterLink = ({ children }) => (
+  <ListGroup.Item as="li" className={styles.footerLink}>
+    <a href={getLinkPath(children)} className={styles.linkText}>
+      {children}
+    </a>
+  </ListGroup.Item>
+);
+
+const ContactItem = ({ Icon, text, href }) => (
+  <a
+    href={href}
+    className={styles.contactItem}
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    <Icon className={styles.contactIcon} />
+    <span className={styles.contactText}>{text}</span>
+  </a>
+);
+
+const TheFooter = () => {
   return (
-    <footer className={`${classes.footer} pt-4 pb-2 mt-5`}>
-      <Container fluid>
-        <Row className="gy-4 justify-content-between">
-          <Col xs={12} sm={6} md={3} lg={3}>
-            <Stack direction="horizontal" gap={2} className="mb-2">
-              <Image
-                roundedCircle
-                width={36}
-                height={36}
-                src="../../assets/images/ezmovelogo.jpg"
-                alt="Ezmove logo"
+    <footer className={styles.footer}>
+      <Container className="py-5">
+        <Row>
+          {/* Column 1: Logo and Description */}
+          <Col md={4} sm={12} className="mb-4 mb-md-0">
+            <EzmoveLogo />
+            <p className={styles.description}>
+              Your smart companion for public transportation.
+              <br />
+              Find the best routes and travel with ease.
+            </p>
+          </Col>
+
+          {/* Column 2: Quick Links */}
+          <Col xs={12} sm={6} md={2} className="mb-4 mb-md-0">
+            <h5 className={styles.heading}>Quick Links</h5>
+            <ListGroup as="ul" variant="flush" className={styles.listGroup}>
+              <FooterLink>Find Routes</FooterLink>
+              <FooterLink>Search Transport</FooterLink>
+              <FooterLink>Metro Guide</FooterLink>
+              <FooterLink>Saved List</FooterLink>
+            </ListGroup>
+          </Col>
+
+          {/* Column 3: Resources */}
+          <Col xs={12} sm={6} md={3} className="mb-4 mb-md-0">
+            <h5 className={styles.heading}>Resources</h5>
+            <ListGroup as="ul" variant="flush" className={styles.listGroup}>
+              <FooterLink>Help Center</FooterLink>
+              <FooterLink>FAQs</FooterLink>
+              <FooterLink>Terms of Service</FooterLink>
+              <FooterLink>Privacy Policy</FooterLink>
+            </ListGroup>
+          </Col>
+
+          {/* Column 4: Contact */}
+          <Col xs={12} sm={6} md={3}>
+            <h5 className={styles.heading}>Contact</h5>
+            <div className={styles.contactList}>
+                <ContactItem
+                Icon={Envelope}
+                text="support@ezmove.com"
+                href="mailto:support@ezmove.com"
               />
-              <strong>Ezmove</strong>
-            </Stack>
-            <div className="small text-start">
-              Your smart companion for public transportation. Find the best
-              routes and travel with ease.
+                <ContactItem
+                Icon={GeoAlt}
+                text="123 Transit Ave, City"
+                href="#" 
+              />
+              <ContactItem
+                Icon={Github}
+                text="GitHub"
+                href="https://github.com/YourGitHubRepo"
+              />
             </div>
           </Col>
+        </Row>
 
-          <Col xs={12} sm={6} md={3} lg={3}>
-            <h6 className="mb-3 text-start">Quick Links</h6>
-            <Nav className="flex-column small text-start">
-              <Nav.Link href="#routes" className="px-0 text-white-50">
-                Find Routes
-              </Nav.Link>
-              <Nav.Link href="#search" className="px-0 text-white-50">
-                Search Transport
-              </Nav.Link>
-              <Nav.Link href="#metro" className="px-0 text-white-50">
-                Metro Guide
-              </Nav.Link>
-              <Nav.Link href="#saved" className="px-0 text-white-50">
-                Saved List
-              </Nav.Link>
-            </Nav>
+        {/* Separator Line */}
+        <hr className={styles.divider} />
+
+        {/* Bottom Bar */}
+        <Row className="align-items-center">
+          <Col md={4}>
+            <p className={styles.copyright}>
+              &copy; 2025 Ezmove. All rights reserved.
+            </p>
           </Col>
-
-          <Col xs={12} sm={6} md={3} lg={3}>
-            <h6 className="mb-3 text-start">Resources</h6>
-            <Stack gap={2} className="small text-start">
-              <a href="#help" className="text-white-50 text-decoration-none">
-                Help Center
-              </a>
-              <a href="#faqs" className="text-white-50 text-decoration-none">
-                FAQs
-              </a>
-              <a href="#terms" className="text-white-50 text-decoration-none">
-                Terms of Service
-              </a>
-              <a href="#privacy" className="text-white-50 text-decoration-none">
-                Privacy Policy
-              </a>
-            </Stack>
+          <Col
+            md={4}
+            className="d-flex justify-content-md-end justify-content-start "
+          >
+            <p className={styles.madeWith}>
+              Made with<span className={styles.heart}>&hearts;</span>for
+              better commuting
+            </p>
           </Col>
-
-          <Col xs={12} sm={6} md={3} lg={3}>
-            <h6 className="mb-3 text-start">Contact</h6>
-
-            {/* add classes.contactStack – remove text-white-50            */}
-            <Stack
-              gap={2}
-              className={`small text-start ${classes.contactStack}`}
-            >
-              <div className="d-flex align-items-center gap-2">
-                <BiMailSend /> support@ezmove.com
-              </div>
-              <div className="d-flex align-items-center gap-2">
-                <BiMap /> 123 Transit Ave, City
-              </div>
-              <div className="d-flex align-items-center gap-2">
-                <BiLogoGithub /> GitHub
-              </div>
-            </Stack>
+          <Col
+            md={4}
+            className="d-flex justify-content-md-end justify-content-start "
+          >
+            <button className={styles.languageButton}>
+              <Translate className="me-1" /> English
+            </button>
           </Col>
         </Row>
       </Container>
-
-      <Container
-        fluid
-        className={`py-5 ${classes.footerBottom}`} // ← no border utils here
-      >
-        {/* inner wrapper: draws the shorter border */}
-        <div
-          className={`${classes.footerBottom}  mx-auto`}
-        >
-          <Row className="align-items-center">
-            {/* ── left ── */}
-            <Col md="auto" className="text-start">
-              <div className="small">
-                © {new Date().getFullYear()} Ezmove. All rights reserved.
-              </div>
-            </Col>
-
-            {/* ── centre ── */}
-            <Col className="text-center">
-              <div className="small d-flex justify-content-center align-items-center gap-1">
-                Made with&nbsp;
-                <AiFillHeart className={classes.heartIcon} />
-                &nbsp;for better commuting
-              </div>
-            </Col>
-
-            {/* ── right ── */}
-            <Col md="auto" className="text-end">
-              <Badge
-                bg="light"
-                text="dark"
-                className={`border rounded-pill py-2 px-3 ${classes.langBadge}`}
-              >
-                <MdTranslate className="me-1" /> English
-              </Badge>
-            </Col>
-          </Row>
-        </div>
-      </Container>
     </footer>
   );
-}
+};
 
 export default TheFooter;
