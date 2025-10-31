@@ -1,27 +1,48 @@
-import React from 'react';
-import './Home.css';
-import { useNavigate } from 'react-router-dom';
-import { ArrowRight, MapPin, Search, Map, Heart, Clock, DollarSign, Zap, Shield } from 'lucide-react';
+import React from "react";
+import styles from "./Home.module.css";
+import { useNavigate } from "react-router-dom";
+import {
+  ArrowRight,
+  MapPin,
+  Search,
+  Map,
+  Heart,
+  Clock,
+  DollarSign,
+  Zap,
+  Shield,
+} from "lucide-react";
 
 // Hero Section Component
-function HeroSection({ onFindRoutes }) {
+function HeroSection({ onFindRoutes, onLogin }) {
   return (
-    <section className="hero-section">
-      <div className="hero-container">
-        <h1 className="hero-title">Welcome to Ezmove</h1>
-        <p className="hero-subtitle">Your smart companion for public transportation</p>
-        <p className="hero-description">
-          Navigate the city with ease. Find routes, check schedules, and plan your journey across buses, metro, and more.
+    <section className={styles["hero-section"]}>
+      <div className={styles["hero-container"]}>
+        <h1 className={styles["hero-title"]}>Welcome to Ezmove</h1>
+        <p className={styles["hero-subtitle"]}>
+          Your smart companion for public transportation
+        </p>
+        <p className={styles["hero-description"]}>
+          Navigate the city with ease. Find routes, check schedules, and plan
+          your journey across buses, metro, and more.
         </p>
 
-        <div className="hero-buttons">
-          <button className="btn btn-primary" onClick={onFindRoutes}>
-            <span className="btn-content">
+        <div className={styles["hero-buttons"]}>
+          <button
+            className={`${styles.btn} ${styles["btn-primary"]}`}
+            onClick={onFindRoutes}
+          >
+            <span className={styles["btn-content"]}>
               Find Routes Now
-              <ArrowRight size={18} style={{ marginLeft: '8px' }} />
+              <ArrowRight size={18} style={{ marginLeft: "8px" }} />
             </span>
           </button>
-          <button className="btn btn-secondary">Login</button>
+          <button
+            className={`${styles.btn} ${styles["btn-secondary"]}`}
+            onClick={onLogin}
+          >
+            Login
+          </button>
         </div>
       </div>
     </section>
@@ -35,7 +56,8 @@ function FeaturesSection() {
       id: 1,
       icon: MapPin,
       title: "Find Routes",
-      description: "Discover the best routes between any two locations with multiple transport options.",
+      description:
+        "Discover the best routes between any two locations with multiple transport options.",
       color: "bg-blue",
       link: "Get Started →",
     },
@@ -43,7 +65,8 @@ function FeaturesSection() {
       id: 2,
       icon: Search,
       title: "Search Transport",
-      description: "Look up specific transport lines, schedules, and real-time arrival information.",
+      description:
+        "Look up specific transport lines, schedules, and real-time arrival information.",
       color: "bg-purple",
       link: "Get Started →",
     },
@@ -51,7 +74,8 @@ function FeaturesSection() {
       id: 3,
       icon: Map,
       title: "Metro Guide",
-      description: "Complete metro network map with all lines, stations, and operating hours.",
+      description:
+        "Complete metro network map with all lines, stations, and operating hours.",
       color: "bg-red",
       link: "Get Started →",
     },
@@ -59,7 +83,8 @@ function FeaturesSection() {
       id: 4,
       icon: Heart,
       title: "Saved List",
-      description: "Save your favorite routes and transport lines for quick access.",
+      description:
+        "Save your favorite routes and transport lines for quick access.",
       color: "bg-pink",
       link: "Sign In to Access",
       disabled: true,
@@ -67,26 +92,36 @@ function FeaturesSection() {
   ];
 
   return (
-    <section className="features-section">
-      <div className="features-container">
-        <div className="section-header">
-          <h2 className="section-title">Features</h2>
-          <p className="section-subtitle">Everything you need for seamless public transportation</p>
+    <section className={styles["features-section"]}>
+      <div className={styles["features-container"]}>
+        <div className={styles["section-header"]}>
+          <h2 className={styles["section-title"]}>Features</h2>
+          <p className={styles["section-subtitle"]}>
+            Everything you need for seamless public transportation
+          </p>
         </div>
 
-        <div className="features-grid">
+        <div className={styles["features-grid"]}>
           {features.map((feature) => {
             const IconComponent = feature.icon;
             return (
-              <div key={feature.id} className="feature-card">
-                <div className={`feature-icon ${feature.color}`}>
+              <div key={feature.id} className={styles["feature-card"]}>
+                <div
+                  className={`${styles["feature-icon"]} ${
+                    styles[feature.color]
+                  }`}
+                >
                   <IconComponent size={24} />
                 </div>
-                <h3 className="feature-title">{feature.title}</h3>
-                <p className="feature-description">{feature.description}</p>
+                <h3 className={styles["feature-title"]}>{feature.title}</h3>
+                <p className={styles["feature-description"]}>
+                  {feature.description}
+                </p>
                 <a
                   href="#"
-                  className={`feature-link ${feature.disabled ? 'disabled' : ''}`}
+                  className={`${styles["feature-link"]} ${
+                    feature.disabled ? styles.disabled : ""
+                  }`}
                 >
                   {feature.link}
                 </a>
@@ -129,23 +164,27 @@ function WhyChooseUsSection() {
   ];
 
   return (
-    <section className="why-choose-section">
-      <div className="why-choose-container">
-        <div className="section-header">
-          <h2 className="section-title">Why Choose Ezmove?</h2>
-          <p className="section-subtitle">Making public transportation easier for everyone</p>
+    <section className={styles["why-choose-section"]}>
+      <div className={styles["why-choose-container"]}>
+        <div className={styles["section-header"]}>
+          <h2 className={styles["section-title"]}>Why Choose Ezmove?</h2>
+          <p className={styles["section-subtitle"]}>
+            Making public transportation easier for everyone
+          </p>
         </div>
 
-        <div className="benefits-grid">
+        <div className={styles["benefits-grid"]}>
           {benefits.map((benefit) => {
             const IconComponent = benefit.icon;
             return (
-              <div key={benefit.id} className="benefit-card">
-                <div className="benefit-icon">
+              <div key={benefit.id} className={styles["benefit-card"]}>
+                <div className={styles["benefit-icon"]}>
                   <IconComponent size={32} />
                 </div>
-                <h3 className="benefit-title">{benefit.title}</h3>
-                <p className="benefit-description">{benefit.description}</p>
+                <h3 className={styles["benefit-title"]}>{benefit.title}</h3>
+                <p className={styles["benefit-description"]}>
+                  {benefit.description}
+                </p>
               </div>
             );
           })}
@@ -158,21 +197,28 @@ function WhyChooseUsSection() {
 // CTA Section Component
 function CTASection({ onFindRoutes }) {
   return (
-    <section className="cta-section">
-      <div className="cta-container">
-        <h2 className="section-title">Ready to Start Your Journey?</h2>
-        <p className="section-subtitle">Join thousands of commuters who trust Ezmove for their daily travels</p>
+    <section className={styles["cta-section"]}>
+      <div className={styles["cta-container"]}>
+        <h2 className={styles["section-title"]}>
+          Ready to Start Your Journey?
+        </h2>
+        <p className={styles["section-subtitle"]}>
+          Join thousands of commuters who trust Ezmove for their daily travels
+        </p>
 
-        <div className="cta-buttons">
-          <button className="btn btn-primary" onClick={onFindRoutes}>
-            <span className="btn-content">
-              <MapPin size={18} style={{ marginRight: '8px' }} />
+        <div className={styles["cta-buttons"]}>
+          <button
+            className={`${styles.btn} ${styles["btn-primary"]}`}
+            onClick={onFindRoutes}
+          >
+            <span className={styles["btn-content"]}>
+              <MapPin size={18} style={{ marginRight: "8px" }} />
               Find Your Route
             </span>
           </button>
-          <button className="btn btn-outline">
-            <span className="btn-content">
-              <Map size={18} style={{ marginRight: '8px' }} />
+          <button className={`${styles.btn} ${styles["btn-outline"]}`}>
+            <span className={styles["btn-content"]}>
+              <Map size={18} style={{ marginRight: "8px" }} />
               View Metro Guide
             </span>
           </button>
@@ -187,13 +233,17 @@ export default function Home() {
   const navigate = useNavigate();
 
   const handleFindRoutes = () => {
-    navigate('/find-routes'); // ✅ يفتح صفحة findroute.jsx
+    navigate("/findroutes");
+  };
+
+  const handleLogin = () => {
+    navigate("/login");
   };
 
   return (
-    <div className="home">
-      <main className="main-content">
-        <HeroSection onFindRoutes={handleFindRoutes} />
+    <div className={styles.home}>
+      <main className={styles["main-content"]}>
+        <HeroSection onFindRoutes={handleFindRoutes} onLogin={handleLogin} />
         <FeaturesSection />
         <WhyChooseUsSection />
         <CTASection onFindRoutes={handleFindRoutes} />
@@ -201,4 +251,3 @@ export default function Home() {
     </div>
   );
 }
-
