@@ -1,0 +1,50 @@
+[
+  {
+    "route_id":"L1",
+    "service_id":"DAILY",
+    "trip_id":"T_L1_N",
+    "trip_short_name":"Helwan - El Marg",
+    "direction_id":0,
+    "wheelchair_accessible":1
+  },
+  {
+    "route_id":"L3",
+    "service_id":"DAILY",
+    "trip_id":"T_L3_E",
+    "trip_short_name":"Attaba - Ahram",
+    "direction_id":0,
+    "wheelchair_accessible":1
+  },
+  {
+    "route_id":"L1",
+    "service_id":"DAILY",
+    "trip_id":"T_L1_S",
+    "trip_short_name":"El Marg - Helwan",
+    "direction_id":1,
+    "wheelchair_accessible":1
+  },
+  {
+    "route_id":"L3",
+    "service_id":"DAILY",
+    "trip_id":"T_L3_W",
+    "trip_short_name":"Ahram - Attaba",
+    "direction_id":1,
+    "wheelchair_accessible":1
+  },
+  {
+    "route_id":"L2",
+    "service_id":"DAILY",
+    "trip_id":"T_L2_S",
+    "trip_short_name":"El Mounib - Shobra El Kheima",
+    "direction_id":0,
+    "wheelchair_accessible":1
+  },
+  {
+    "route_id":"L2",
+    "service_id":"DAILY",
+    "trip_id":"T_L2_N",
+    "trip_short_name":"Shobra El Kheima - El Mounib",
+    "direction_id":1,
+    "wheelchair_accessible":1
+  }
+]

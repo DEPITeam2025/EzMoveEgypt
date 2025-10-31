@@ -1,0 +1,35 @@
+[
+  {
+    "route_id":"L1",
+    "agency_id":"NAT",
+    "route_short_name":"M1",
+    "route_long_name":"Metro Line 1",
+    "route_desc":"Helwan - El Marg",
+    "route_type":1,
+    "route_url":null,
+    "route_color":null,
+    "route_text_color":null
+  },
+  {
+    "route_id":"L3",
+    "agency_id":"NAT",
+    "route_short_name":"M3",
+    "route_long_name":"Metro Line 3",
+    "route_desc":"Attaba - Al Ahram",
+    "route_type":1,
+    "route_url":null,
+    "route_color":null,
+    "route_text_color":null
+  },
+  {
+    "route_id":"L2",
+    "agency_id":"NAT",
+    "route_short_name":"M2",
+    "route_long_name":"Metro Line 2",
+    "route_desc":"Shobra El Kheima - El Mounib",
+    "route_type":1,
+    "route_url":null,
+    "route_color":null,
+    "route_text_color":null
+  }
+]
