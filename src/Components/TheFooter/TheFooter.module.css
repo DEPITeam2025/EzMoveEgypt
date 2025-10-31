@@ -1,0 +1,162 @@
+.footer {
+  background-color: #ffffff; /* Assuming a white background from the image */
+  color: #000000;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+  bottom: 0;
+  width: 100%;
+  z-index: 1030;
+    border-top: 1px solid hsla(0, 0%, 0%, 0.1);
+}
+
+.logoContainer {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.iconBox {
+  width: 40px;
+  height: 40px;
+  border-radius: 9px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 0.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+.iconBox img {
+  width: 40px; 
+  height: 40px; 
+  object-fit:contain; 
+}
+
+
+.logoText {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #000000;
+}
+
+.description {
+  font-size: 0.875rem;
+  color: #6c757d; /* Light gray for description text */
+  line-height: 1.5;
+}
+
+.heading {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #000000;
+  margin-bottom: 1rem;
+}
+
+.listGroup {
+  padding-left: 0;
+}
+
+.footerLink {
+  background-color: transparent;
+  border: none;
+  padding: 0.25rem 0;
+}
+
+.linkText {
+  color: #6c757d; /* Light gray for link text */
+  text-decoration: none;
+  font-size: 0.875rem;
+}
+
+.linkText:hover {
+  color: #000000;
+  text-decoration: none;
+}
+
+.contactList {
+  display: flex;
+  flex-direction: column;
+}
+
+.contactItem {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.contactIcon {
+  color: #6c757d;
+  margin-right: 0.75rem;
+  font-size: 1rem;
+}
+
+.contactText {
+  color: #6c757d;
+  font-size: 0.875rem;
+}
+
+.divider {
+  border-top: 1px solid hsla(0, 0%, 0%, 0.4);
+  margin-top: 3rem;
+  margin-bottom: 1.5rem;
+}
+
+.copyright {
+  font-size: 0.9rem;
+  color: #6c757d;
+  margin-bottom: 0;
+}
+
+.madeWith {
+  font-size: 0.9rem;
+  color: #6c757d;
+  margin-bottom: 0;
+  margin-right: 1.5rem;
+}
+
+.heart {
+  color: #dc3545; 
+  margin: 0 0.25rem;
+  font-size: 1.5rem;
+}
+
+.languageButton {
+  background-color: transparent;
+  border: 1px solid #ced4da; 
+  border-radius: 8px;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.8rem;
+  color: #000000;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.languageButton:hover {
+background: linear-gradient(135deg, #2B7FFF 0%, #9810FA 100%);
+color: #ffffff;
+border: none;
+}
+
+/* Adjustments for Bootstrap's Row/Col spacing if needed */
+.row > [class*="col-"] {
+  padding-right: 15px;
+  padding-left: 15px;
+}
+
+.listGroup {
+  list-style: none;
+}
+
+.contactItem {
+  color: #6c757d; 
+  text-decoration: none;
+  font-size: 1.875rem; 
+  
+}
+
+.contactText:hover {
+  color: #000000;
+  text-decoration: none;
+}
+
+
