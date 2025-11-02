@@ -1,4 +1,5 @@
-import { Outlet } from "react-router";
+import { Outlet } from "react-router-dom";
+
 import TheHeader from "@/Components/TheHeader/TheHeader";
 import TheFooter from "@/Components/TheFooter/TheFooter";
 

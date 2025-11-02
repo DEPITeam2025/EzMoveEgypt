@@ -9,7 +9,7 @@ import {
 } from "react-bootstrap";
 import styles from "./SignUp.module.css";
 import SignUpSuccess from "./SignUpSuccess";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 
 // Simple email validation regex
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -132,7 +132,7 @@ const SignUp = () => {
       [field]: value,
     });
     // Clear validation error on change
-    if (!!errors[field]) {
+    if (!errors[field]) {
       setErrors({
         ...errors,
         [field]: null,
@@ -385,7 +385,7 @@ const SignUp = () => {
               variant="text"
               className="fw-bold"
               style={{ color: "#8A2BE2" }}
-              onClick={() => navigate("/login")}
+              onClick={() => navigate("/auth/login")}
             >
               Login
             </Button>
