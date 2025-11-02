@@ -8,15 +8,21 @@ import FindRoutesIcon from "./Icons/FindRoutesIcon.svg";
 import SearchTransportIcon from "./Icons/SearchTransportIcon.svg";
 import MetroGuideIcon from "./Icons/MetroGuideIcon.svg";
 
+import { useSelector, useDispatch } from "react-redux";
+import { logout } from "@/features/auth/authSlice";
+
 function TheHeader() {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const isLoggedIn = Boolean(localStorage.getItem("token"));
+
+  // ✅ خدي بيانات المستخدم من Redux
+  const { user, token } = useSelector((state) => state.auth);
+  const isLoggedIn = Boolean(token);
 
   function handleLogout() {
-    localStorage.removeItem("token");
+    dispatch(logout());
     navigate("/");
   }
-
   return (
     <Navbar expand="lg" className={styles.header}>
       <Container fluid>
@@ -78,21 +84,39 @@ function TheHeader() {
               />
               metro guide
             </Nav.Link>
+
+            <Nav.Link as={Link} to="/saveditems" className={styles.navLink}>
+              <img
+                src={MetroGuideIcon}
+                alt="Metro Guide"
+                width="18"
+                height="18"
+                className={styles.icon}
+              />
+              saved items
+            </Nav.Link>
           </Nav>
 
           <div className={styles.buttonContainer}>
             {isLoggedIn ? (
-              <Button
-                variant="outline-danger"
-                onClick={handleLogout}
-                className={styles.authButton}
+              <div
+                style={{ display: "flex", alignItems: "center", gap: "10px" }}
               >
-                Logout
-              </Button>
+                <span style={{ color: "black" }}>
+                  👋 Hello, <strong>{user?.name || "User"}</strong>
+                </span>
+                <Button
+                  variant="outline-danger"
+                  onClick={handleLogout}
+                  className={styles.authButton}
+                >
+                  Logout
+                </Button>
+              </div>
             ) : (
               <Button
                 as={Link}
-                to="/login"
+                to="/auth/login"
                 variant="primary"
                 className={styles.authButton}
               >
