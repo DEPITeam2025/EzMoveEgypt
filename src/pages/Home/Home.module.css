@@ -1,0 +1,445 @@
+.home {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-content {
+  flex: 1;
+}
+
+/* ============================================
+   HERO SECTION
+   ============================================ */
+
+.hero-section {
+  background: linear-gradient(135deg, #5b6ef5 0%, #8b5cf6 100%);
+  color: #ffffff;
+  padding: 5rem 1rem;
+}
+
+@media (min-width: 768px) {
+  .hero-section {
+    padding: 8rem 1rem;
+  }
+}
+
+.hero-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  text-align: center;
+  padding: 0 1rem;
+}
+
+@media (min-width: 1024px) {
+  .hero-container {
+    padding: 0 2rem;
+  }
+}
+
+.hero-title {
+  font-size: 2.25rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+@media (min-width: 768px) {
+  .hero-title {
+    font-size: 3rem;
+  }
+}
+
+.hero-subtitle {
+  font-size: 1.125rem;
+  color: #dbeafe;
+  margin-bottom: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .hero-subtitle {
+    font-size: 1.25rem;
+  }
+}
+
+.hero-description {
+  font-size: 1rem;
+  color: #dbeafe;
+  margin-bottom: 3rem;
+  max-width: 42rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media (min-width: 768px) {
+  .hero-description {
+    font-size: 1.125rem;
+  }
+}
+
+/* Hero Buttons */
+.hero-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  justify-content: center;
+}
+
+@media (min-width: 640px) {
+  .hero-buttons {
+    flex-direction: row;
+  }
+}
+
+/* ============================================
+   BUTTON STYLES
+   ============================================ */
+
+.btn {
+  padding: 0.75rem 2rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  display: inline-block;
+  font-size: 1rem;
+}
+
+.btn-primary {
+  background: #ffffff;
+  color: #2563eb;
+  border: 1px solid #2563eb;
+}
+
+.btn-primary:hover {
+  background-color: #f3f4f6;
+}
+
+.btn-secondary {
+  border: 2px solid #ffffff;
+  color: #ffffff;
+  background: transparent;
+}
+
+.btn-secondary:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.btn-outline {
+  border: 1px solid #d1d5db;
+  color: #374151;
+  background: transparent;
+}
+
+.btn-outline:hover {
+  background-color: #f3f4f6;
+}
+
+.btn-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+/* ============================================
+   FEATURES SECTION
+   ============================================ */
+
+.features-section {
+  padding: 5rem 1rem;
+  background-color: #f9fafb;
+}
+
+@media (min-width: 768px) {
+  .features-section {
+    padding: 8rem 1rem;
+  }
+}
+
+.features-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+@media (min-width: 1024px) {
+  .features-container {
+    padding: 0 2rem;
+  }
+}
+
+/* Section Header */
+.section-header {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.section-title {
+  font-size: 1.875rem;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 0.5rem;
+  color: #111827;
+}
+
+.section-subtitle {
+  text-align: center;
+  color: #6b7280;
+  margin-bottom: 3rem;
+  font-size: 1rem;
+}
+
+/* Features Grid */
+.features-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+@media (min-width: 768px) {
+  .features-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Feature Card */
+.feature-card {
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+  background-color: #ffffff;
+  transition: box-shadow 0.3s ease;
+}
+
+.feature-card:hover {
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Feature Icon */
+.feature-icon {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+  color: #ffffff;
+}
+
+.feature-icon.bg-blue {
+  background-color: #2563eb;
+}
+
+.feature-icon.bg-purple {
+  background-color: #7c3aed;
+}
+
+.feature-icon.bg-red {
+  background-color: #ef4444;
+}
+
+.feature-icon.bg-pink {
+  background-color: #ec4899;
+}
+
+.feature-title {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #111827;
+  margin-bottom: 0.75rem;
+}
+
+.feature-description {
+  color: #4b5563;
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+}
+
+.feature-link {
+  display: inline-block;
+  font-weight: 500;
+  transition: color 0.3s ease;
+  color: #ec4899;
+}
+
+.feature-link:hover {
+  color: #be185d;
+}
+
+.feature-link.disabled {
+  color: #d1d5db;
+  cursor: not-allowed;
+}
+
+/* ============================================
+   WHY CHOOSE US SECTION
+   ============================================ */
+
+.why-choose-section {
+  padding: 5rem 1rem;
+  background-color: #ffffff;
+}
+
+@media (min-width: 768px) {
+  .why-choose-section {
+    padding: 8rem 1rem;
+  }
+}
+
+.why-choose-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+@media (min-width: 1024px) {
+  .why-choose-container {
+    padding: 0 2rem;
+  }
+}
+
+/* Benefits Grid */
+.benefits-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+@media (min-width: 768px) {
+  .benefits-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .benefits-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Benefit Card */
+.benefit-card {
+  text-align: center;
+}
+
+.benefit-icon {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.benefit-icon div {
+  width: 4rem;
+  height: 4rem;
+  background-color: #f3f4f6;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #374151;
+}
+
+.benefit-title {
+  font-size: 1.125rem;
+  font-weight: bold;
+  color: #111827;
+  margin-bottom: 0.75rem;
+}
+
+.benefit-description {
+  color: #4b5563;
+  font-size: 0.875rem;
+}
+
+/* ============================================
+   CTA SECTION
+   ============================================ */
+
+.cta-section {
+  padding: 5rem 1rem;
+  background-color: #f9fafb;
+}
+
+@media (min-width: 768px) {
+  .cta-section {
+    padding: 8rem 1rem;
+  }
+}
+
+.cta-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  text-align: center;
+  padding: 0 1rem;
+}
+
+@media (min-width: 1024px) {
+  .cta-container {
+    padding: 0 2rem;
+  }
+}
+
+/* CTA Buttons */
+.cta-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  justify-content: center;
+}
+
+@media (min-width: 640px) {
+  .cta-buttons {
+    flex-direction: row;
+  }
+}
+
+/* ============================================
+   RESPONSIVE ADJUSTMENTS
+   ============================================ */
+
+@media (max-width: 640px) {
+  .hero-title {
+    font-size: 1.875rem;
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+  }
+
+  .btn {
+    padding: 0.625rem 1.5rem;
+    font-size: 0.95rem;
+  }
+
+  .footer-grid {
+    gap: 2rem;
+  }
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+
+.text-center {
+  text-align: center;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.gap-4 {
+  gap: 1rem;
+}
+
+.mb-4 {
+  margin-bottom: 1rem;
+}
+
+.mt-4 {
+  margin-top: 1rem;
+}
