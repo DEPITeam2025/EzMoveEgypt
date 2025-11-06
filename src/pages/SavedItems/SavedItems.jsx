@@ -1,35 +1,43 @@
-import { useSelector } from "react-redux";
-import { useEffect, useState } from "react";
+import React from "react";
+import { Outlet, NavLink } from "react-router-dom";
+import { Container } from "react-bootstrap";
+import { HeartFill } from "react-bootstrap-icons";
 
-function SavedItems() {
-  const { user } = useSelector((state) => state.auth);
-  const [items, setItems] = useState([]);
-
-  useEffect(() => {
-    if (user?.email) {
-      const saved = JSON.parse(localStorage.getItem("savedItems")) || {};
-
-      console.log("🟢 Current User Email:", user.email);
-      console.log("🟡 All Saved Items in LocalStorage:", saved);
-      console.log("🔵 Items for This User:", saved[user.email]);
-      setItems(saved[user.email] || []);
-    }
-  }, [user]);
-
+const SavedItems = () => {
   return (
-    <div>
-      <h2>Saved Items</h2>
-      {items.length === 0 ? (
-        <p>No saved items yet.</p>
-      ) : (
-        <ul>
-          {items.map((item) => (
-            <li key={item.id}>{item.name}</li>
-          ))}
-        </ul>
-      )}
-    </div>
+    <Container className="my-4">
+      <h5 className="text-danger fw-bold mb-1">
+        <HeartFill className="me-2" /> Saved Items
+      </h5>
+      <p className="text-muted">
+        Your saved transport lines and routes for quick access
+      </p>
+
+      
+      <div className="btn-group mb-4">
+        <NavLink
+          to="savedroutes"
+          className={({ isActive }) =>
+            `btn ${isActive ? "btn-primary" : "btn-outline-primary"}`
+          }
+        >
+          🚏 Saved Routes
+        </NavLink>
+
+        <NavLink
+          to="savedtransport"
+          className={({ isActive }) =>
+            `btn ${isActive ? "btn-primary" : "btn-outline-primary"}`
+          }
+        >
+          🚍 Saved Transport
+        </NavLink>
+      </div>
+
+      
+      <Outlet />
+    </Container>
   );
-}
+};
 
 export default SavedItems;
