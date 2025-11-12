@@ -8,6 +8,10 @@ import {
   DollarSign,
   AlertCircle,
 } from "lucide-react";
+import stopsData from "../../Data/metro/stops.json";
+import stoptimesData from "../../Data/metro/stop_times.json";
+import tripsData from "../../Data/metro/trips.json";
+import routesData from "../../Data/metro/routes.json";
 import MetroRouteFinder from "./MetroRouteFinder";
 import styles from "./MetroGuide.module.css";
 
@@ -123,84 +127,81 @@ function MetroLine({ line }) {
 
 // Metro Lines Section
 function MetroLinesSection() {
-  const metroLines = [
-    {
-      name: "Red Line",
-      color: "red",
-      direction: "North to South",
-      schedule: "Operating Hours: 5:00 AM - 12:00 AM",
-      frequency: "5-7 minutes during peak hours, 10-12 minutes off-peak",
-      stations: [
-        { name: "North Terminal", hasWifi: true, hasParking: true },
-        { name: "Suburban Plaza", hasWifi: true },
-        { name: "Business Park", hasWifi: true },
-        { name: "Airport Junction", hasWifi: true },
-        { name: "Medical Center", hasWifi: true },
-        { name: "University", hasWifi: true },
-        { name: "City Hall", hasWifi: true },
-        {
-          name: "Central Station",
-          note: "Interchange to Other Lines",
-          hasWifi: true,
-          hasParking: true,
-        },
-      ],
-    },
-    {
-      name: "Blue Line",
-      color: "blue",
-      direction: "East to West",
-      schedule: "Operating Hours: 5:30 AM - 11:30 PM",
-      frequency: "6-8 minutes during peak hours, 12-15 minutes off-peak",
-      stations: [
-        { name: "East End", hasWifi: true },
-        { name: "Harbor View", hasWifi: true },
-        { name: "Downtown Plaza", hasWifi: true },
-        { name: "Financial District", hasWifi: true },
-        {
-          name: "Central Station",
-          note: "Interchange to Other Lines",
-          hasWifi: true,
-          hasParking: true,
-        },
-        { name: "South Park", hasWifi: true },
-        { name: "Stadium", hasWifi: true },
-        { name: "Business Park", hasWifi: true },
-        { name: "East Terminal", hasWifi: true },
-      ],
-    },
-    {
-      name: "Green Line",
-      color: "green",
-      direction: "Southwest to Northeast",
-      schedule: "Operating Hours: 5:30 AM - 12:00 AM",
-      frequency: "7-8 minutes during peak hours, 12-15 minutes off-peak",
-      stations: [
-        { name: "South Bay", hasWifi: true },
-        { name: "Coastal Avenue", hasWifi: true },
-        { name: "Shopping District", hasWifi: true },
-        { name: "Arts Center", hasWifi: true },
-        {
-          name: "Central Station",
-          note: "Interchange to Other Lines",
-          hasWifi: true,
-          hasParking: true,
-        },
-        { name: "University", hasWifi: true },
-        { name: "Research Park", hasWifi: true },
-        { name: "Innovation Hub", hasWifi: true },
-        { name: "North Point", hasWifi: true },
-      ],
-    },
-  ];
+  const [metroLines, setMetroLines] = useState([]);
+
+  useEffect(() => {
+    // Define color mapping for Cairo Metro lines
+    const lineColors = {
+      L1: "blue", // Helwan – El Marg
+      L2: "red", // Shoubra – El Mounib
+      L3: "green", // Adly Mansour – Kit Kat
+    };
+
+    const lines = routesData.map((route) => {
+      // Get all trips (directions) for this route
+      const routeTrips = tripsData.filter(
+        (trip) => trip.route_id === route.route_id
+      );
+
+      // Use only one representative trip per direction (0 or 1)
+      const uniqueTrips = [];
+      for (const dir of [0, 1]) {
+        const trip = routeTrips.find((t) => t.direction_id === dir);
+        if (trip) uniqueTrips.push(trip);
+      }
+
+      // Gather stations from stop_times for each trip direction
+      const stations = uniqueTrips.flatMap((trip) => {
+        const stopTimes = stoptimesData
+          .filter((st) => st.trip_id === trip.trip_id)
+          .sort((a, b) => a.stop_sequence - b.stop_sequence);
+
+        return stopTimes
+          .map((st) => {
+            const stop = stopsData.find((s) => s.stop_id === st.stop_id);
+            return stop
+              ? {
+                  name: stop.stop_name,
+                  hasWifi: false,
+                  hasParking: false,
+                  direction: trip.trip_short_name,
+                  order: st.stop_sequence,
+                }
+              : null;
+          })
+          .filter(Boolean);
+      });
+
+      // Remove duplicates (same stop appearing in both directions)
+      const uniqueStations = [];
+      const seen = new Set();
+      for (const s of stations) {
+        if (!seen.has(s.name)) {
+          seen.add(s.name);
+          uniqueStations.push(s);
+        }
+      }
+
+      return {
+        name: route.route_long_name,
+        color: lineColors[route.route_id] || "gray",
+        direction: route.route_desc,
+        schedule: "Operating Hours: 5:00 AM - 12:00 AM",
+        frequency: "Every 5–10 minutes",
+        stations: uniqueStations,
+      };
+    });
+
+    setMetroLines(lines);
+  }, []);
 
   return (
     <section className={styles["metro-lines-section"]}>
       <div className={styles.container}>
         <div className={styles["section-header"]}>
-          <h2 className={styles["section-title"]}>Metro Network</h2>
+          <h2 className={styles["section-title"]}>Cairo Metro Network</h2>
           <p className={styles["section-subtitle"]}>
-            Explore all metro lines and their stations
+            Explore all Cairo Metro lines and their stations
           </p>
         </div>
 
