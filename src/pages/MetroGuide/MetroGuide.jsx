@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import styles from "./MetroGuide.module.css";
+import React, { useState, useEffect } from "react";
 import {
   MapPin,
   Clock,
@@ -9,6 +8,8 @@ import {
   DollarSign,
   AlertCircle,
 } from "lucide-react";
+import MetroRouteFinder from "./MetroRouteFinder";
+import styles from "./MetroGuide.module.css";
 
 // Metro Overview Component
 function MetroOverview() {
@@ -265,6 +266,7 @@ export default function MetroGuide() {
   return (
     <div className={styles["metro-guide"]}>
       <main className={styles["main-content"]}>
+        <MetroRouteFinder />
         <MetroOverview />
         <MetroLinesSection />
         <FaresTicketsSection />
