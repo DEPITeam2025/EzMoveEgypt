@@ -215,52 +215,7 @@ function MetroLinesSection() {
   );
 }
 
-// Fares & Tickets Section
-function FaresTicketsSection() {
-  const fares = [
-    { type: "Single Journey", price: "$2.50" },
-    { type: "Day Pass", price: "$8.00" },
-    { type: "Monthly Pass", price: "$75.00" },
-  ];
 
-  return (
-    <section className={styles["fares-section"]}>
-      <div className={styles.container}>
-        <div className={styles["fares-grid"]}>
-          <div className={styles["fares-column"]}>
-            <div className={styles["fares-header"]}>
-              <DollarSign size={24} />
-              <h3 className={styles["fares-title"]}>Fares & Tickets</h3>
-            </div>
-            <div className={styles["fares-list"]}>
-              {fares.map((fare, index) => (
-                <div key={index} className={styles["fare-item"]}>
-                  <p className={styles["fare-type"]}>{fare.type}</p>
-                  <p className={styles["fare-price"]}>{fare.price}</p>
-                </div>
-              ))}
-            </div>
-            <button className={styles["btn-purchase"]}>Purchase Tickets</button>
-          </div>
-
-          <div className={styles["info-column"]}>
-            <div className={styles["info-header"]}>
-              <AlertCircle size={24} />
-              <h3 className={styles["info-title"]}>Important Information</h3>
-            </div>
-            <ul className={styles["info-list"]}>
-              <li>All stations are equipped with accessible facilities</li>
-              <li>Keep your ticket until the end of your journey</li>
-              <li>Trains are frequent during peak hours (7-9 AM & 5-7 PM)</li>
-              <li>Service may be adjusted on public holidays</li>
-              <li>WiFi available at all major stations</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
 
 // Main Component
 export default function MetroGuide() {
@@ -270,7 +225,6 @@ export default function MetroGuide() {
         <MetroRouteFinder />
         <MetroOverview />
         <MetroLinesSection />
-        <FaresTicketsSection />
       </main>
     </div>
   );
