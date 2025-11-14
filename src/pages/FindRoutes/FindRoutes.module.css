@@ -115,8 +115,32 @@
     /* Green */
 }
 
+/* Select Options Fix - Alternative Approach */
+.selectContainer {
+    /* Add a class to the parent div to apply the fix */
+    overflow: hidden;
+}
+
+.selectContainer select {
+    /* This is often the only way to force the select width */
+    width: 100%;
+}
+
+/* React-Select Customizations */
+/* This ensures the dropdown menu width is the same as the control width */
+.react-select__menu {
+    width: 100%;
+    min-width: 100%;
+    /* Add max-width to prevent overflow in case of very long options */
+    max-width: 100%;
+    /* Ensure the options themselves don't force the menu wider */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 /* Other transport lines */
 .otherLine {
-    background-color: #ff9800;
+    background-color: #6967f3;
     /* Orange for bus/minibus */
 }

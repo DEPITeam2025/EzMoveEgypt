@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
+import Select from "react-select";
 import graphData from "../../Data/graph.json";
 import { findShortestPath } from "../../utils/dijkstra";
 import styles from "./FindRoutes.module.css";
@@ -9,6 +10,18 @@ export default function FindRoutes() {
   const [result, setResult] = useState(null);
 
   const stops = Object.values(graphData.nodes);
+
+  const selectOptions = useMemo(() => {
+    return stops.map((s) => ({
+      value: s.id,
+      label: s.name,
+    }));
+  }, [stops]);
+
+  const startValue = selectOptions.find((option) => option.value === start);
+  const endValue = selectOptions.find((option) => option.value === end);
+
+
 
   const handleSearch = () => {
     if (!start || !end) return;
@@ -30,33 +43,25 @@ export default function FindRoutes() {
 
       <div className="row g-3 mb-4">
         <div className="col-md-4">
-          <select
-            className="form-select"
-            value={start}
-            onChange={(e) => setStart(e.target.value)}
-          >
-            <option value="">Select Start Stop</option>
-            {stops.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.name}
-              </option>
-            ))}
-          </select>
+          <Select
+            classNamePrefix="react-select"
+            value={startValue}
+            onChange={(selectedOption) => setStart(selectedOption ? selectedOption.value : "")}
+            options={selectOptions}
+            placeholder="Select Start Stop"
+            isClearable={true}
+          />
         </div>
 
         <div className="col-md-4">
-          <select
-            className="form-select"
-            value={end}
-            onChange={(e) => setEnd(e.target.value)}
-          >
-            <option value="">Select Destination Stop</option>
-            {stops.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.name}
-              </option>
-            ))}
-          </select>
+          <Select
+            classNamePrefix="react-select"
+            value={endValue}
+            onChange={(selectedOption) => setEnd(selectedOption ? selectedOption.value : "")}
+            options={selectOptions}
+            placeholder="Select Destination Stop"
+            isClearable={true}
+          />
         </div>
 
         <div className="col-md-4">
