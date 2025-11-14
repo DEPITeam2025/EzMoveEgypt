@@ -1,109 +1,145 @@
 import React, { useState } from "react";
-import "./FindRoutes.css";
+import graphData from "../../Data/graph.json";
+import { findShortestPath } from "../../utils/dijkstra";
+import styles from "./FindRoutes.module.css";
 
-function FindRoutes() {
-  const [searchDone, setSearchDone] = useState(false);
+export default function FindRoutes() {
+  const [start, setStart] = useState("");
+  const [end, setEnd] = useState("");
+  const [result, setResult] = useState(null);
+
+  const stops = Object.values(graphData.nodes);
 
   const handleSearch = () => {
-    setSearchDone(true);
+    if (!start || !end) return;
+    const res = findShortestPath(graphData, start, end);
+    setResult(res);
   };
 
-  const handleBack = () => {
-    setSearchDone(false);
+  const getLineColor = (line) => {
+    if (!line) return styles.otherLine;
+    if (line.includes("Line 1")) return styles.line1;
+    if (line.includes("Line 2")) return styles.line2;
+    if (line.includes("Line 3")) return styles.line3;
+    return styles.otherLine;
   };
 
   return (
-    <div className="find-routes-container">
-      {!searchDone ? (
-        // الحالة الأولى: قبل البحث
-        <div className="find-routes-main">
-          <h2 className="title">Easy way to look for available routes</h2>
+    <div className={`container mt-5 ${styles.container}`}>
+      <h2 className="text-center mb-4">🗺️ Cairo Route Finder</h2>
 
-          <div className="info-cards">
-            <div className="info-card blue">
-              <span>📍</span>
-              <p>Choose your starting point and destination</p>
-            </div>
-            <div className="info-card purple">
-              <span>🔀</span>
-              <p>Compare different route options</p>
-            </div>
-            <div className="info-card yellow">
-              <span>⚡</span>
-              <p>Find out the fastest and cheapest route</p>
-            </div>
-          </div>
-
-          <div className="search-box">
-            <div className="input-row">
-              <label>Current Location</label>
-              <input type="text" placeholder="Enter your current location" />
-            </div>
-            <div className="input-row">
-              <label>Destination</label>
-              <input type="text" placeholder="Enter your destination" />
-            </div>
-            <button className="find-btn" onClick={handleSearch}>
-              🔍 Find Routes
-            </button>
-          </div>
+      <div className="row g-3 mb-4">
+        <div className="col-md-4">
+          <select
+            className="form-select"
+            value={start}
+            onChange={(e) => setStart(e.target.value)}
+          >
+            <option value="">Select Start Stop</option>
+            {stops.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.name}
+              </option>
+            ))}
+          </select>
         </div>
-      ) : (
-        // الحالة الثانية: بعد البحث
-        <div className="results-section">
-          <div className="results-header">
-            <h3>Available Routes from Downtown to Airport</h3>
-            <button className="back-btn" onClick={handleBack}>
-              🔄 Find Another Routes
-            </button>
-          </div>
 
-          <div className="stats">
-            <div className="stat-card">
-              <p>Fastest</p>
-              <h4>35m</h4>
-            </div>
-            <div className="stat-card">
-              <p>Cheapest</p>
-              <h4>$2.00</h4>
-            </div>
-            <div className="stat-card">
-              <p>Avg Time</p>
-              <h4>42m</h4>
-            </div>
-          </div>
-
-          <div className="route-card">
-            <div className="route-header">
-              <span>🚇 35 min • 12.5 km</span>
-              <span>$2.50</span>
-            </div>
-            <ul>
-              <li>Walk 5 min → Central Station</li>
-              <li>Metro Red Line (18 min, 8 stops)</li>
-              <li>Walk 3 min → Bus stop</li>
-              <li>Bus 42 (9 min, 5 stops)</li>
-            </ul>
-            <button className="save-btn">❤️ Saved</button>
-          </div>
-          <div className="route-card">
-            <div className="route-header">
-              <span>🚈 42 min • 10.8 km</span>
-              <span>$2.00</span>
-            </div>
-            <ul>
-              <li>Walk 4 min → Oak Avenue</li>
-              <li>Minibus M7 (12 min, 6 stops)</li>
-              <li>Light Rail Green Line (20 min, 10 stops)</li>
-              <li>Walk 4 min → destination</li>
-            </ul>
-            <button className="save-btn">♡ Save</button>
-          </div>
+        <div className="col-md-4">
+          <select
+            className="form-select"
+            value={end}
+            onChange={(e) => setEnd(e.target.value)}
+          >
+            <option value="">Select Destination Stop</option>
+            {stops.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.name}
+              </option>
+            ))}
+          </select>
         </div>
+
+        <div className="col-md-4">
+          <button
+            onClick={handleSearch}
+            className="btn btn-primary w-100 fw-bold"
+          >
+            Find Route
+          </button>
+        </div>
+      </div>
+
+      {result && (
+        <>
+          {/* --- Summary Section --- */}
+          <div className={styles.summary}>
+            <div className={styles.summaryIcons}>
+              {result.summary.map((seg, idx) => (
+                <div
+                  key={idx}
+                  className={`${styles.summaryIcon} ${getLineColor(seg.line)}`}
+                >
+                  {seg.mode === "metro" ? "🚇" : "🚌"}
+                </div>
+              ))}
+            </div>
+            <div className={styles.summaryText}>
+              {result.summary.map((seg, idx) => (
+                <span
+                  key={idx}
+                  className={`${styles.lineTag} ${getLineColor(seg.line)}`}
+                >
+                  {seg.mode === "metro"
+                    ? seg.line
+                    : seg.line
+                    ? `${seg.line}`
+                    : "Bus"}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* --- Detailed Route --- */}
+          <div className="mt-4">
+            {result.summary.map((seg, idx) => (
+              <div key={idx} className={styles.segment}>
+                <div className={`${styles.icon} ${getLineColor(seg.line)}`}>
+                  {seg.mode === "metro" ? "🚇" : "🚌"}
+                </div>
+                <div className={styles.segmentInfo}>
+                  <div className="fw-bold">
+                    {seg.mode === "metro" ? "Metro" : "Bus"}{" "}
+                    <span
+                      className={`${styles.lineName} ${getLineColor(seg.line)}`}
+                    >
+                      {seg.line}
+                    </span>{" "}
+                    • {seg.stops} stops
+                  </div>
+                  <div className="text-muted small">
+                    Take {seg.line} towards {seg.direction || "destination"}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* --- Stop-by-stop List --- */}
+          <div className={`mt-4 ${styles.detailedList}`}>
+            {result.path.map((step, idx) => {
+              const lineColor = getLineColor(step.line_name);
+              return (
+                <div key={idx} className={styles.stopItem}>
+                  <div className={`${styles.stopBullet} ${lineColor}`}></div>
+                  <div className={styles.stopText}>
+                    {graphData.nodes[step.to]?.name}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </>
       )}
     </div>
   );
 }
-
-export default FindRoutes;
-
