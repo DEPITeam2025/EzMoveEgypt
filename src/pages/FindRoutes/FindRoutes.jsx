@@ -76,34 +76,6 @@ export default function FindRoutes() {
 
       {result && (
         <>
-          {/* --- Summary Section --- */}
-          <div className={styles.summary}>
-            <div className={styles.summaryIcons}>
-              {result.summary.map((seg, idx) => (
-                <div
-                  key={idx}
-                  className={`${styles.summaryIcon} ${getLineColor(seg.line)}`}
-                >
-                  {seg.mode === "metro" ? "🚇" : "🚌"}
-                </div>
-              ))}
-            </div>
-            <div className={styles.summaryText}>
-              {result.summary.map((seg, idx) => (
-                <span
-                  key={idx}
-                  className={`${styles.lineTag} ${getLineColor(seg.line)}`}
-                >
-                  {seg.mode === "metro"
-                    ? seg.line
-                    : seg.line
-                    ? `${seg.line}`
-                    : "Bus"}
-                </span>
-              ))}
-            </div>
-          </div>
-
           {/* --- Detailed Route --- */}
           <div className="mt-4">
             {result.summary.map((seg, idx) => (
