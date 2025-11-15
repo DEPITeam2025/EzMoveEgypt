@@ -14,26 +14,19 @@ import {
 } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-// ----------------------------------------------------
-// *** 1. استيراد ودمج جميع بيانات GTFS ***
-// (يجب تعديل مسارات الاستيراد لتناسب هيكلة مشروعك)
-// ----------------------------------------------------
-
-// بيانات النقل العام (الحافلات/الميكروباص)
+//Buses data import
 import busRoutesData from '/src/Data/bus/routes.json';
 import busTripsData from '/src/Data/bus/trips.json';
 import busStopTimesData from '/src/Data/bus/stop_times.json';
 import busStopsData from '/src/Data/bus/stops.json';
 
-// بيانات المترو
+//Metro data import
 import metroRoutesData from '/src/Data/metro/routes.json';
 import metroTripsData from '/src/Data/metro/trips.json';
 import metroStopTimesData from '/src/Data/metro/stop_times.json';
 import metroStopsData from '/src/Data/metro/stops.json';
 
-// ----------------------------------------------------
-// --- 2. دالة مساعدة لربط بيانات الخطوط والمحطات (Helper Functions) ---
-// ----------------------------------------------------
+// (Helper Functions) 
 const allRoutesData = [...busRoutesData, ...metroRoutesData];
 const allTripsData = [...busTripsData, ...metroTripsData];
 const allStopTimesData = [...busStopTimesData, ...metroStopTimesData];
@@ -44,9 +37,7 @@ const getRouteTypeColor = (routeType) => {
   return routeType === 1 ? "danger" : "primary";
 };
 
-/**
- * دالة البحث عن تفاصيل مسار الخط (كما تم إنشاؤها سابقاً)
- */
+//search for route details by line number
 const findRouteDetails = (lineNumber) => {
   const normalizedLineNumber = lineNumber.toUpperCase().trim();
   const route = allRoutesData.find(
@@ -114,9 +105,7 @@ const findRouteDetails = (lineNumber) => {
   };
 };
 
-/**
- * دالة مساعدة للبحث عن الخطوط التي تخدم محطة معينة
- */
+//دالة البحث بالمنطقة
 const findRoutesByStopName = (areaName) => {
   const normalizedAreaName = areaName.toLowerCase().trim();
 
@@ -158,10 +147,10 @@ const findRoutesByStopName = (areaName) => {
 };
 
 // ----------------------------------------------------
-// --- 3. المكون الرئيسي: SearchForTransport ---
+//  SearchForTransport 
 // ----------------------------------------------------
 function SearchForTransport() {
-  // حالة التبويب النشط وحالة البحث برقم الخط (كما في السابق)
+
   const [activeKey, setActiveKey] = useState("number");
   const [lineNumber, setLineNumber] = useState("");
   const [searchResults, setSearchResults] = useState(null);
@@ -189,7 +178,7 @@ function SearchForTransport() {
     }
   };
 
-  // دالة البحث بالمنطقة (الجديدة)
+  // دالة البحث بالمنطقة
   const handleAreaSearch = (e) => {
     e.preventDefault();
     setAreaError("");
@@ -208,10 +197,7 @@ function SearchForTransport() {
       setAreaError(`No lines found serving an area matching: ${areaName}`);
     }
   };
-
-  // ----------------------------------------------------
-  // --- 4. دالة عرض تفاصيل المسار (BusRouteDetails) --- (كما في السابق)
-  // ----------------------------------------------------
+//BusRouteDetails Component
   const renderBusRouteDetails = (route) => {
     const { name, stops, isMetro } = route;
     const startStop = stops[0]?.name || "Unknown Start";
@@ -270,13 +256,11 @@ function SearchForTransport() {
     );
   };
 
-  // ----------------------------------------------------
-  // --- 5. محتوى البحث برقم الخط (SearchByNumber Component) ---
-  // ----------------------------------------------------
+  //SearchByNumber Component
   const renderSearchByNumber = () => (
     <Card className="p-4 shadow">
       <Form onSubmit={handleLineSearch}>
-        {/* ... حقل البحث والزر كما في السابق ... */}
+        {/* ... مكان البحث والزر كما في السابق ... */}
         <Row className="align-items-center">
           <Col xs={12} md={8}>
             <Form.Group controlId="formLineNumber" className="mb-3 mb-md-0">
@@ -310,9 +294,7 @@ function SearchForTransport() {
     </Card>
   );
 
-  // ----------------------------------------------------
-  // --- 6. محتوى البحث بالمنطقة (SearchByArea Component) --- (المكون الجديد)
-  // ----------------------------------------------------
+  // SearchByArea Component
   const renderSearchByArea = () => (
     <Card className="p-4 shadow">
       <h4 className="text-success">Search By Area (Stops Match)</h4>
@@ -371,9 +353,7 @@ function SearchForTransport() {
     </Card>
   );
 
-  // ----------------------------------------------------
-  // --- 7. الهيكل الرئيسي للمكون (Return Statement) --- (كما في السابق)
-  // ----------------------------------------------------
+  // Return Statement
   return (
     <Container className="my-5">
       <h2 className="text-center mb-5 text-dark">
