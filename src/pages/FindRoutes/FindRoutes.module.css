@@ -1,0 +1,146 @@
+.container {
+    background: #fff;
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.summary {
+    display: flex;
+    align-items: center;
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 1rem;
+    gap: 1rem;
+}
+
+.summaryIcons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.summaryIcon {
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    color: white;
+    font-size: 16px;
+}
+
+.summaryText {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.lineTag {
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 14px;
+    color: white;
+}
+
+.segment {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 18px;
+    margin-right: 0.8rem;
+}
+
+.segmentInfo {
+    flex: 1;
+}
+
+.lineName {
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: white;
+    font-size: 13px;
+    margin-left: 4px;
+}
+
+/* Stop-by-stop list */
+.detailedList {
+    border-left: 2px solid #ccc;
+    margin-left: 1.5rem;
+    padding-left: 1.2rem;
+}
+
+.stopItem {
+    display: flex;
+    align-items: center;
+    margin: 0.4rem 0;
+}
+
+.stopBullet {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 0.6rem;
+}
+
+.stopText {
+    font-size: 14px;
+}
+
+/* Line colors */
+.line1 {
+    background-color: #007bff;
+    /* Blue */
+}
+
+.line2 {
+    background-color: #dc3545;
+    /* Red */
+}
+
+.line3 {
+    background-color: #28a745;
+    /* Green */
+}
+
+/* Select Options Fix - Alternative Approach */
+.selectContainer {
+    /* Add a class to the parent div to apply the fix */
+    overflow: hidden;
+}
+
+.selectContainer select {
+    /* This is often the only way to force the select width */
+    width: 100%;
+}
+
+/* React-Select Customizations */
+/* This ensures the dropdown menu width is the same as the control width */
+.react-select__menu {
+    width: 100%;
+    min-width: 100%;
+    /* Add max-width to prevent overflow in case of very long options */
+    max-width: 100%;
+    /* Ensure the options themselves don't force the menu wider */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Other transport lines */
+.otherLine {
+    background-color: #6967f3;
+    /* Orange for bus/minibus */
+}

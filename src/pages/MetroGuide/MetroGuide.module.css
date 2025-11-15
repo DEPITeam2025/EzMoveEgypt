@@ -1,0 +1,801 @@
+/* ============================================
+   CONTAINER & LAYOUT
+   ============================================ */
+
+.container {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+@media (min-width: 640px) {
+  .container {
+    padding: 0 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    padding: 0 2rem;
+  }
+}
+
+.metro-guide {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-content {
+  flex: 1;
+}
+
+
+/* ============================================
+   METRO OVERVIEW SECTION
+   ============================================ */
+
+.metro-overview {
+  padding: 3rem 1rem;
+  background-color: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+@media (min-width: 768px) {
+  .metro-overview {
+    padding: 4rem 1rem;
+  }
+}
+
+.page-title {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #111827;
+  margin-bottom: 0.5rem;
+}
+
+@media (min-width: 768px) {
+  .page-title {
+    font-size: 2.5rem;
+  }
+}
+
+.page-subtitle {
+  color: #6b7280;
+  margin-bottom: 2rem;
+  font-size: 1rem;
+}
+
+/* Overview Cards */
+.overview-cards {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .overview-cards {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.overview-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  background-color: #ffffff;
+  border-radius: 0.75rem;
+  border: 1px solid #e5e7eb;
+}
+
+.overview-icon {
+  width: 3rem;
+  height: 3rem;
+  background-color: #f3f4f6;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #374151;
+  font-weight: bold;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.icon-number {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #5b6ef5;
+}
+
+.overview-label {
+  color: #6b7280;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+/* ============================================
+   METRO LINES SECTION
+   ============================================ */
+
+.metro-lines-section {
+  padding: 3rem 1rem;
+}
+
+@media (min-width: 768px) {
+  .metro-lines-section {
+    padding: 4rem 1rem;
+  }
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.section-title {
+  font-size: 1.875rem;
+  font-weight: bold;
+  color: #111827;
+  margin-bottom: 0.5rem;
+}
+
+.section-subtitle {
+  color: #6b7280;
+  font-size: 1rem;
+}
+
+/* Metro Lines List */
+.metro-lines-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Metro Line */
+.metro-line {
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  background-color: #ffffff;
+  transition: box-shadow 0.3s ease;
+}
+
+.metro-line:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.metro-line-red {
+  border-top: 4px solid #ef4444;
+}
+
+.metro-line-blue {
+  border-top: 4px solid #3b82f6;
+}
+
+.metro-line-green {
+  border-top: 4px solid #10b981;
+}
+
+/* Line Header */
+.line-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem;
+  background-color: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.line-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  flex: 1;
+}
+
+.line-badge {
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+.line-badge.red {
+  background-color: #ef4444;
+}
+
+.line-badge.blue {
+  background-color: #3b82f6;
+}
+
+.line-badge.green {
+  background-color: #10b981;
+}
+
+.line-details {
+  flex: 1;
+}
+
+.line-direction {
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 0.25rem;
+}
+
+.line-schedule {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-bottom: 0.25rem;
+}
+
+.line-frequency {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.expand-btn {
+  background: none;
+  color: #6b7280;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.3s ease;
+  border: none;
+}
+
+.expand-btn:hover {
+  color: #111827;
+}
+
+/* Line Content */
+.line-content {
+  padding: 1.5rem;
+}
+
+.stations-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.stations-title {
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 0.5rem;
+}
+
+.stations-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.station-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem;
+  background-color: #f9fafb;
+  border-radius: 0.5rem;
+  transition: background-color 0.3s ease;
+}
+
+.station-item:hover {
+  background-color: #f3f4f6;
+}
+
+.station-badge {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.station-badge.red {
+  background-color: #ef4444;
+}
+
+.station-badge.blue {
+  background-color: #3b82f6;
+}
+
+.station-badge.green {
+  background-color: #10b981;
+}
+
+.station-info {
+  flex: 1;
+}
+
+.station-name {
+  font-weight: 500;
+  color: #111827;
+  font-size: 0.95rem;
+}
+
+.station-note {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-top: 0.25rem;
+}
+
+.station-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.action-badge {
+  font-size: 0.75rem;
+  background-color: #e5e7eb;
+  color: #374151;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  white-space: nowrap;
+}
+
+/* ============================================
+   FARES & TICKETS SECTION
+   ============================================ */
+
+.fares-section {
+  padding: 3rem 1rem;
+  background-color: #f9fafb;
+}
+
+@media (min-width: 768px) {
+  .fares-section {
+    padding: 4rem 1rem;
+  }
+}
+
+.fares-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+@media (min-width: 768px) {
+  .fares-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* Fares Column */
+.fares-column {
+  background-color: #ffffff;
+  padding: 2rem;
+  border-radius: 0.75rem;
+  border: 1px solid #e5e7eb;
+}
+
+.fares-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  color: #111827;
+}
+
+.fares-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.fares-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.fare-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background-color: #f9fafb;
+  border-radius: 0.5rem;
+}
+
+.fare-type {
+  color: #374151;
+  font-weight: 500;
+}
+
+.fare-price {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.btn-purchase {
+  width: 100%;
+  padding: 0.75rem 1.5rem;
+  background-color: #111827;
+  color: #ffffff;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+}
+
+.btn-purchase:hover {
+  background-color: #374151;
+}
+
+/* Info Column */
+.info-column {
+  background-color: #ffffff;
+  padding: 2rem;
+  border-radius: 0.75rem;
+  border: 1px solid #e5e7eb;
+}
+
+.info-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  color: #111827;
+}
+
+.info-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.info-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.info-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  color: #374151;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.info-list li::before {
+  content: '✓';
+  color: #10b981;
+  font-weight: bold;
+  flex-shrink: 0;
+  margin-top: 0.125rem;
+}
+
+/* ============================================
+   FOOTER STYLES
+   ============================================ */
+
+.footer {
+  background-color: #111827;
+  color: #d1d5db;
+  padding: 4rem 1rem;
+  margin-top: 3rem;
+}
+
+.footer-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+@media (min-width: 1024px) {
+  .footer-container {
+    padding: 0 2rem;
+  }
+}
+
+/* Footer Grid */
+.footer-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 3rem;
+  margin-bottom: 3rem;
+}
+
+@media (min-width: 768px) {
+  .footer-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .footer-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Footer Section */
+.footer-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.footer-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.footer-logo .logo-icon {
+  width: 2rem;
+  height: 2rem;
+  background: linear-gradient(135deg, #7c3aed 0%, #5b6ef5 100%);
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-weight: bold;
+  font-size: 1.125rem;
+}
+
+.footer-logo .logo-text {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #ffffff;
+}
+
+.footer-description {
+  font-size: 0.875rem;
+  color: #9ca3af;
+  line-height: 1.6;
+}
+
+.footer-title {
+  color: #ffffff;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+/* Footer Links */
+.footer-links {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.footer-links a {
+  color: #d1d5db;
+  transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+  color: #ffffff;
+}
+
+/* Footer Contact */
+.footer-contact {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  font-size: 0.875rem;
+}
+
+.contact-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.contact-item a {
+  color: #d1d5db;
+  transition: color 0.3s ease;
+}
+
+.contact-item a:hover {
+  color: #ffffff;
+}
+
+/* Footer Bottom */
+.footer-bottom {
+  border-top: 1px solid #374151;
+  padding-top: 2rem;
+}
+
+.footer-bottom-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 0.875rem;
+}
+
+@media (min-width: 768px) {
+  .footer-bottom-content {
+    flex-direction: row;
+  }
+}
+
+.footer-text {
+  color: #9ca3af;
+}
+
+.heart {
+  color: #ef4444;
+}
+
+.footer-language {
+  display: flex;
+  gap: 1rem;
+}
+
+.language-select {
+  background-color: #1f2937;
+  color: #d1d5db;
+  font-size: 0.875rem;
+  border-radius: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  border: 1px solid #374151;
+  transition: border-color 0.3s ease;
+}
+
+.language-select:hover {
+  border-color: #4b5563;
+}
+
+/* ============================================
+   RESPONSIVE ADJUSTMENTS
+   ============================================ */
+
+@media (max-width: 640px) {
+  .page-title {
+    font-size: 1.5rem;
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+  }
+
+  .line-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .line-info {
+    width: 100%;
+  }
+
+  .expand-btn {
+    align-self: flex-start;
+    margin-top: 0.5rem;
+  }
+
+  .station-item {
+    flex-wrap: wrap;
+  }
+
+  .station-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .fares-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .footer-grid {
+    gap: 2rem;
+  }
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+
+.text-center {
+  text-align: center;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.gap-4 {
+  gap: 1rem;
+}
+
+.mb-4 {
+  margin-bottom: 1rem;
+}
+
+.mt-4 {
+  margin-top: 1rem;
+}
+
+.summaryBox {
+  background: #f8f9fa;
+  border-left: 5px solid #0d6efd;
+  border-radius: 8px;
+}
+
+.routeContainer {
+  background-color: #f8f9fa;
+  position: relative;
+  overflow: hidden;
+}
+
+.stopRow {
+  position: relative;
+  padding: 10px 0;
+  border-left: 3px solid #ccc;
+  margin-left: 15px;
+}
+
+.stopRow:last-child {
+  border-left: none;
+}
+
+.lineCircle {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* === Metro Line Colors === */
+.line1 {
+  background-color: #007bff;
+  /* Blue */
+  border-left-color: #007bff;
+}
+
+.line2 {
+  background-color: #dc3545;
+  /* Red */
+  border-left-color: #dc3545;
+}
+
+.line3 {
+  background-color: #28a745;
+  /* Green */
+  border-left-color: #28a745;
+}
+
+.transfer {
+  font-size: 0.9rem;
+  background-color: #eef5ff;
+  border-radius: 6px;
+  padding: 6px;
+  margin-left: 2rem;
+  margin-right: 2rem;
+}
+
+.dropdownList {
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.dropdownList li {
+  cursor: pointer;
+}
+
+.dropdownList li:hover {
+  background-color: #f1f1f1;
+}
