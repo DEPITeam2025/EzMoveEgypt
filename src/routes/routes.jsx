@@ -1,21 +1,21 @@
 import { createBrowserRouter } from "react-router-dom";
 
 // ✅ الصفحات
-import Home from "@/Pages/Home/Home";
-import MetroGuide from "@/Pages/MetroGuide/MetroGuide";
-import Login from "@/Pages/Login/Login";
-import SignUp from "@/Pages/SignUp/SignUp";
-import FindRoutes from "@/Pages/FindRoutes/FindRoutes";
-import SearchForTransport from "@/Pages/SearchForTransport/SearchForTransport";
-import SavedItems from "@/Pages/SavedItems/SavedItems";
-import SavedRoutes from "@/Pages/SavedItems/SavedRoutes";
-import SavedTransport from "@/Pages/SavedItems/SavedTransport";
-import ForgotPassword from "@/Pages/ForgotPassword/ForgotPassword";
-import ResetPassword from "@/Pages/ForgotPassword/ResetPasword";
+import Home from "@/pages/Home/Home";
+import MetroGuide from "@/pages/MetroGuide/MetroGuide";
+import Login from "@/pages/Login/Login";
+import SignUp from "@/pages/SignUp/SignUp";
+import FindRoutes from "@/pages/FindRoutes/FindRoutes";
+import SearchForTransport from "@/pages/SearchForTransport/SearchForTransport";
+import SavedItems from "@/pages/SavedItems/SavedItems";
+import SavedRoutes from "@/pages/SavedItems/SavedRoutes";
+import SavedTransport from "@/pages/SavedItems/SavedTransport";
+import ForgotPassword from "@/pages/ForgotPassword/ForgotPassword";
+import ResetPassword from "@/pages/ForgotPassword/ResetPasword";
 
 // ✅ الـ Layouts
-import MainLayout from "@/Layout/MainLayout/MainLayout";
-import AuthLayout from "@/Layout/AuthLayout/AuthLayout";
+import MainLayout from "@/layout/mainLayout/mainLayout";
+import AuthLayout from "@/layout/authLayout/authLayout";
 
 const router = createBrowserRouter([
   {
