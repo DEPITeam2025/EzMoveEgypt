@@ -2,6 +2,7 @@ import React from "react";
 import { Container, Row, Col, ListGroup } from "react-bootstrap";
 import { Envelope, GeoAlt, Github, Translate } from "react-bootstrap-icons";
 import styles from "./TheFooter.module.css";
+import { Link } from "react-router-dom";
 
 const getLinkPath = (text) => {
   switch (text) {
@@ -30,7 +31,7 @@ const getLinkPath = (text) => {
 const EzmoveLogo = () => (
   <div className={styles.logoContainer}>
     <div className={styles.iconBox}>
-      <img src="/src/assets/images/LogoFooter.png" alt="Ezmove Logo" />
+      <img src="ezmove-logo.svg" alt="Ezmove Logo" />
     </div>
     <span className={styles.logoText}>Ezmove</span>
   </div>
@@ -38,9 +39,9 @@ const EzmoveLogo = () => (
 
 const FooterLink = ({ children }) => (
   <ListGroup.Item as="li" className={styles.footerLink}>
-    <a href={getLinkPath(children)} className={styles.linkText}>
+    <Link to={getLinkPath(children)} className={styles.linkText}>
       {children}
-    </a>
+    </Link>
   </ListGroup.Item>
 );
 
@@ -97,15 +98,15 @@ const TheFooter = () => {
           <Col xs={12} sm={6} md={3}>
             <h5 className={styles.heading}>Contact</h5>
             <div className={styles.contactList}>
-                <ContactItem
+              <ContactItem
                 Icon={Envelope}
                 text="support@ezmove.com"
                 href="mailto:support@ezmove.com"
               />
-                <ContactItem
+              <ContactItem
                 Icon={GeoAlt}
                 text="123 Transit Ave, City"
-                href="#" 
+                href="#"
               />
               <ContactItem
                 Icon={Github}
@@ -131,8 +132,8 @@ const TheFooter = () => {
             className="d-flex justify-content-md-end justify-content-start "
           >
             <p className={styles.madeWith}>
-              Made with<span className={styles.heart}>&hearts;</span>for
-              better commuting
+              Made with<span className={styles.heart}>&hearts;</span>for better
+              commuting
             </p>
           </Col>
           <Col
