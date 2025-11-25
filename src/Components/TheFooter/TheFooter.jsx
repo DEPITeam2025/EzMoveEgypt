@@ -2,6 +2,7 @@ import React from "react";
 import { Container, Row, Col, ListGroup } from "react-bootstrap";
 import { Envelope, GeoAlt, Github, Translate } from "react-bootstrap-icons";
 import styles from "./TheFooter.module.css";
+import { Link } from "react-router-dom";
 
 const getLinkPath = (text) => {
   switch (text) {
@@ -29,7 +30,7 @@ const getLinkPath = (text) => {
 const EzmoveLogo = () => (
   <div className={styles.logoContainer}>
     <div className={styles.iconBox}>
-      <img src="/src/assets/images/LogoFooter.png" alt="Ezmove Logo" />
+      <img src="ezmove-logo.svg" alt="Ezmove Logo" />
     </div>
     <span className={styles.logoText}>Ezmove</span>
   </div>
@@ -37,9 +38,9 @@ const EzmoveLogo = () => (
 
 const FooterLink = ({ children }) => (
   <ListGroup.Item as="li" className={styles.footerLink}>
-    <a href={getLinkPath(children)} className={styles.linkText}>
+    <Link to={getLinkPath(children)} className={styles.linkText}>
       {children}
-    </a>
+    </Link>
   </ListGroup.Item>
 );
 
