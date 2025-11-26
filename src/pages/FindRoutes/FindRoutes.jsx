@@ -142,9 +142,9 @@ export default function FindRoutes() {
       {/* Main Route */}
       {routes.map((route, idx) => (
         <Card key={idx} className="mb-3 shadow-sm p-3 border-success">
-          <Card>
+          <Card className="border-0">
             <h5>Main Route</h5>
-            <div class="border-0">
+            <div>
               {route.summary.map((seg, i) => (
                 <Row key={i} className="align-items-center mb-1">
                   <Col xs="auto">{seg.mode === "metro" ? "🚇" : "🚌"}</Col>
