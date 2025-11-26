@@ -7,7 +7,7 @@
 
 /* Search Section */
 .searchSection {
-  max-width: 800px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 0 1rem;
 }
@@ -103,7 +103,7 @@
 
 /* Results Section */
 .resultsSection {
-  max-width: 800px;
+  max-width: 1200px;
   margin: 3rem auto;
   padding: 0 1rem;
 }
@@ -283,7 +283,7 @@
 }
 
 .instruction:not(:last-child)::after {
-  content: '';
+  content: "";
   position: absolute;
   left: 26px;
   top: calc(100% - 8px);
@@ -434,6 +434,13 @@
   .segment {
     min-width: 100%;
   }
+  .arrow {
+    display: flex;
+    justify-content: center;
+    transform: rotate(90deg); /* يدور السهم لتحت */
+    font-size: 20px; /* ممكن تعدلي الحجم حسب الحاجة */
+    margin: 4px 0; /* مسافة بين الـsegments */
+  }
 }
 
 /* Loading Animation */
@@ -447,7 +454,13 @@
 }
 
 .loading {
-  background: linear-gradient(to right, #f6f7f8 0%, #edeef1 20%, #f6f7f8 40%, #f6f7f8 100%);
+  background: linear-gradient(
+    to right,
+    #f6f7f8 0%,
+    #edeef1 20%,
+    #f6f7f8 40%,
+    #f6f7f8 100%
+  );
   background-size: 800px 100px;
   animation: shimmer 1.5s infinite;
 }
@@ -549,60 +562,6 @@
   }
 }
 
-/* Dark Mode Support (optional) */
-@media (prefers-color-scheme: dark) {
-  .mainContainer {
-    background: #111827;
-  }
-
-  .searchCard,
-  .routeCard {
-    background: #1f2937;
-    color: #f3f4f6;
-  }
-
-  .title,
-  .routeLabel,
-  .lineName {
-    color: #f3f4f6;
-  }
-
-  .inputGroup {
-    background: #374151;
-  }
-
-  .inputGroup:hover {
-    background: #4b5563;
-  }
-
-  .segment {
-    background: #374151;
-  }
-
-  .instructions {
-    background: #374151;
-  }
-
-  .instructionText,
-  .lineDetails,
-  .statValue {
-    color: #d1d5db;
-  }
-
-  .custom-select__placeholder {
-    color: #9ca3af !important;
-  }
-
-  .custom-select__single-value {
-    color: #f3f4f6 !important;
-  }
-
-  .detailsButton {
-    background: #374151;
-    color: #818cf8;
-    border-color: #4b5563;
-  }
-}
 /* Header Actions */
 .headerActions {
   display: flex;
@@ -677,7 +636,8 @@
 
 /* Star Animation */
 @keyframes starPulse {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1);
   }
   50% {
@@ -703,4 +663,15 @@
     justify-content: center;
   }
 }
+.arrow {
+  text-align: center;
+  font-size: 25px;
+  color: #6b5b95; /* لون السهم حسب التصميم */
+  margin: auto;
+}
 
+/* Optional if you want extra hover effect */
+.progress-bar:hover {
+  opacity: 0.8;
+  transition: 0.3s;
+}

@@ -1,295 +1,276 @@
 import React, { useState, useMemo, useEffect } from "react";
 import Select from "react-select";
+import { Container, Row, Col, Card, Button } from "react-bootstrap";
 import graphData from "../../Data/graph.json";
 import { findShortestPath } from "../../utils/dijkstra";
-import styles from "./FindRoutes.module.css";
 
 export default function FindRoutes() {
   const [start, setStart] = useState("");
   const [end, setEnd] = useState("");
   const [routes, setRoutes] = useState([]);
   const [savedRoutes, setSavedRoutes] = useState([]);
-  const [saveStatus, setSaveStatus] = useState({});
+  const [editRouteId, setEditRouteId] = useState(null);
+  const [editSummary, setEditSummary] = useState("");
+  const [newSummary, setNewSummary] = useState("");
 
   const stops = Object.values(graphData.nodes);
 
-  // Load saved routes from localStorage on mount
   useEffect(() => {
-    const saved = localStorage.getItem('savedRoutes');
-    if (saved) {
-      setSavedRoutes(JSON.parse(saved));
-    }
+    const saved = localStorage.getItem("savedRoutes");
+    if (saved) setSavedRoutes(JSON.parse(saved));
   }, []);
 
   const selectOptions = useMemo(() => {
-    return stops.map((s) => ({
-      value: s.id,
-      label: s.name,
-    }));
+    const map = new Map();
+    stops.forEach((s) => {
+      if (!map.has(s.name)) map.set(s.name, { value: s.id, label: s.name });
+    });
+    return Array.from(map.values());
   }, [stops]);
 
-  const startValue = selectOptions.find((option) => option.value === start);
-  const endValue = selectOptions.find((option) => option.value === end);
+  const startValue = selectOptions.find((opt) => opt.value === start);
+  const endValue = selectOptions.find((opt) => opt.value === end);
 
   const handleSearch = () => {
     if (!start || !end) return;
     const result = findShortestPath(graphData, start, end);
     if (result) {
-      const routeData = {
-        ...result,
-        estimatedTime: result.path.length * 2,
-        transfers: result.summary.length - 1,
-        startId: start,
-        endId: end,
-        startName: graphData.nodes[start]?.name,
-        endName: graphData.nodes[end]?.name,
-        id: Date.now(), // Unique ID for the route
-        savedAt: null
-      };
-      setRoutes([routeData]);
+      setRoutes([result]);
     }
   };
 
-  const handleSaveRoute = (route, index) => {
-    const routeToSave = {
-      ...route,
-      savedAt: new Date().toISOString()
+  // Save custom route
+  const addNewRoute = () => {
+    if (!start || !end) {
+      alert("Search for a route first!");
+      return;
+    }
+    if (!newSummary.trim()) {
+      alert("Enter route info first");
+      return;
+    }
+
+    const routeObject = {
+      id: Date.now(),
+      startId: start,
+      endId: end,
+      startName: graphData.nodes[start]?.name,
+      endName: graphData.nodes[end]?.name,
+      userGenerated: true,
+      summary: newSummary
+        .split("\n")
+        .map((line) => line.trim())
+        .filter(Boolean),
     };
 
-    // Get existing saved routes
-    const existing = JSON.parse(localStorage.getItem('savedRoutes') || '[]');
-    
-    // Check if route already exists
-    const existingIndex = existing.findIndex(r => 
-      r.startId === route.startId && r.endId === route.endId
-    );
-
-    if (existingIndex === -1) {
-      // Add new route
-      const updated = [...existing, routeToSave];
-      localStorage.setItem('savedRoutes', JSON.stringify(updated));
-      setSavedRoutes(updated);
-      
-      // Show success status
-      setSaveStatus({ ...saveStatus, [index]: 'success' });
-      setTimeout(() => {
-        setSaveStatus({ ...saveStatus, [index]: null });
-      }, 2000);
-    } else {
-      // Already saved
-      setSaveStatus({ ...saveStatus, [index]: 'exists' });
-      setTimeout(() => {
-        setSaveStatus({ ...saveStatus, [index]: null });
-      }, 2000);
-    }
+    const existing = JSON.parse(localStorage.getItem("savedRoutes") || "[]");
+    const updated = [...existing, routeObject];
+    localStorage.setItem("savedRoutes", JSON.stringify(updated));
+    setSavedRoutes(updated);
+    setNewSummary("");
+    alert("Custom route added!");
   };
 
-  const isRouteSaved = (route) => {
-    return savedRoutes.some(r => 
-      r.startId === route.startId && r.endId === route.endId
-    );
-  };
-
-  const getLineColor = (line) => {
-    if (!line) return styles.otherLine;
-    if (line.includes("Line 1")) return styles.line1;
-    if (line.includes("Line 2")) return styles.line2;
-    if (line.includes("Line 3")) return styles.line3;
-    return styles.otherLine;
-  };
-
-  const getLineIcon = (mode) => {
-    return mode === "metro" ? "M" : "B";
+  // Save edited route
+  const saveEditedRoute = (id) => {
+    const updatedRoutes = savedRoutes.map((r) => {
+      if (r.id === id) {
+        return {
+          ...r,
+          summary: editSummary
+            .split("\n")
+            .map((line) => line.trim())
+            .filter(Boolean),
+        };
+      }
+      return r;
+    });
+    localStorage.setItem("savedRoutes", JSON.stringify(updatedRoutes));
+    setSavedRoutes(updatedRoutes);
+    setEditRouteId(null);
+    setEditSummary("");
+    alert("Route updated successfully!");
   };
 
   return (
-    <div className={styles.mainContainer}>
-      <div className={styles.searchSection}>
-        <h1 className={styles.title}>Cairo Transit Route Finder</h1>
-        
-        <div className={styles.searchCard}>
-          <div className={styles.searchInputs}>
-            <div className={styles.inputGroup}>
-              <div className={styles.inputIcon}>📍</div>
-              <Select
-                classNamePrefix="custom-select"
-                className={styles.selectInput}
-                value={startValue}
-                onChange={(selectedOption) =>
-                  setStart(selectedOption ? selectedOption.value : "")
-                }
-                options={selectOptions}
-                placeholder="From: Choose starting point"
-                isClearable={true}
-              />
+    <Container className="py-4">
+      <h1 className="text-center mb-4">Cairo Transit Route Finder</h1>
+
+      {/* Search Section */}
+      <Card className="mb-4 p-3 shadow-sm">
+        <Row className="align-items-center g-2 mb-2">
+          <Col xs={12} md>
+            <Select
+              value={startValue}
+              onChange={(opt) => setStart(opt ? opt.value : "")}
+              options={selectOptions}
+              placeholder="From: Choose starting point"
+              isClearable
+            />
+          </Col>
+          <Col xs="auto" className="text-center">
+            <Button
+              onClick={() => {
+                const t = start;
+                setStart(end);
+                setEnd(t);
+              }}
+            >
+              ⇅
+            </Button>
+          </Col>
+          <Col xs={12} md>
+            <Select
+              value={endValue}
+              onChange={(opt) => setEnd(opt ? opt.value : "")}
+              options={selectOptions}
+              placeholder="To: Choose destination"
+              isClearable
+            />
+          </Col>
+        </Row>
+        <Button
+          variant="primary"
+          className="w-100 mt-2"
+          onClick={handleSearch}
+          disabled={!start || !end}
+        >
+          Find Routes
+        </Button>
+      </Card>
+
+      {/* Main Route */}
+      {routes.map((route, idx) => (
+        <Card key={idx} className="mb-3 shadow-sm p-3 border-success">
+          <Card>
+            <h5>Main Route</h5>
+            <div class="border-0">
+              {route.summary.map((seg, i) => (
+                <Row key={i} className="align-items-center mb-1">
+                  <Col xs="auto">{seg.mode === "metro" ? "🚇" : "🚌"}</Col>
+                  <Col>
+                    Take {seg.line.replace(/ - | → |–/g, " → ")}{" "}
+                    {/* ← هنا بنبدل أي شرط بـ سهم */}
+                    {seg.stops ? `for ${seg.stops} stops` : ""}
+                  </Col>
+                </Row>
+              ))}
+            </div>
+          </Card>
+        </Card>
+      ))}
+
+      {/* User Routes */}
+      {savedRoutes
+        .filter(
+          (r) => r.userGenerated && r.startId === start && r.endId === end
+        )
+        .map((route, idx) => (
+          <Card key={route.id} className="mb-3 shadow-sm p-3 border-success">
+            <Row className="align-items-center mb-2">
+              <Col>
+                <h5>User Route {idx + 1}</h5>
+              </Col>
+              <Col className="text-end">
+                <Button
+                  variant="outline-secondary"
+                  size="sm"
+                  onClick={() => {
+                    setEditRouteId(route.id);
+                    setEditSummary(route.summary.join("\n"));
+                  }}
+                  className="me-2"
+                >
+                  Edit
+                </Button>
+                <Button
+                  variant="outline-danger"
+                  size="sm"
+                  onClick={() => {
+                    if (
+                      !window.confirm(
+                        "Are you sure you want to delete this route?"
+                      )
+                    )
+                      return;
+                    const updatedRoutes = savedRoutes.filter(
+                      (r) => r.id !== route.id
+                    );
+                    localStorage.setItem(
+                      "savedRoutes",
+                      JSON.stringify(updatedRoutes)
+                    );
+                    setSavedRoutes(updatedRoutes);
+                    if (editRouteId === route.id) {
+                      setEditRouteId(null);
+                      setEditSummary("");
+                    }
+                  }}
+                >
+                  Delete
+                </Button>
+              </Col>
+            </Row>
+
+            {/* Display each line */}
+            <div>
+              {route.summary.map((line, i) => (
+                <Row key={i} className="align-items-center mb-1">
+                  <Col style={{ whiteSpace: "pre-wrap" }}>{line}</Col>
+                </Row>
+              ))}
             </div>
 
-            <div className={styles.swapButton}>
-              <button 
-                type="button"
-                onClick={() => {
-                  const temp = start;
-                  setStart(end);
-                  setEnd(temp);
-                }}
-              >
-                ⇅
-              </button>
-            </div>
-
-            <div className={styles.inputGroup}>
-              <div className={styles.inputIcon}>📍</div>
-              <Select
-                classNamePrefix="custom-select"
-                className={styles.selectInput}
-                value={endValue}
-                onChange={(selectedOption) =>
-                  setEnd(selectedOption ? selectedOption.value : "")
-                }
-                options={selectOptions}
-                placeholder="To: Choose destination"
-                isClearable={true}
-              />
-            </div>
-          </div>
-
-          <button
-            onClick={handleSearch}
-            className={styles.searchButton}
-            disabled={!start || !end}
-          >
-            Find Routes
-          </button>
-        </div>
-      </div>
-
-      {routes.length > 0 && (
-        <div className={styles.resultsSection}>
-          <h2 className={styles.resultsTitle}>
-            {routes.length} Route{routes.length > 1 ? 's' : ''} Found
-          </h2>
-
-          {routes.map((route, index) => (
-            <div key={index} className={styles.routeCard}>
-              {/* Header */}
-              <div className={styles.routeHeader}>
-                <div className={styles.routeTitle}>
-                  <span className={styles.routeLabel}>Route {index + 1}</span>
-                  <span className={styles.routeBadge}>Recommended</span>
-                </div>
-                <div className={styles.headerActions}>
-                  <div className={styles.routeStats}>
-                    <div className={styles.stat}>
-                      <span className={styles.statIcon}>⏱</span>
-                      <span className={styles.statValue}>{route.estimatedTime} min</span>
-                    </div>
-                    <div className={styles.stat}>
-                      <span className={styles.statIcon}>🔄</span>
-                      <span className={styles.statValue}>{route.transfers} transfers</span>
-                    </div>
-                  </div>
-                  <button
-                    className={`${styles.saveButton} ${
-                      saveStatus[index] === 'success' ? styles.saved : ''
-                    } ${saveStatus[index] === 'exists' ? styles.exists : ''} ${
-                      isRouteSaved(route) && !saveStatus[index] ? styles.alreadySaved : ''
-                    }`}
-                    onClick={() => handleSaveRoute(route, index)}
-                    disabled={saveStatus[index] === 'success'}
-                  >
-                    {saveStatus[index] === 'success' ? (
-                      <>✓ Saved</>
-                    ) : saveStatus[index] === 'exists' ? (
-                      <>ℹ Already Saved</>
-                    ) : isRouteSaved(route) ? (
-                      <><span className={styles.heart}>&hearts;</span> Saved</>
-                    ) : (
-                      <><span className={styles.heart}>&hearts;</span> Save Route</>
-                    )}
-                  </button>
-                </div>
+            {/* Edit Section */}
+            {editRouteId === route.id && (
+              <div className="mt-2">
+                <textarea
+                  className="form-control"
+                  rows={Math.max(route.summary.length, 3)}
+                  value={editSummary}
+                  onChange={(e) => setEditSummary(e.target.value)}
+                />
+                <Button
+                  className="mt-2 w-100 btn-primary"
+                  onClick={() => saveEditedRoute(route.id)}
+                >
+                  Save Changes
+                </Button>
               </div>
+            )}
+          </Card>
+        ))}
 
-              {/* Visual Timeline */}
-              <div className={styles.timeline}>
-                <div className={styles.timelineTrack}>
-                  {route.summary.map((segment, idx) => (
-                    <div key={idx} className={styles.timelineSegment}>
-                      <div className={`${styles.segmentLine} ${getLineColor(segment.line)}`}>
-                        <div className={styles.segmentDots}>
-                          {[...Array(Math.min(segment.stops, 5))].map((_, i) => (
-                            <div key={i} className={styles.dot}></div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Route Details */}
-              <div className={styles.routeDetails}>
-                {route.summary.map((segment, idx) => (
-                  <div key={idx} className={styles.segment}>
-                    <div className={`${styles.lineIcon} ${getLineColor(segment.line)}`}>
-                      {getLineIcon(segment.mode)}
-                    </div>
-                    <div className={styles.segmentInfo}>
-                      <div className={styles.lineName}>{segment.line}</div>
-                      <div className={styles.lineDetails}>
-                        {segment.stops} stops • {segment.stops * 2} min
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Instructions */}
-              <div className={styles.instructions}>
-                <div className={styles.instruction}>
-                  <div className={styles.instructionIcon}>🚶</div>
-                  <div className={styles.instructionText}>
-                    Walk to {route.startName}
-                  </div>
-                </div>
-                
-                {route.summary.map((segment, idx) => (
-                  <React.Fragment key={idx}>
-                    <div className={styles.instruction}>
-                      <div className={`${styles.instructionIcon} ${getLineColor(segment.line)}`}>
-                        {segment.mode === "metro" ? "🚇" : "🚌"}
-                      </div>
-                      <div className={styles.instructionText}>
-                        Take {segment.line} for {segment.stops} stops
-                      </div>
-                    </div>
-                    {idx < route.summary.length - 1 && (
-                      <div className={styles.instruction}>
-                        <div className={styles.instructionIcon}>🚶</div>
-                        <div className={styles.instructionText}>
-                          Transfer (2-5 min walk)
-                        </div>
-                      </div>
-                    )}
-                  </React.Fragment>
-                ))}
-                
-                <div className={styles.instruction}>
-                  <div className={styles.instructionIcon}>📍</div>
-                  <div className={styles.instructionText}>
-                    Arrive at {route.endName}
-                  </div>
-                </div>
-              </div>
-
-              {/* Show Details Button */}
-              <button className={styles.detailsButton}>
-                Show all stops →
-              </button>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
+      {/* Add New Route */}
+      <Card className="mt-4 p-3 shadow-sm border-success">
+        <h4 className="text-center mb-3">Add Custom Route for This Trip</h4>
+        <Row className="g-2 mb-2">
+          <Col>
+            <input
+              className="form-control"
+              value={graphData.nodes[start]?.name || ""}
+              disabled
+            />
+          </Col>
+          <Col>
+            <input
+              className="form-control"
+              value={graphData.nodes[end]?.name || ""}
+              disabled
+            />
+          </Col>
+        </Row>
+        <textarea
+          className="form-control mt-2"
+          rows={5}
+          placeholder="Write your route freely, one line per segment"
+          value={newSummary}
+          onChange={(e) => setNewSummary(e.target.value)}
+        />
+        <Button className="w-100 mt-3 btn-success" onClick={addNewRoute}>
+          Save Custom Route
+        </Button>
+      </Card>
+    </Container>
   );
 }
