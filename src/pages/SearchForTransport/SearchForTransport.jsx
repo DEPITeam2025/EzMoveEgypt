@@ -18,18 +18,18 @@ import {
 import "bootstrap/dist/css/bootstrap.min.css";
 
 //Buses data import
-import busRoutesData from '/src/Data/bus/routes.json';
-import busTripsData from '/src/Data/bus/trips.json';
-import busStopTimesData from '/src/Data/bus/stop_times.json';
-import busStopsData from '/src/Data/bus/stops.json';
+import busRoutesData from "/src/Data/bus/routes.json";
+import busTripsData from "/src/Data/bus/trips.json";
+import busStopTimesData from "/src/Data/bus/stop_times.json";
+import busStopsData from "/src/Data/bus/stops.json";
 
 //Metro data import
-import metroRoutesData from '/src/Data/metro/routes.json';
-import metroTripsData from '/src/Data/metro/trips.json';
-import metroStopTimesData from '/src/Data/metro/stop_times.json';
-import metroStopsData from '/src/Data/metro/stops.json';
+import metroRoutesData from "/src/Data/metro/routes.json";
+import metroTripsData from "/src/Data/metro/trips.json";
+import metroStopTimesData from "/src/Data/metro/stop_times.json";
+import metroStopsData from "/src/Data/metro/stops.json";
 
-// (Helper Functions) 
+// (Helper Functions)
 const allRoutesData = [...busRoutesData, ...metroRoutesData];
 const allTripsData = [...busTripsData, ...metroTripsData];
 const allStopTimesData = [...busStopTimesData, ...metroStopTimesData];
@@ -40,11 +40,42 @@ const getRouteTypeColor = (routeType) => {
 };
 
 //search for route details by line number
-const findRouteDetails = (lineNumber) => {
-  const normalizedLineNumber = lineNumber.toUpperCase().trim();
-  const route = allRoutesData.find(
-    (r) => r.route_short_name === normalizedLineNumber
+const findRouteDetails = (lineNumber, routeLongname) => {
+  if (!lineNumber) return null;
+  const trimedLineNumber = lineNumber.trim().toLowerCase();
+  const routes = allRoutesData.filter(
+    (r) => (r.route_short_name || "").toLowerCase() === trimedLineNumber
   );
+
+  if (routes.length === 0) return null;
+
+  let route = null;
+  if (routes.length === 1) {
+    route = routes[0];
+  } else {
+    // Try to find exact long name match (case-insensitive) when provided
+    if (routeLongname) {
+      const normalizedLong = routeLongname.trim().toLowerCase();
+      route = routes.find(
+        (r) => (r.route_long_name || "").trim().toLowerCase() === normalizedLong
+      );
+    }
+
+    // Fallback: try partial match on long name, else pick the first route
+    if (!route) {
+      if (routeLongname) {
+        const normalizedLong = routeLongname.trim().toLowerCase();
+        route = routes.find((r) =>
+          (r.route_long_name || "").toLowerCase().includes(normalizedLong)
+        );
+      }
+    }
+
+    if (!route) {
+      route = routes[0];
+    }
+  }
+
   if (!route) return null;
 
   const trip = allTripsData.find((t) => t.route_id === route.route_id);
@@ -58,7 +89,8 @@ const findRouteDetails = (lineNumber) => {
 
   const detailedStops = routeStopTimes.map((st) => {
     const stop = allStopsData.find((s) => s.stop_id === st.stop_id);
-    const [hours, minutes, seconds] = st.arrival_time.split(":").map(Number);
+    const arrival = st.arrival_time || st.departure_time || "00:00:00";
+    const [hours, minutes, seconds] = arrival.split(":").map(Number);
     const now = new Date();
     const departureTime = new Date(
       now.getFullYear(),
@@ -71,30 +103,39 @@ const findRouteDetails = (lineNumber) => {
     const isPassed = departureTime < now;
 
     return {
+      stop_id: st.stop_id,
       name: stop ? stop.stop_name : `Stop ID: ${st.stop_id}`,
-      time: st.arrival_time.substring(0, 5),
-      isPassed: isPassed,
+      time: arrival.substring(0, 5),
+      isPassed,
     };
   });
 
-  const dailySchedule = allStopTimesData
-    .filter((st) => st.stop_id === detailedStops[0].stop_id)
-    .map((st) => st.departure_time)
-    .filter((value, index, self) => self.indexOf(value) === index)
-    .sort()
-    .map((time) => {
-      const [hours, minutes, seconds] = time.split(":").map(Number);
-      const now = new Date();
-      const departureTime = new Date(
-        now.getFullYear(),
-        now.getMonth(),
-        now.getDate(),
-        hours,
-        minutes,
-        seconds || 0
-      );
-      return { time: time.substring(0, 5), isPassed: departureTime < now };
-    });
+  const firstStopId = detailedStops[0]?.stop_id;
+  const dailySchedule = firstStopId
+    ? allStopTimesData
+        .filter((st) => st.stop_id === firstStopId)
+        .map((st) => st.departure_time || st.arrival_time)
+        .filter((value, index, self) => value && self.indexOf(value) === index)
+        .sort()
+        .map((time) => {
+          const [hours, minutes, seconds] = (time || "00:00:00")
+            .split(":")
+            .map(Number);
+          const now = new Date();
+          const departureTime = new Date(
+            now.getFullYear(),
+            now.getMonth(),
+            now.getDate(),
+            hours,
+            minutes,
+            seconds || 0
+          );
+          return {
+            time: (time || "").substring(0, 5),
+            isPassed: departureTime < now,
+          };
+        })
+    : [];
 
   return {
     number: route.route_short_name,
@@ -154,7 +195,8 @@ function SearchForTransport() {
   const [areaName, setAreaName] = useState("");
   const [areaResults, setAreaResults] = useState(null);
   const [areaError, setAreaError] = useState("");
-  const [selectedAreaRouteDetails, setSelectedAreaRouteDetails] = useState(null);
+  const [selectedAreaRouteDetails, setSelectedAreaRouteDetails] =
+    useState(null);
 
   // دالة البحث برقم الخط
   const handleLineSearch = (e) => {
@@ -194,8 +236,8 @@ function SearchForTransport() {
     }
   };
 
-  const handleSelectAreaRoute = (routeNumber) => {
-    const details = findRouteDetails(routeNumber);
+  const handleSelectAreaRoute = (routeNumber, routeName) => {
+    const details = findRouteDetails(routeNumber, routeName);
     if (details) {
       setSelectedAreaRouteDetails(details);
     }
@@ -213,7 +255,10 @@ function SearchForTransport() {
         <Card.Header className={`bg-${routeVariant} text-white`}>
           <Card.Title className="mb-0">
             <i className="bi bi-bus-front me-2"></i>
-            {name} <Badge bg="light" text="dark">{route.number}</Badge>
+            {name}{" "}
+            <Badge bg="light" text="dark">
+              {route.number}
+            </Badge>
           </Card.Title>
         </Card.Header>
 
@@ -238,7 +283,10 @@ function SearchForTransport() {
             <i className="bi bi-pin-map me-2"></i>
             Route Stops ({stops.length})
           </h6>
-          <ListGroup variant="flush" className="mb-4 border rounded overflow-hidden">
+          <ListGroup
+            variant="flush"
+            className="mb-4 border rounded overflow-hidden"
+          >
             {stops.map((stop, index) => (
               <ListGroup.Item
                 key={index}
@@ -297,7 +345,7 @@ function SearchForTransport() {
     );
   };
 
-  // ✅ SearchByNumber Component - 
+  // ✅ SearchByNumber Component -
   const renderSearchByNumber = () => (
     <Card className="p-4 shadow">
       <Card.Body>
@@ -316,7 +364,7 @@ function SearchForTransport() {
                   onChange={(e) => setLineNumber(e.target.value)}
                   size="lg"
                   required
-                  style={{ height: '50px' }}
+                  style={{ height: "50px" }}
                 />
                 <Form.Text className="text-muted d-block mt-2">
                   Try M1, M3, M5, or CTA 354
@@ -329,7 +377,7 @@ function SearchForTransport() {
                 type="submit"
                 size="lg"
                 className="w-100"
-                style={{ height: '50px' }}
+                style={{ height: "50px" }}
               >
                 <i className="bi bi-search me-2"></i>Search
               </Button>
@@ -350,7 +398,7 @@ function SearchForTransport() {
       </Card.Body>
     </Card>
   );
-  
+
   const renderSearchByArea = () => (
     <Card className="p-4 shadow">
       <Card.Body>
@@ -376,7 +424,7 @@ function SearchForTransport() {
                   onChange={(e) => setAreaName(e.target.value)}
                   size="lg"
                   required
-                  style={{ height: '50px' }}
+                  style={{ height: "50px" }}
                 />
                 <Form.Text className="text-muted d-block mt-2">
                   Minimum 3 characters required
@@ -389,7 +437,7 @@ function SearchForTransport() {
                 type="submit"
                 size="lg"
                 className="w-100"
-                style={{ height: '50px' }}
+                style={{ height: "50px" }}
               >
                 <i className="bi bi-search me-2"></i>Find Lines
               </Button>
@@ -420,7 +468,9 @@ function SearchForTransport() {
                   {/* Route Item */}
                   <ListGroup.Item
                     as="button"
-                    onClick={() => handleSelectAreaRoute(route.number)}
+                    onClick={() =>
+                      handleSelectAreaRoute(route.number, route.name)
+                    }
                     className="d-flex justify-content-between align-items-center text-start"
                     variant={
                       selectedAreaRouteDetails?.number === route.number
@@ -502,7 +552,10 @@ function SearchForTransport() {
                               overflowY: "auto",
                             }}
                           >
-                            <ListGroup variant="flush" className="border rounded">
+                            <ListGroup
+                              variant="flush"
+                              className="border rounded"
+                            >
                               {selectedAreaRouteDetails.stops.map(
                                 (stop, stopIndex) => (
                                   <ListGroup.Item
@@ -517,7 +570,7 @@ function SearchForTransport() {
                                             : stopIndex ===
                                               selectedAreaRouteDetails.stops
                                                 .length -
-                                              1
+                                                1
                                             ? "danger"
                                             : "secondary"
                                         }
@@ -530,7 +583,11 @@ function SearchForTransport() {
                                         {stop.name}
                                       </small>
                                     </div>
-                                    <Badge bg="light" text="dark" className="ms-2">
+                                    <Badge
+                                      bg="light"
+                                      text="dark"
+                                      className="ms-2"
+                                    >
                                       {stop.time}
                                     </Badge>
                                   </ListGroup.Item>
@@ -628,8 +685,8 @@ function SearchForTransport() {
             variant="pills"
             className="justify-content-center"
             style={{
-              display: 'flex',
-              justifyContent: 'center',
+              display: "flex",
+              justifyContent: "center",
             }}
           >
             <Tab
@@ -665,8 +722,6 @@ function SearchForTransport() {
           {activeKey === "area" && renderSearchByArea()}
         </Col>
       </Row>
-
-      
     </Container>
   );
 }
