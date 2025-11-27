@@ -434,12 +434,16 @@
   .segment {
     min-width: 100%;
   }
+
   .arrow {
     display: flex;
     justify-content: center;
-    transform: rotate(90deg); /* يدور السهم لتحت */
-    font-size: 20px; /* ممكن تعدلي الحجم حسب الحاجة */
-    margin: 4px 0; /* مسافة بين الـsegments */
+    transform: rotate(90deg);
+    /* يدور السهم لتحت */
+    font-size: 20px;
+    /* ممكن تعدلي الحجم حسب الحاجة */
+    margin: 4px 0;
+    /* مسافة بين الـsegments */
   }
 }
 
@@ -448,19 +452,18 @@
   0% {
     background-position: -468px 0;
   }
+
   100% {
     background-position: 468px 0;
   }
 }
 
 .loading {
-  background: linear-gradient(
-    to right,
-    #f6f7f8 0%,
-    #edeef1 20%,
-    #f6f7f8 40%,
-    #f6f7f8 100%
-  );
+  background: linear-gradient(to right,
+      #f6f7f8 0%,
+      #edeef1 20%,
+      #f6f7f8 40%,
+      #f6f7f8 100%);
   background-size: 800px 100px;
   animation: shimmer 1.5s infinite;
 }
@@ -471,6 +474,7 @@
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -626,9 +630,11 @@
   0% {
     transform: scale(1);
   }
+
   50% {
     transform: scale(1.1);
   }
+
   100% {
     transform: scale(1);
   }
@@ -636,10 +642,12 @@
 
 /* Star Animation */
 @keyframes starPulse {
+
   0%,
   100% {
     transform: scale(1);
   }
+
   50% {
     transform: scale(1.2);
   }
@@ -663,10 +671,12 @@
     justify-content: center;
   }
 }
+
 .arrow {
   text-align: center;
   font-size: 25px;
-  color: #6b5b95; /* لون السهم حسب التصميم */
+  color: #6b5b95;
+  /* لون السهم حسب التصميم */
   margin: auto;
 }
 
@@ -674,4 +684,37 @@
 .progress-bar:hover {
   opacity: 0.8;
   transition: 0.3s;
+}
+
+/* Responsive layout for search inputs and button */
+.swapBtn {
+  /* width: 100% !important; */
+  margin-bottom: 0.5rem;
+  border-radius: 25px;
+  transform: rotate(90deg);
+}
+
+.findButton {
+  height: auto;
+}
+
+@media (max-width: 991.98px) {
+  .swapBtn {
+    margin-bottom: 0.5rem;
+    transform: rotate(0deg);
+  }
+
+  .findButton {
+    margin-top: 0.5rem;
+  }
+}
+
+@media (min-width: 992px) {
+  .swapBtn {
+    margin-bottom: 0;
+  }
+
+  .findButton {
+    margin-top: 0;
+  }
 }

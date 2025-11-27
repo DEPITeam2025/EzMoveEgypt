@@ -28,7 +28,7 @@ function MetroOverview() {
         <div className={styles["overview-cards"]}>
           <div className={styles["overview-card"]}>
             <div className={styles["overview-icon"]}>
-              <span className={styles["icon-number"]}>4</span>
+              <span className={styles["icon-number"]}>3</span>
             </div>
             <div className={styles["overview-content"]}>
               <p className={styles["overview-label"]}>Metro Lines</p>
@@ -37,7 +37,7 @@ function MetroOverview() {
 
           <div className={styles["overview-card"]}>
             <div className={styles["overview-icon"]}>
-              <span className={styles["icon-number"]}>28</span>
+              <span className={styles["icon-number"]}>68</span>
             </div>
             <div className={styles["overview-content"]}>
               <p className={styles["overview-label"]}>All Stations</p>
@@ -214,8 +214,6 @@ function MetroLinesSection() {
     </section>
   );
 }
-
-
 
 // Main Component
 export default function MetroGuide() {

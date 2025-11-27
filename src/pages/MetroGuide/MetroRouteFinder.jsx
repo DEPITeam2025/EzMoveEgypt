@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Row, Col } from "react-bootstrap";
 import stopsData from "../../Data/metro/stops.json";
 import stoptimesData from "../../Data/metro/stop_times.json";
 import tripsData from "../../Data/metro/trips.json";
@@ -190,80 +191,90 @@ function MetroRouteFinder() {
 
   return (
     <div className="container py-5">
-      <div className="card shadow p-4 mx-auto" style={{ maxWidth: "600px" }}>
+      <div className="card shadow p-4 mx-auto">
         <h1 className="text-center mb-4 text-primary fw-bold">
           Cairo Metro Route Finder 🚇
         </h1>
 
-        {/* Source Input */}
-        <div className="mb-4 position-relative">
-          <label className="form-label fw-semibold">From:</label>
-          <input
-            type="text"
-            className="form-control"
-            value={sourceQuery}
-            placeholder="Type to search for a stop..."
-            onChange={(e) => {
-              setSourceQuery(e.target.value);
-              setShowSourceList(true);
-            }}
-            onFocus={() => setShowSourceList(true)}
-            onBlur={() => setTimeout(() => setShowSourceList(false), 150)}
-          />
-          {showSourceList && sourceQuery && (
-            <ul
-              className={`list-group position-absolute w-100 ${styles.dropdownList}`}
-            >
-              {filteredStops(sourceQuery).map((stop) => (
-                <li
-                  key={stop.stop_id}
-                  className={`list-group-item list-group-item-action`}
-                  onClick={() => handleSelectSource(stop)}
+        {/* Search Inputs Row */}
+        <Row className="align-items-end g-2 mb-4">
+          <Col xs={12} lg={4}>
+            <label className="form-label fw-semibold">From:</label>
+            <div className="position-relative">
+              <input
+                type="text"
+                className="form-control"
+                value={sourceQuery}
+                placeholder="Type to search for a stop..."
+                onChange={(e) => {
+                  setSourceQuery(e.target.value);
+                  setShowSourceList(true);
+                }}
+                onFocus={() => setShowSourceList(true)}
+                onBlur={() => setTimeout(() => setShowSourceList(false), 150)}
+              />
+              {showSourceList && sourceQuery && (
+                <ul
+                  className={`list-group position-absolute w-100 ${styles.dropdownList}`}
                 >
-                  {stop.stop_name}
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
+                  {filteredStops(sourceQuery).map((stop) => (
+                    <li
+                      key={stop.stop_id}
+                      className={`list-group-item list-group-item-action`}
+                      onClick={() => handleSelectSource(stop)}
+                    >
+                      {stop.stop_name}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </Col>
 
-        {/* Destination Input */}
-        <div className="mb-4 position-relative">
-          <label className="form-label fw-semibold">To:</label>
-          <input
-            type="text"
-            className="form-control"
-            value={destinationQuery}
-            placeholder="Type to search for a stop..."
-            onChange={(e) => {
-              setDestinationQuery(e.target.value);
-              setShowDestinationList(true);
-            }}
-            onFocus={() => setShowDestinationList(true)}
-            onBlur={() => setTimeout(() => setShowDestinationList(false), 150)}
-          />
-          {showDestinationList && destinationQuery && (
-            <ul
-              className={`list-group position-absolute w-100 ${styles.dropdownList}`}
-            >
-              {filteredStops(destinationQuery).map((stop) => (
-                <li
-                  key={stop.stop_id}
-                  className={`list-group-item list-group-item-action`}
-                  onClick={() => handleSelectDestination(stop)}
+          <Col xs={12} lg={4}>
+            <label className="form-label fw-semibold">To:</label>
+            <div className="position-relative">
+              <input
+                type="text"
+                className="form-control"
+                value={destinationQuery}
+                placeholder="Type to search for a stop..."
+                onChange={(e) => {
+                  setDestinationQuery(e.target.value);
+                  setShowDestinationList(true);
+                }}
+                onFocus={() => setShowDestinationList(true)}
+                onBlur={() =>
+                  setTimeout(() => setShowDestinationList(false), 150)
+                }
+              />
+              {showDestinationList && destinationQuery && (
+                <ul
+                  className={`list-group position-absolute w-100 ${styles.dropdownList}`}
                 >
-                  {stop.stop_name}
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
+                  {filteredStops(destinationQuery).map((stop) => (
+                    <li
+                      key={stop.stop_id}
+                      className={`list-group-item list-group-item-action`}
+                      onClick={() => handleSelectDestination(stop)}
+                    >
+                      {stop.stop_name}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </Col>
 
-        <div className="text-center">
-          <button onClick={handleSearch} className="btn btn-primary px-4 py-2">
-            Find Route
-          </button>
-        </div>
+          <Col xs={12} lg={4}>
+            <button
+              onClick={handleSearch}
+              className={`btn btn-primary w-100 ${styles.findButton}`}
+            >
+              Find Route
+            </button>
+          </Col>
+        </Row>
 
         {route.length > 0 && (
           <div className="mt-5">

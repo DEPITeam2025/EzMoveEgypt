@@ -3,6 +3,7 @@ import Select from "react-select";
 import { Container, Row, Col, Card, Button } from "react-bootstrap";
 import graphData from "../../Data/graph.json";
 import { findShortestPath } from "../../utils/dijkstra";
+import styles from "./FindRoutes.module.css";
 
 export default function FindRoutes() {
   const [start, setStart] = useState("");
@@ -98,8 +99,8 @@ export default function FindRoutes() {
 
       {/* Search Section */}
       <Card className="mb-4 p-3 shadow-sm">
-        <Row className="align-items-center g-2 mb-2">
-          <Col xs={12} md>
+        <Row className="align-items-end g-2">
+          <Col xs={12} lg={4}>
             <Select
               value={startValue}
               onChange={(opt) => setStart(opt ? opt.value : "")}
@@ -108,18 +109,19 @@ export default function FindRoutes() {
               isClearable
             />
           </Col>
-          <Col xs="auto" className="text-center">
+          <Col xs={12} md={1} lg={1} className="text-center">
             <Button
               onClick={() => {
                 const t = start;
                 setStart(end);
                 setEnd(t);
               }}
+              className={styles.swapBtn}
             >
               ⇅
             </Button>
           </Col>
-          <Col xs={12} md>
+          <Col xs={12} md lg={4}>
             <Select
               value={endValue}
               onChange={(opt) => setEnd(opt ? opt.value : "")}
@@ -128,15 +130,17 @@ export default function FindRoutes() {
               isClearable
             />
           </Col>
+          <Col xs={12} lg={3}>
+            <Button
+              variant="primary"
+              className={`w-100 ${styles.findButton}`}
+              onClick={handleSearch}
+              disabled={!start || !end}
+            >
+              Find Routes
+            </Button>
+          </Col>
         </Row>
-        <Button
-          variant="primary"
-          className="w-100 mt-2"
-          onClick={handleSearch}
-          disabled={!start || !end}
-        >
-          Find Routes
-        </Button>
       </Card>
 
       {/* Main Route */}
