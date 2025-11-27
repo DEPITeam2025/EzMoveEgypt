@@ -44,7 +44,7 @@ const findRouteDetails = (lineNumber, routeLongname) => {
   if (!lineNumber) return null;
   const trimedLineNumber = lineNumber.trim().toLowerCase();
   const routes = allRoutesData.filter(
-    (r) => (r.route_short_name || "").toLowerCase() === trimedLineNumber
+    (r) => r.route_short_name.toLowerCase() === trimedLineNumber
   );
 
   if (routes.length === 0) return null;
@@ -57,7 +57,7 @@ const findRouteDetails = (lineNumber, routeLongname) => {
     if (routeLongname) {
       const normalizedLong = routeLongname.trim().toLowerCase();
       route = routes.find(
-        (r) => (r.route_long_name || "").trim().toLowerCase() === normalizedLong
+        (r) => r.route_long_name.trim().toLowerCase() === normalizedLong
       );
     }
 
@@ -473,11 +473,11 @@ function SearchForTransport() {
                     }
                     className="d-flex justify-content-between align-items-center text-start"
                     variant={
-                      selectedAreaRouteDetails?.number === route.number
+                      selectedAreaRouteDetails?.name === route.name
                         ? "light"
                         : "white"
                     }
-                    active={selectedAreaRouteDetails?.number === route.number}
+                    active={selectedAreaRouteDetails?.name === route.name}
                   >
                     <div className="flex-grow-1">
                       <h6 className="mb-1">
@@ -498,9 +498,7 @@ function SearchForTransport() {
                   </ListGroup.Item>
 
                   {/* Collapse Details */}
-                  <Collapse
-                    in={selectedAreaRouteDetails?.number === route.number}
-                  >
+                  <Collapse in={selectedAreaRouteDetails?.name === route.name}>
                     <div className="bg-light border-bottom p-4">
                       <div className="d-flex justify-content-between align-items-center mb-3">
                         <h6 className="mb-0 text-info">
