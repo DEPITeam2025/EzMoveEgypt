@@ -61,7 +61,7 @@ const TheFooter = () => {
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
-      behavior: "smooth", // smooth = بدون خضة
+      behavior: "smooth",  
     });
   };
 
