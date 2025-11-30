@@ -14,42 +14,331 @@ import {
   Collapse,
   OverlayTrigger,
   Tooltip,
-  Spinner,
 } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { useSearchByLineNumber, useSearchByArea } from '../hooks/useTransportQueries';
 
+//Buses data import
+import busRoutesData from "/src/Data/bus/routes.json";
+import busTripsData from "/src/Data/bus/trips.json";
+import busStopTimesData from "/src/Data/bus/stop_times.json";
+import busStopsData from "/src/Data/bus/stops.json";
+
+//Metro data import
+import metroRoutesData from "/src/Data/metro/routes.json";
+import metroTripsData from "/src/Data/metro/trips.json";
+import metroStopTimesData from "/src/Data/metro/stop_times.json";
+import metroStopsData from "/src/Data/metro/stops.json";
+
+// (Helper Functions)
+const allRoutesData = [...busRoutesData, ...metroRoutesData];
+const allTripsData = [...busTripsData, ...metroTripsData];
+const allStopTimesData = [...busStopTimesData, ...metroStopTimesData];
+const allStopsData = [...busStopsData, ...metroStopsData];
+
+const getRouteTypeColor = (routeType) => {
+  return routeType === 1 ? "danger" : "primary";
+};
+
+//search for route details by line number
+const findRouteDetails = (lineNumber, routeLongname) => {
+  if (!lineNumber) return null;
+  const trimedLineNumber = lineNumber.trim().toLowerCase();
+  const routes = allRoutesData.filter(
+    (r) => r.route_short_name.toLowerCase() === trimedLineNumber
+  );
+
+  if (routes.length === 0) return null;
+
+  let route = null;
+  if (routes.length === 1) {
+    route = routes[0];
+  } else {
+    // Try to find exact long name match (case-insensitive) when provided
+    if (routeLongname) {
+      const normalizedLong = routeLongname.trim().toLowerCase();
+      route = routes.find(
+        (r) => r.route_long_name.trim().toLowerCase() === normalizedLong
+      );
+    }
+
+    // Fallback: try partial match on long name, else pick the first route
+    if (!route) {
+      if (routeLongname) {
+        const normalizedLong = routeLongname.trim().toLowerCase();
+        route = routes.find((r) =>
+          (r.route_long_name || "").toLowerCase().includes(normalizedLong)
+        );
+      }
+    }
+
+    if (!route) {
+      route = routes[0];
+    }
+  }
+
+  if (!route) return null;
+
+  const trip = allTripsData.find((t) => t.route_id === route.route_id);
+  if (!trip) return null;
+
+  const routeStopTimes = allStopTimesData
+    .filter((st) => st.trip_id === trip.trip_id)
+    .sort((a, b) => a.stop_sequence - b.stop_sequence);
+
+  if (routeStopTimes.length === 0) return null;
+
+  const detailedStops = routeStopTimes.map((st) => {
+    const stop = allStopsData.find((s) => s.stop_id === st.stop_id);
+    const arrival = st.arrival_time || st.departure_time || "00:00:00";
+    const [hours, minutes, seconds] = arrival.split(":").map(Number);
+    const now = new Date();
+    const departureTime = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate(),
+      hours,
+      minutes,
+      seconds || 0
+    );
+    const isPassed = departureTime < now;
+
+    return {
+      stop_id: st.stop_id,
+      name: stop ? stop.stop_name : `Stop ID: ${st.stop_id}`,
+      time: arrival.substring(0, 5),
+      isPassed,
+    };
+  });
+
+  const firstStopId = detailedStops[0]?.stop_id;
+  const dailySchedule = firstStopId
+    ? allStopTimesData
+        .filter((st) => st.stop_id === firstStopId)
+        .map((st) => st.departure_time || st.arrival_time)
+        .filter((value, index, self) => value && self.indexOf(value) === index)
+        .sort()
+        .map((time) => {
+          const [hours, minutes, seconds] = (time || "00:00:00")
+            .split(":")
+            .map(Number);
+          const now = new Date();
+          const departureTime = new Date(
+            now.getFullYear(),
+            now.getMonth(),
+            now.getDate(),
+            hours,
+            minutes,
+            seconds || 0
+          );
+          return {
+            time: (time || "").substring(0, 5),
+            isPassed: departureTime < now,
+          };
+        })
+    : [];
+
+  return {
+    number: route.route_short_name,
+    name: route.route_long_name || route.route_short_name,
+    description: route.route_desc,
+    stops: detailedStops,
+    schedule: dailySchedule.slice(0, 12),
+    isMetro: route.route_type === 1,
+    route_id: route.route_id,
+  };
+};
+
+// Helper function to categorize routes by type
+const categorizeRouteType = (routeNumber) => {
+  if (routeNumber === "Microbus") {
+    return "Microbus";
+  } else if (routeNumber === "Tomnaya") {
+    return "Tomnaya";
+  } else if (routeNumber.includes("Minibus")) {
+    return "Minibus";
+  } else if (routeNumber.startsWith("M") && /^M\d+$/.test(routeNumber)) {
+    // Match M followed by digits only (M1, M2, M3, etc.)
+    return "Metro";
+  } else {
+    return "Bus";
+  }
+};
+
+// Helper function to get filter color based on route type
+const getFilterColor = (routeType) => {
+  switch (routeType) {
+    case "Metro":
+      return "primary";
+    case "Microbus":
+      return "success";
+    case "Minibus":
+      return "info";
+    case "Tomnaya":
+      return "warning";
+    case "Bus":
+      return "secondary";
+    case "All":
+      return "dark";
+    default:
+      return "secondary";
+  }
+};
+
+//دالة البحث بالمنطقة
+const findRoutesByStopName = (areaName) => {
+  const normalizedAreaName = areaName.toLowerCase().trim();
+
+  const matchingStops = allStopsData.filter(
+    (s) => s.stop_name && s.stop_name.toLowerCase().includes(normalizedAreaName)
+  );
+
+  if (matchingStops.length === 0) return [];
+
+  const matchingStopIds = matchingStops.map((s) => s.stop_id);
+
+  const uniqueTripIds = new Set(
+    allStopTimesData
+      .filter((st) => matchingStopIds.includes(st.stop_id))
+      .map((st) => st.trip_id)
+  );
+
+  const uniqueRouteIds = new Set(
+    allTripsData
+      .filter((t) => uniqueTripIds.has(t.trip_id))
+      .map((t) => t.route_id)
+  );
+
+  const results = allRoutesData
+    .filter((r) => uniqueRouteIds.has(r.route_id))
+    .map((r) => ({
+      number: r.route_short_name,
+      name: r.route_long_name || r.route_short_name,
+      type: r.route_type === 1 ? "Metro" : "Bus/Microbus",
+      route_id: r.route_id,
+      color: getRouteTypeColor(r.route_type),
+    }));
+
+  return results;
+};
+
+// SearchForTransport Component
 function SearchForTransport() {
   const [activeKey, setActiveKey] = useState("number");
   const [lineNumber, setLineNumber] = useState("");
+  const [searchResults, setSearchResults] = useState(null);
+  const [error, setError] = useState("");
+
   const [areaName, setAreaName] = useState("");
-  const [selectedAreaRouteDetails, setSelectedAreaRouteDetails] = useState(null);
+  const [areaResults, setAreaResults] = useState(null);
+  const [areaError, setAreaError] = useState("");
+  const [selectedAreaRouteDetails, setSelectedAreaRouteDetails] =
+    useState(null);
+  const [activeFilters, setActiveFilters] = useState({
+    All: true,
+    Metro: false,
+    Microbus: false,
+    Tomnaya: false,
+    Minibus: false,
+    Bus: false,
+  });
 
-  // ✅ استخدام React Query
-  const {
-    data: searchResults,
-    isLoading: lineLoading,
-    error: lineError,
-    isFetching: lineIsFetching,
-  } = useSearchByLineNumber(lineNumber);
-
-  const {
-    data: areaResults,
-    isLoading: areaLoading,
-    error: areaError,
-    isFetching: areaIsFetching,
-  } = useSearchByArea(areaName);
-
+  // دالة البحث برقم الخط
   const handleLineSearch = (e) => {
     e.preventDefault();
-    // لا نحتاج لعمل شيء - React Query تتولى البحث تلقائياً
+    setError("");
+    setSearchResults(null);
+
+    const data = findRouteDetails(lineNumber);
+
+    if (data) {
+      setSearchResults(data);
+    } else {
+      setError(
+        `No route found or missing data for line: ${lineNumber}. Try M1 or CTA 354.`
+      );
+    }
   };
 
+  // دالة البحث بالمنطقة
   const handleAreaSearch = (e) => {
     e.preventDefault();
-    // لا نحتاج لعمل شيء - React Query تتولى البحث تلقائياً
+    setAreaError("");
+    setAreaResults(null);
     setSelectedAreaRouteDetails(null);
+
+    if (areaName.length < 3) {
+      setAreaError("Please enter at least 3 characters for the area search.");
+      return;
+    }
+
+    const results = findRoutesByStopName(areaName);
+
+    if (results.length > 0) {
+      setAreaResults(results);
+    } else {
+      setAreaError(`No lines found serving an area matching: ${areaName}`);
+    }
   };
+
+  const handleSelectAreaRoute = (routeNumber, routeName) => {
+    const details = findRouteDetails(routeNumber, routeName);
+    if (details) {
+      setSelectedAreaRouteDetails(details);
+    }
+  };
+
+  // Filter results based on active filters
+  const getFilteredAreaResults = () => {
+    if (!areaResults) return [];
+    if (activeFilters.All) return areaResults;
+
+    const activeFilterType = Object.keys(activeFilters).find(
+      (key) => activeFilters[key] && key !== "All"
+    );
+
+    if (!activeFilterType) return areaResults;
+
+    return areaResults.filter((route) => {
+      const routeType = categorizeRouteType(route.number);
+      return routeType === activeFilterType;
+    });
+  };
+
+  const toggleFilter = (filterName) => {
+    setActiveFilters({
+      All: filterName === "All",
+      Metro: filterName === "Metro",
+      Microbus: filterName === "Microbus",
+      Tomnaya: filterName === "Tomnaya",
+      Minibus: filterName === "Minibus",
+      Bus: filterName === "Bus",
+    });
+  };
+
+  // Helper function to count routes by category
+  const getRouteCounts = () => {
+    if (!areaResults) {
+      return { All: 0, Metro: 0, Microbus: 0, Tomnaya: 0, Minibus: 0, Bus: 0 };
+    }
+
+    const counts = {
+      All: areaResults.length,
+      Metro: 0,
+      Microbus: 0,
+      Tomnaya: 0,
+      Minibus: 0,
+      Bus: 0,
+    };
+
+    areaResults.forEach((route) => {
+      const routeType = categorizeRouteType(route.number);
+      counts[routeType]++;
+    });
+
+    return counts;
+  };
+
+  const routeCounts = getRouteCounts();
 
   // ✅ BusRouteDetails Component
   const renderBusRouteDetails = (route) => {
@@ -63,7 +352,10 @@ function SearchForTransport() {
         <Card.Header className={`bg-${routeVariant} text-white`}>
           <Card.Title className="mb-0">
             <i className="bi bi-bus-front me-2"></i>
-            {name} <Badge bg="light" text="dark">{route.number}</Badge>
+            {name}{" "}
+            <Badge bg="light" text="dark">
+              {route.number}
+            </Badge>
           </Card.Title>
         </Card.Header>
 
@@ -88,7 +380,10 @@ function SearchForTransport() {
             <i className="bi bi-pin-map me-2"></i>
             Route Stops ({stops.length})
           </h6>
-          <ListGroup variant="flush" className="mb-4 border rounded overflow-hidden">
+          <ListGroup
+            variant="flush"
+            className="mb-4 border rounded overflow-hidden"
+          >
             {stops.map((stop, index) => (
               <ListGroup.Item
                 key={index}
@@ -147,7 +442,7 @@ function SearchForTransport() {
     );
   };
 
-  // ✅ SearchByNumber Component - مع React Query
+  // ✅ SearchByNumber Component -
   const renderSearchByNumber = () => (
     <Card className="p-4 shadow">
       <Card.Body>
@@ -166,8 +461,7 @@ function SearchForTransport() {
                   onChange={(e) => setLineNumber(e.target.value)}
                   size="lg"
                   required
-                  style={{ height: '50px' }}
-                  disabled={lineLoading}
+                  style={{ height: "50px" }}
                 />
                 <Form.Text className="text-muted d-block mt-2">
                   Try M1, M3, M5, or CTA 354
@@ -180,66 +474,28 @@ function SearchForTransport() {
                 type="submit"
                 size="lg"
                 className="w-100"
-                style={{ height: '50px' }}
-                disabled={lineLoading || !lineNumber.trim()}
+                style={{ height: "50px" }}
               >
-                {lineLoading ? (
-                  <>
-                    <Spinner
-                      as="span"
-                      animation="border"
-                      size="sm"
-                      role="status"
-                      aria-hidden="true"
-                      className="me-2"
-                    />
-                    Searching...
-                  </>
-                ) : (
-                  <>
-                    <i className="bi bi-search me-2"></i>Search
-                  </>
-                )}
+                <i className="bi bi-search me-2"></i>Search
               </Button>
             </Col>
           </Row>
         </Form>
 
-        {/* Error Alert */}
-        {lineError && (
+        {error && (
           <Alert variant="danger" className="mt-4" dismissible>
             <Alert.Heading>Search Error</Alert.Heading>
-            <p>{lineError.message}</p>
+            <p>{error}</p>
           </Alert>
         )}
 
-        {/* Loading State */}
-        {lineLoading && (
-          <div className="text-center mt-4">
-            <Spinner animation="border" role="status">
-              <span className="visually-hidden">Loading...</span>
-            </Spinner>
-            <p className="mt-2">Searching for route...</p>
-          </div>
-        )}
-
-        {/* Results */}
-        {searchResults && !lineLoading && (
+        {searchResults && (
           <div className="mt-4">{renderBusRouteDetails(searchResults)}</div>
-        )}
-
-        {/* Refetching Indicator */}
-        {lineIsFetching && !lineLoading && (
-          <small className="text-muted d-block mt-2">
-            <i className="bi bi-arrow-repeat me-1"></i>
-            Updating...
-          </small>
         )}
       </Card.Body>
     </Card>
   );
 
-  // ✅ SearchByArea Component - مع React Query
   const renderSearchByArea = () => (
     <Card className="p-4 shadow">
       <Card.Body>
@@ -265,8 +521,7 @@ function SearchForTransport() {
                   onChange={(e) => setAreaName(e.target.value)}
                   size="lg"
                   required
-                  style={{ height: '50px' }}
-                  disabled={areaLoading}
+                  style={{ height: "50px" }}
                 />
                 <Form.Text className="text-muted d-block mt-2">
                   Minimum 3 characters required
@@ -279,26 +534,9 @@ function SearchForTransport() {
                 type="submit"
                 size="lg"
                 className="w-100"
-                style={{ height: '50px' }}
-                disabled={areaLoading || areaName.length < 3}
+                style={{ height: "50px" }}
               >
-                {areaLoading ? (
-                  <>
-                    <Spinner
-                      as="span"
-                      animation="border"
-                      size="sm"
-                      role="status"
-                      aria-hidden="true"
-                      className="me-2"
-                    />
-                    Searching...
-                  </>
-                ) : (
-                  <>
-                    <i className="bi bi-search me-2"></i>Find Lines
-                  </>
-                )}
+                <i className="bi bi-search me-2"></i>Find Lines
               </Button>
             </Col>
           </Row>
@@ -308,22 +546,12 @@ function SearchForTransport() {
         {areaError && (
           <Alert variant="danger" className="mt-4" dismissible>
             <Alert.Heading>No Results Found</Alert.Heading>
-            <p>{areaError.message}</p>
+            <p>{areaError}</p>
           </Alert>
         )}
 
-        {/* Loading State */}
-        {areaLoading && (
-          <div className="text-center mt-4">
-            <Spinner animation="border" role="status">
-              <span className="visually-hidden">Loading...</span>
-            </Spinner>
-            <p className="mt-2">Searching for areas...</p>
-          </div>
-        )}
-
         {/* Results */}
-        {areaResults && areaResults.length > 0 && !areaLoading && (
+        {areaResults && areaResults.length > 0 && (
           <div className="mt-4">
             <Alert variant="info">
               <i className="bi bi-info-circle me-2"></i>
@@ -331,95 +559,289 @@ function SearchForTransport() {
               <strong>"{areaName}"</strong>
             </Alert>
 
-            <ListGroup className="mb-4">
-              {areaResults.map((route, index) => (
-                <React.Fragment key={index}>
-                  <ListGroup.Item
-                    as="button"
-                    onClick={() => setSelectedAreaRouteDetails(route.number)}
-                    className="d-flex justify-content-between align-items-center text-start"
-                    active={selectedAreaRouteDetails === route.number}
+            {/* Filter Buttons */}
+            <div className="mb-4 p-3 bg-light rounded border">
+              <h6 className="fw-bold mb-3">
+                <i className="bi bi-funnel me-2"></i>
+                Filter by Transport Type
+              </h6>
+              <div className="d-flex flex-wrap gap-2">
+                <Button
+                  variant={activeFilters.All ? "dark" : "outline-dark"}
+                  size="sm"
+                  onClick={() => toggleFilter("All")}
+                  className="fw-bold"
+                >
+                  <i className="bi bi-list me-1"></i>All ({routeCounts.All})
+                </Button>
+                {routeCounts.Metro > 0 && (
+                  <Button
+                    variant={
+                      activeFilters.Metro ? "primary" : "outline-primary"
+                    }
+                    size="sm"
+                    onClick={() => toggleFilter("Metro")}
+                    className="fw-bold"
                   >
-                    <div className="flex-grow-1">
-                      <h6 className="mb-1">
-                        <Badge bg={route.color} className="me-2">
-                          {route.number}
-                        </Badge>
-                        <span className="text-dark">{route.name}</span>
-                      </h6>
-                      <small className="text-muted">{route.type}</small>
-                    </div>
-                    <i
-                      className={`bi bi-chevron-${
-                        selectedAreaRouteDetails === route.number ? "up" : "down"
-                      } text-secondary`}
-                    ></i>
-                  </ListGroup.Item>
+                    <i className="bi bi-train-front me-1"></i>Metro (
+                    {routeCounts.Metro})
+                  </Button>
+                )}
+                {routeCounts.Microbus > 0 && (
+                  <Button
+                    variant={
+                      activeFilters.Microbus ? "success" : "outline-success"
+                    }
+                    size="sm"
+                    onClick={() => toggleFilter("Microbus")}
+                    className="fw-bold"
+                  >
+                    <i className="bi bi-bus-front me-1"></i>Microbus (
+                    {routeCounts.Microbus})
+                  </Button>
+                )}
+                {routeCounts.Minibus > 0 && (
+                  <Button
+                    variant={activeFilters.Minibus ? "info" : "outline-info"}
+                    size="sm"
+                    onClick={() => toggleFilter("Minibus")}
+                    className="fw-bold"
+                  >
+                    <i className="bi bi-bus-front me-1"></i>Minibus (
+                    {routeCounts.Minibus})
+                  </Button>
+                )}
+                {routeCounts.Tomnaya > 0 && (
+                  <Button
+                    variant={
+                      activeFilters.Tomnaya ? "warning" : "outline-warning"
+                    }
+                    size="sm"
+                    onClick={() => toggleFilter("Tomnaya")}
+                    className="fw-bold"
+                  >
+                    <i className="bi bi-bus-front me-1"></i>Tomnaya (
+                    {routeCounts.Tomnaya})
+                  </Button>
+                )}
+                {routeCounts.Bus > 0 && (
+                  <Button
+                    variant={
+                      activeFilters.Bus ? "secondary" : "outline-secondary"
+                    }
+                    size="sm"
+                    onClick={() => toggleFilter("Bus")}
+                    className="fw-bold"
+                  >
+                    <i className="bi bi-bus-front me-1"></i>Bus (
+                    {routeCounts.Bus})
+                  </Button>
+                )}
+              </div>
+            </div>
 
-                  {/* Collapse Details - مع Query للتفاصيل */}
-                  <Collapse in={selectedAreaRouteDetails === route.number}>
-                    <div className="bg-light border-bottom p-4">
-                      <AreaRouteDetails routeNumber={route.number} />
-                    </div>
-                  </Collapse>
-                </React.Fragment>
-              ))}
-            </ListGroup>
+            {/* Filtered Results */}
+            {getFilteredAreaResults().length > 0 ? (
+              <ListGroup className="mb-4">
+                {getFilteredAreaResults().map((route, index) => (
+                  <React.Fragment key={index}>
+                    {/* Route Item */}
+                    <ListGroup.Item
+                      as="button"
+                      onClick={() =>
+                        handleSelectAreaRoute(route.number, route.name)
+                      }
+                      className="d-flex justify-content-between align-items-center text-start"
+                      variant={
+                        selectedAreaRouteDetails?.name === route.name
+                          ? "light"
+                          : "white"
+                      }
+                      active={selectedAreaRouteDetails?.name === route.name}
+                    >
+                      <div className="flex-grow-1">
+                        <h6 className="mb-1">
+                          <Badge
+                            bg={getFilterColor(
+                              categorizeRouteType(route.number)
+                            )}
+                            className="me-2"
+                          >
+                            {route.number}
+                          </Badge>
+                          <span className="text-dark">{route.name}</span>
+                        </h6>
+                        <small className="text-muted">{route.type}</small>
+                      </div>
+                      <i
+                        className={`bi bi-chevron-${
+                          selectedAreaRouteDetails?.number === route.number
+                            ? "up"
+                            : "down"
+                        } text-secondary`}
+                      ></i>
+                    </ListGroup.Item>
+
+                    {/* Collapse Details */}
+                    <Collapse
+                      in={selectedAreaRouteDetails?.name === route.name}
+                    >
+                      <div className="bg-light border-bottom p-4">
+                        <div className="d-flex justify-content-between align-items-center mb-3">
+                          <h6 className="mb-0 text-info">
+                            <i className="bi bi-bus-front me-2"></i>
+                            Route Details
+                          </h6>
+                          <Button
+                            variant="outline-danger"
+                            size="sm"
+                            onClick={() => setSelectedAreaRouteDetails(null)}
+                          >
+                            <i className="bi bi-x-circle me-1"></i>Close
+                          </Button>
+                        </div>
+
+                        {selectedAreaRouteDetails && (
+                          <>
+                            {/* Route Info */}
+                            <Row className="mb-4 p-3 bg-white rounded border">
+                              <Col>
+                                <small className="text-muted d-block">
+                                  From
+                                </small>
+                                <strong className="text-success">
+                                  {selectedAreaRouteDetails.stops[0]?.name}
+                                </strong>
+                              </Col>
+                              <Col className="text-center">
+                                <i className="bi bi-arrow-right text-secondary"></i>
+                              </Col>
+                              <Col className="text-end">
+                                <small className="text-muted d-block">To</small>
+                                <strong className="text-danger">
+                                  {
+                                    selectedAreaRouteDetails.stops[
+                                      selectedAreaRouteDetails.stops.length - 1
+                                    ]?.name
+                                  }
+                                </strong>
+                              </Col>
+                            </Row>
+
+                            {/* Stops List */}
+                            <h6 className="fw-bold mb-2">
+                              <i className="bi bi-pin-map me-2"></i>
+                              Stops ({selectedAreaRouteDetails.stops.length})
+                            </h6>
+                            <div
+                              style={{
+                                maxHeight: "300px",
+                                overflowY: "auto",
+                              }}
+                            >
+                              <ListGroup
+                                variant="flush"
+                                className="border rounded"
+                              >
+                                {selectedAreaRouteDetails.stops.map(
+                                  (stop, stopIndex) => (
+                                    <ListGroup.Item
+                                      key={stopIndex}
+                                      className="py-2 px-3 d-flex justify-content-between align-items-center"
+                                    >
+                                      <div className="d-flex align-items-center flex-grow-1">
+                                        <Badge
+                                          bg={
+                                            stopIndex === 0
+                                              ? "success"
+                                              : stopIndex ===
+                                                selectedAreaRouteDetails.stops
+                                                  .length -
+                                                  1
+                                              ? "danger"
+                                              : "secondary"
+                                          }
+                                          className="me-2"
+                                          pill
+                                        >
+                                          {stopIndex + 1}
+                                        </Badge>
+                                        <small className="text-truncate">
+                                          {stop.name}
+                                        </small>
+                                      </div>
+                                      <Badge
+                                        bg="light"
+                                        text="dark"
+                                        className="ms-2"
+                                      >
+                                        {stop.time}
+                                      </Badge>
+                                    </ListGroup.Item>
+                                  )
+                                )}
+                              </ListGroup>
+                            </div>
+
+                            {/* Daily Schedule */}
+                            <h6 className="fw-bold mt-3 mb-2">
+                              <i className="bi bi-clock-history me-2"></i>
+                              Today's Schedule
+                            </h6>
+                            <div className="d-flex flex-wrap gap-2">
+                              {selectedAreaRouteDetails.schedule &&
+                                selectedAreaRouteDetails.schedule.map(
+                                  (scheduleItem, idx) => (
+                                    <OverlayTrigger
+                                      key={idx}
+                                      overlay={
+                                        <Tooltip id={`tooltip-area-${idx}`}>
+                                          {scheduleItem.isPassed
+                                            ? "Passed"
+                                            : "Upcoming"}
+                                        </Tooltip>
+                                      }
+                                    >
+                                      <Badge
+                                        bg={
+                                          scheduleItem.isPassed
+                                            ? "secondary"
+                                            : route.color
+                                        }
+                                        className="p-2"
+                                      >
+                                        {scheduleItem.time}
+                                      </Badge>
+                                    </OverlayTrigger>
+                                  )
+                                )}
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    </Collapse>
+                  </React.Fragment>
+                ))}
+              </ListGroup>
+            ) : (
+              <Alert variant="warning" className="mt-4">
+                <i className="bi bi-exclamation-triangle me-2"></i>
+                No transport types match your selected filters.
+              </Alert>
+            )}
           </div>
         )}
 
         {/* Initial Message */}
-        {!areaResults && !areaError && !areaLoading && (
+        {!areaResults && !areaError && (
           <Alert variant="info" className="mt-4">
             <i className="bi bi-info-circle me-2"></i>
             Search for a stop or area name to see available lines.
           </Alert>
         )}
-
-        {/* Refetching Indicator */}
-        {areaIsFetching && !areaLoading && (
-          <small className="text-muted d-block mt-2">
-            <i className="bi bi-arrow-repeat me-1"></i>
-            Updating...
-          </small>
-        )}
       </Card.Body>
     </Card>
   );
-
-  // مكون منفصل لتفاصيل الخط
-  const AreaRouteDetails = ({ routeNumber }) => {
-    const { data: routeDetails, isLoading } = useSearchByLineNumber(routeNumber);
-
-    if (isLoading) {
-      return (
-        <div className="text-center">
-          <Spinner animation="border" size="sm" />
-        </div>
-      );
-    }
-
-    if (!routeDetails) return null;
-
-    return (
-      <>
-        <div className="d-flex justify-content-between align-items-center mb-3">
-          <h6 className="mb-0 text-info">
-            <i className="bi bi-bus-front me-2"></i>
-            Route Details
-          </h6>
-          <Button
-            variant="outline-danger"
-            size="sm"
-            onClick={() => setSelectedAreaRouteDetails(null)}
-          >
-            <i className="bi bi-x-circle me-1"></i>Close
-          </Button>
-        </div>
-        {renderBusRouteDetails(routeDetails)}
-      </>
-    );
-  };
 
   // Return Statement
   return (
@@ -437,16 +859,36 @@ function SearchForTransport() {
         </Col>
       </Row>
 
-      {/* Tabs */}
+      {/* ✅ Tabs - Centered */}
       <Row className="mb-4">
         <Col className="text-center">
           <Tabs
             id="transport-search-tabs"
             activeKey={activeKey}
-            onSelect={(k) => setActiveKey(k)}
+            onSelect={(k) => {
+              setActiveKey(k);
+              setSearchResults(null);
+              setError("");
+              setLineNumber("");
+              setAreaResults(null);
+              setAreaError("");
+              setAreaName("");
+              setSelectedAreaRouteDetails(null);
+              setActiveFilters({
+                All: true,
+                Metro: false,
+                Microbus: false,
+                Tomnaya: false,
+                Minibus: false,
+                Bus: false,
+              });
+            }}
             variant="pills"
             className="justify-content-center"
-            style={{ display: 'flex', justifyContent: 'center' }}
+            style={{
+              display: "flex",
+              justifyContent: "center",
+            }}
           >
             <Tab
               eventKey="number"
@@ -456,7 +898,9 @@ function SearchForTransport() {
                   By Line Number
                 </span>
               }
-            />
+            >
+              {/* Content will be rendered below */}
+            </Tab>
             <Tab
               eventKey="area"
               title={
@@ -465,7 +909,9 @@ function SearchForTransport() {
                   By Area
                 </span>
               }
-            />
+            >
+              {/* Content will be rendered below */}
+            </Tab>
           </Tabs>
         </Col>
       </Row>
@@ -475,17 +921,6 @@ function SearchForTransport() {
         <Col lg={10}>
           {activeKey === "number" && renderSearchByNumber()}
           {activeKey === "area" && renderSearchByArea()}
-        </Col>
-      </Row>
-
-      {/* Footer */}
-      <Row className="mt-5 pt-4 border-top text-muted">
-        <Col md={6}>
-          <h6 className="fw-bold">Popular Lines</h6>
-          <small>M1, M2, M3, M5, CTA 354, CTA 147</small>
-        </Col>
-        <Col md={6} className="text-end">
-          <small>© 2024 Transport Portal. All rights reserved.</small>
         </Col>
       </Row>
     </Container>
