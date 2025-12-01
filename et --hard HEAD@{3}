@@ -1,0 +1,21 @@
+[33m8088f38[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mstaging[m[33m)[m HEAD@{0}: reset: moving to HEAD~4
+[33m4d674a7[m[33m ([m[1;31morigin/staging[m[33m)[m HEAD@{1}: checkout: moving from staging to staging
+[33m4d674a7[m[33m ([m[1;31morigin/staging[m[33m)[m HEAD@{2}: pull origin staging: Fast-forward
+[33m108357d[m HEAD@{3}: commit: Remove React Query
+[33m022ab4c[m HEAD@{4}: commit: Adding React Query & Search Filters
+[33m8d6459e[m HEAD@{5}: checkout: moving from search-for-transport to staging
+[33m1776fbf[m[33m ([m[1;31morigin/search-for-transport[m[33m, [m[1;32msearch-for-transport[m[33m)[m HEAD@{6}: checkout: moving from staging to search-for-transport
+[33m8d6459e[m HEAD@{7}: commit: Editing Scroll To Top Button
+[33me83924e[m HEAD@{8}: pull origin staging: Fast-forward
+[33m5f60215[m HEAD@{9}: commit: adding "Route Path" for each bus appears in any route when click on it
+[33md5c484a[m HEAD@{10}: pull origin staging: Fast-forward
+[33m0678435[m HEAD@{11}: commit: Recoding Find Routes Page
+[33m427ad7c[m HEAD@{12}: pull origin staging: Fast-forward
+[33m9954a46[m HEAD@{13}: pull origin main: Fast-forward
+[33m0e720a5[m HEAD@{14}: pull --tags origin staging: Merge made by the 'ort' strategy.
+[33m0aad94b[m HEAD@{15}: commit: Modifying search for transport
+[33m5a28582[m HEAD@{16}: commit: Modifying Matro Guide Page
+[33m23b3c80[m HEAD@{17}: commit: modify options part
+[33m2743733[m HEAD@{18}: pull: Fast-forward
+[33m1dee048[m HEAD@{19}: checkout: moving from main to staging
+[33md08d078[m[33m ([m[1;32mmain[m[33m)[m HEAD@{20}: clone: from https://github.com/DEPITeam2025/EzMoveEgypt.git

@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
+import { useQuery, QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Container,
   Tabs,
@@ -37,6 +38,29 @@ const allStopsData = [...busStopsData, ...metroStopsData];
 
 const getRouteTypeColor = (routeType) => {
   return routeType === 1 ? "danger" : "primary";
+};
+
+// --- React Query Wrappers for Data Fetching ---
+
+// Async wrapper for findRouteDetails
+const fetchRouteDetails = async ({ queryKey }) => {
+  const [_, lineNumber, routeLongname] = queryKey;
+  if (!lineNumber) return null;
+  // Simulate network delay for a more realistic React Query experience
+  await new Promise(resolve => setTimeout(resolve, 300));
+  return findRouteDetails(lineNumber, routeLongname);
+};
+
+// Async wrapper for findRoutesByArea
+const fetchRoutesByArea = async ({ queryKey }) => {
+  const [_, areaName] = queryKey;
+  if (!areaName || areaName.length < 3) {
+    // React Query will catch this error and set the isError state
+    throw new Error("Please enter at least 3 characters for the area search.");
+  }
+  // Simulate network delay
+  await new Promise(resolve => setTimeout(resolve, 300));
+  return findRoutesByStopName(areaName);
 };
 
 //search for route details by line number
@@ -221,18 +245,53 @@ const findRoutesByStopName = (areaName) => {
   return results;
 };
 
+// --- React Query Setup ---
+const queryClient = new QueryClient();
+
 // SearchForTransport Component
-function SearchForTransport() {
+function SearchForTransportContent() {
   const [activeKey, setActiveKey] = useState("number");
   const [lineNumber, setLineNumber] = useState("");
-  const [searchResults, setSearchResults] = useState(null);
-  const [error, setError] = useState("");
+  const [lineSearchQuery, setLineSearchQuery] = useState(null);
+
+  const {
+    data: searchResults,
+    error: lineError,
+    isLoading: isLineLoading,
+    isFetching: isLineFetching,
+  } = useQuery({
+    queryKey: ["routeDetails", lineSearchQuery],
+    queryFn: fetchRouteDetails,
+    enabled: !!lineSearchQuery,
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+  });
 
   const [areaName, setAreaName] = useState("");
-  const [areaResults, setAreaResults] = useState(null);
-  const [areaError, setAreaError] = useState("");
-  const [selectedAreaRouteDetails, setSelectedAreaRouteDetails] =
-    useState(null);
+  const [areaSearchQuery, setAreaSearchQuery] = useState(null);
+
+  const {
+    data: areaResults,
+    error: areaError,
+    isLoading: isAreaLoading,
+    isFetching: isAreaFetching,
+    isError: isAreaError,
+  } = useQuery({
+    queryKey: ["routesByArea", areaSearchQuery],
+    queryFn: fetchRoutesByArea,
+    enabled: !!areaSearchQuery,
+    staleTime: 5 * 60 * 1000,
+  });
+  const [selectedRoute, setSelectedRoute] = useState({ number: null, name: null });
+
+  const {
+    data: selectedAreaRouteDetails,
+    isLoading: isSelectedRouteLoading,
+  } = useQuery({
+    queryKey: ["routeDetails", selectedRoute.number, selectedRoute.name],
+    queryFn: fetchRouteDetails,
+    enabled: !!selectedRoute.number,
+    staleTime: 5 * 60 * 1000,
+  });
   const [activeFilters, setActiveFilters] = useState({
     All: true,
     Metro: false,
@@ -245,45 +304,26 @@ function SearchForTransport() {
   // دالة البحث برقم الخط
   const handleLineSearch = (e) => {
     e.preventDefault();
-    setError("");
-    setSearchResults(null);
-
-    const data = findRouteDetails(lineNumber);
-
-    if (data) {
-      setSearchResults(data);
-    } else {
-      setError(
-        `No route found or missing data for line: ${lineNumber}. Try M1 or CTA 354.`
-      );
+    if (lineNumber.trim()) {
+      setLineSearchQuery(lineNumber.trim());
     }
   };
 
   // دالة البحث بالمنطقة
   const handleAreaSearch = (e) => {
     e.preventDefault();
-    setAreaError("");
-    setAreaResults(null);
-    setSelectedAreaRouteDetails(null);
-
-    if (areaName.length < 3) {
-      setAreaError("Please enter at least 3 characters for the area search.");
-      return;
-    }
-
-    const results = findRoutesByStopName(areaName);
-
-    if (results.length > 0) {
-      setAreaResults(results);
-    } else {
-      setAreaError(`No lines found serving an area matching: ${areaName}`);
+    setSelectedRoute({ number: null, name: null }); // Clear route details when starting a new area search
+    if (areaName.trim()) {
+      setAreaSearchQuery(areaName.trim());
     }
   };
 
   const handleSelectAreaRoute = (routeNumber, routeName) => {
-    const details = findRouteDetails(routeNumber, routeName);
-    if (details) {
-      setSelectedAreaRouteDetails(details);
+    // If the same route is clicked again, close the details view
+    if (selectedRoute.number === routeNumber && selectedRoute.name === routeName) {
+      setSelectedRoute({ number: null, name: null });
+    } else {
+      setSelectedRoute({ number: routeNumber, name: routeName });
     }
   };
 
@@ -350,24 +390,20 @@ function SearchForTransport() {
     return (
       <Card className="mt-4 border-0 shadow-lg">
         <Card.Header className={`bg-${routeVariant} text-white`}>
-          <Card.Title className="mb-0">
-            <i className="bi bi-bus-front me-2"></i>
-            {name}{" "}
-            <Badge bg="light" text="dark">
-              {route.number}
-            </Badge>
-          </Card.Title>
+          <h4 className="mb-0">
+            <i className={`bi bi-${isMetro ? "train-front" : "bus-front"} me-2`}></i>
+            Line {route.number} - {name}
+          </h4>
         </Card.Header>
-
         <Card.Body>
           {/* Route Info */}
-          <Row className="mb-4 p-3 bg-light rounded">
+          <Row className="mb-4 p-3 bg-light rounded border">
             <Col>
               <small className="text-muted d-block">From</small>
               <strong className="text-success">{startStop}</strong>
             </Col>
             <Col className="text-center">
-              <i className="bi bi-arrow-right text-secondary display-6"></i>
+              <i className="bi bi-arrow-right text-secondary"></i>
             </Col>
             <Col className="text-end">
               <small className="text-muted d-block">To</small>
@@ -376,14 +412,11 @@ function SearchForTransport() {
           </Row>
 
           {/* Stops List */}
-          <h6 className="fw-bold mb-3">
+          <h6 className="fw-bold mb-2">
             <i className="bi bi-pin-map me-2"></i>
-            Route Stops ({stops.length})
+            Stops ({stops.length})
           </h6>
-          <ListGroup
-            variant="flush"
-            className="mb-4 border rounded overflow-hidden"
-          >
+          <ListGroup variant="flush" className="border rounded mb-4">
             {stops.map((stop, index) => (
               <ListGroup.Item
                 key={index}
@@ -446,26 +479,30 @@ function SearchForTransport() {
   const renderSearchByNumber = () => (
     <Card className="p-4 shadow">
       <Card.Body>
+        <h4 className="text-primary mb-3">
+          <i className="bi bi-bus-front me-2"></i>Search By Line Number
+        </h4>
+        <p className="lead text-muted">
+          Find the full route details and schedule for a specific line.
+        </p>
+
         <Form onSubmit={handleLineSearch}>
-          <Row className="g-3 align-items-center">
+          <Row className="g-3 align-items-end">
             <Col xs={12} md={8}>
               <Form.Group controlId="formLineNumber" className="mb-0">
                 <Form.Label className="fw-bold mb-2 d-block">
-                  <i className="bi bi-bus-front me-2"></i>
-                  Enter Transport Line Number
+                  <i className="bi bi-hash me-2"></i>
+                  Enter Line Number
                 </Form.Label>
                 <Form.Control
                   type="text"
-                  placeholder="e.g., M1, M3, or CTA 354"
+                  placeholder="e.g., M1, 354, 100"
                   value={lineNumber}
                   onChange={(e) => setLineNumber(e.target.value)}
                   size="lg"
                   required
                   style={{ height: "50px" }}
                 />
-                <Form.Text className="text-muted d-block mt-2">
-                  Try M1, M3, M5, or CTA 354
-                </Form.Text>
               </Form.Group>
             </Col>
             <Col xs={12} md={4}>
@@ -482,16 +519,16 @@ function SearchForTransport() {
           </Row>
         </Form>
 
-        {error && (
+        {isLineLoading || isLineFetching ? (
+          <Alert variant="info" className="mt-4">Searching for line {lineNumber}...</Alert>
+        ) : lineError ? (
           <Alert variant="danger" className="mt-4" dismissible>
             <Alert.Heading>Search Error</Alert.Heading>
-            <p>{error}</p>
+            <p>{lineError.message || `No route found or missing data for line: ${lineNumber}. Try M1 or CTA 354.`}</p>
           </Alert>
-        )}
-
-        {searchResults && (
+        ) : searchResults ? (
           <div className="mt-4">{renderBusRouteDetails(searchResults)}</div>
-        )}
+        ) : null}
       </Card.Body>
     </Card>
   );
@@ -542,16 +579,18 @@ function SearchForTransport() {
           </Row>
         </Form>
 
-        {/* Error Alert */}
-        {areaError && (
+        {/* Loading/Error State */}
+        {isAreaLoading || isAreaFetching ? (
+          <Alert variant="info" className="mt-4">Searching for routes in {areaName}...</Alert>
+        ) : isAreaError ? (
           <Alert variant="danger" className="mt-4" dismissible>
-            <Alert.Heading>No Results Found</Alert.Heading>
-            <p>{areaError}</p>
+            <Alert.Heading>Search Error</Alert.Heading>
+            <p>{areaError.message}</p>
           </Alert>
-        )}
+        ) : null}
 
         {/* Results */}
-        {areaResults && areaResults.length > 0 && (
+        {areaResults && areaResults.length > 0 && !isAreaError && (
           <div className="mt-4">
             <Alert variant="info">
               <i className="bi bi-info-circle me-2"></i>
@@ -653,11 +692,11 @@ function SearchForTransport() {
                       }
                       className="d-flex justify-content-between align-items-center text-start"
                       variant={
-                        selectedAreaRouteDetails?.name === route.name
+                        selectedRoute.name === route.name
                           ? "light"
                           : "white"
                       }
-                      active={selectedAreaRouteDetails?.name === route.name}
+                      active={selectedRoute.name === route.name}
                     >
                       <div className="flex-grow-1">
                         <h6 className="mb-1">
@@ -675,7 +714,7 @@ function SearchForTransport() {
                       </div>
                       <i
                         className={`bi bi-chevron-${
-                          selectedAreaRouteDetails?.number === route.number
+                          selectedRoute.number === route.number
                             ? "up"
                             : "down"
                         } text-secondary`}
@@ -684,7 +723,7 @@ function SearchForTransport() {
 
                     {/* Collapse Details */}
                     <Collapse
-                      in={selectedAreaRouteDetails?.name === route.name}
+                      in={selectedRoute.name === route.name}
                     >
                       <div className="bg-light border-bottom p-4">
                         <div className="d-flex justify-content-between align-items-center mb-3">
@@ -695,13 +734,15 @@ function SearchForTransport() {
                           <Button
                             variant="outline-danger"
                             size="sm"
-                            onClick={() => setSelectedAreaRouteDetails(null)}
+                            onClick={() => setSelectedRoute({ number: null, name: null })}
                           >
                             <i className="bi bi-x-circle me-1"></i>Close
                           </Button>
                         </div>
 
-                        {selectedAreaRouteDetails && (
+                        {isSelectedRouteLoading ? (
+                          <Alert variant="info">Loading route details...</Alert>
+                        ) : selectedAreaRouteDetails ? (
                           <>
                             {/* Route Info */}
                             <Row className="mb-4 p-3 bg-white rounded border">
@@ -817,7 +858,7 @@ function SearchForTransport() {
                                 )}
                             </div>
                           </>
-                        )}
+                        ) : null}
                       </div>
                     </Collapse>
                   </React.Fragment>
@@ -833,7 +874,7 @@ function SearchForTransport() {
         )}
 
         {/* Initial Message */}
-        {!areaResults && !areaError && (
+        {!areaSearchQuery && !areaResults && !isAreaError && (
           <Alert variant="info" className="mt-4">
             <i className="bi bi-info-circle me-2"></i>
             Search for a stop or area name to see available lines.
@@ -865,66 +906,26 @@ function SearchForTransport() {
           <Tabs
             id="transport-search-tabs"
             activeKey={activeKey}
-            onSelect={(k) => {
-              setActiveKey(k);
-              setSearchResults(null);
-              setError("");
-              setLineNumber("");
-              setAreaResults(null);
-              setAreaError("");
-              setAreaName("");
-              setSelectedAreaRouteDetails(null);
-              setActiveFilters({
-                All: true,
-                Metro: false,
-                Microbus: false,
-                Tomnaya: false,
-                Minibus: false,
-                Bus: false,
-              });
-            }}
-            variant="pills"
+            onSelect={(k) => setActiveKey(k)}
             className="justify-content-center"
-            style={{
-              display: "flex",
-              justifyContent: "center",
-            }}
           >
-            <Tab
-              eventKey="number"
-              title={
-                <span>
-                  <i className="bi bi-bus-front me-2"></i>
-                  By Line Number
-                </span>
-              }
-            >
-              {/* Content will be rendered below */}
+            <Tab eventKey="number" title="Search By Line Number">
+              <div className="mt-4">{renderSearchByNumber()}</div>
             </Tab>
-            <Tab
-              eventKey="area"
-              title={
-                <span>
-                  <i className="bi bi-geo-alt me-2"></i>
-                  By Area
-                </span>
-              }
-            >
-              {/* Content will be rendered below */}
+            <Tab eventKey="area" title="Search By Area">
+              <div className="mt-4">{renderSearchByArea()}</div>
             </Tab>
           </Tabs>
-        </Col>
-      </Row>
-
-      {/* Content Area */}
-      <Row className="justify-content-center">
-        <Col lg={10}>
-          {activeKey === "number" && renderSearchByNumber()}
-          {activeKey === "area" && renderSearchByArea()}
         </Col>
       </Row>
     </Container>
   );
 }
 
-export default SearchForTransport;
+export default function SearchForTransport() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <SearchForTransportContent />
+    </QueryClientProvider>
+  );
+}
