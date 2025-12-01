@@ -47,7 +47,10 @@ export function findShortestPath(graph, startId, endId) {
 
   // summarize lines & transfers
   const summary = [];
-  let currentLine = path[0].line_name;
+  let currentLine =
+    path[0].line_name ||
+    `${graph.nodes[path[0].from]?.name} → ${graph.nodes[path[0].to]?.name}`;
+
   let mode = path[0].mode;
   let stops = 1;
 
@@ -60,7 +63,11 @@ export function findShortestPath(graph, startId, endId) {
         stops,
         transfer: step.mode === "transfer",
       });
-      currentLine = step.line_name;
+
+      currentLine =
+        step.line_name ||
+        `${graph.nodes[step.from]?.name} → ${graph.nodes[step.to]?.name}`;
+
       mode = step.mode;
       stops = 1;
     } else {
