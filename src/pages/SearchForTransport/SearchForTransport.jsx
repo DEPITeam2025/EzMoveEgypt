@@ -1,5 +1,9 @@
 import React, { useState, useMemo } from "react";
-import { useQuery, QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import {
+  useQuery,
+  QueryClient,
+  QueryClientProvider,
+} from "@tanstack/react-query";
 import {
   Container,
   Tabs,
@@ -47,7 +51,7 @@ const fetchRouteDetails = async ({ queryKey }) => {
   const [_, lineNumber, routeLongname] = queryKey;
   if (!lineNumber) return null;
   // Simulate network delay for a more realistic React Query experience
-  await new Promise(resolve => setTimeout(resolve, 300));
+  await new Promise((resolve) => setTimeout(resolve, 300));
   return findRouteDetails(lineNumber, routeLongname);
 };
 
@@ -59,7 +63,7 @@ const fetchRoutesByArea = async ({ queryKey }) => {
     throw new Error("Please enter at least 3 characters for the area search.");
   }
   // Simulate network delay
-  await new Promise(resolve => setTimeout(resolve, 300));
+  await new Promise((resolve) => setTimeout(resolve, 300));
   return findRoutesByStopName(areaName);
 };
 
@@ -281,17 +285,18 @@ function SearchForTransportContent() {
     enabled: !!areaSearchQuery,
     staleTime: 5 * 60 * 1000,
   });
-  const [selectedRoute, setSelectedRoute] = useState({ number: null, name: null });
-
-  const {
-    data: selectedAreaRouteDetails,
-    isLoading: isSelectedRouteLoading,
-  } = useQuery({
-    queryKey: ["routeDetails", selectedRoute.number, selectedRoute.name],
-    queryFn: fetchRouteDetails,
-    enabled: !!selectedRoute.number,
-    staleTime: 5 * 60 * 1000,
+  const [selectedRoute, setSelectedRoute] = useState({
+    number: null,
+    name: null,
   });
+
+  const { data: selectedAreaRouteDetails, isLoading: isSelectedRouteLoading } =
+    useQuery({
+      queryKey: ["routeDetails", selectedRoute.number, selectedRoute.name],
+      queryFn: fetchRouteDetails,
+      enabled: !!selectedRoute.number,
+      staleTime: 5 * 60 * 1000,
+    });
   const [activeFilters, setActiveFilters] = useState({
     All: true,
     Metro: false,
@@ -320,7 +325,10 @@ function SearchForTransportContent() {
 
   const handleSelectAreaRoute = (routeNumber, routeName) => {
     // If the same route is clicked again, close the details view
-    if (selectedRoute.number === routeNumber && selectedRoute.name === routeName) {
+    if (
+      selectedRoute.number === routeNumber &&
+      selectedRoute.name === routeName
+    ) {
       setSelectedRoute({ number: null, name: null });
     } else {
       setSelectedRoute({ number: routeNumber, name: routeName });
@@ -391,7 +399,9 @@ function SearchForTransportContent() {
       <Card className="mt-4 border-0 shadow-lg">
         <Card.Header className={`bg-${routeVariant} text-white`}>
           <h4 className="mb-0">
-            <i className={`bi bi-${isMetro ? "train-front" : "bus-front"} me-2`}></i>
+            <i
+              className={`bi bi-${isMetro ? "train-front" : "bus-front"} me-2`}
+            ></i>
             Line {route.number} - {name}
           </h4>
         </Card.Header>
@@ -520,11 +530,16 @@ function SearchForTransportContent() {
         </Form>
 
         {isLineLoading || isLineFetching ? (
-          <Alert variant="info" className="mt-4">Searching for line {lineNumber}...</Alert>
+          <Alert variant="info" className="mt-4">
+            Searching for line {lineNumber}...
+          </Alert>
         ) : lineError ? (
           <Alert variant="danger" className="mt-4" dismissible>
             <Alert.Heading>Search Error</Alert.Heading>
-            <p>{lineError.message || `No route found or missing data for line: ${lineNumber}. Try M1 or CTA 354.`}</p>
+            <p>
+              {lineError.message ||
+                `No route found or missing data for line: ${lineNumber}. Try M1 or CTA 354.`}
+            </p>
           </Alert>
         ) : searchResults ? (
           <div className="mt-4">{renderBusRouteDetails(searchResults)}</div>
@@ -581,7 +596,9 @@ function SearchForTransportContent() {
 
         {/* Loading/Error State */}
         {isAreaLoading || isAreaFetching ? (
-          <Alert variant="info" className="mt-4">Searching for routes in {areaName}...</Alert>
+          <Alert variant="info" className="mt-4">
+            Searching for routes in {areaName}...
+          </Alert>
         ) : isAreaError ? (
           <Alert variant="danger" className="mt-4" dismissible>
             <Alert.Heading>Search Error</Alert.Heading>
@@ -692,9 +709,7 @@ function SearchForTransportContent() {
                       }
                       className="d-flex justify-content-between align-items-center text-start"
                       variant={
-                        selectedRoute.name === route.name
-                          ? "light"
-                          : "white"
+                        selectedRoute.name === route.name ? "light" : "white"
                       }
                       active={selectedRoute.name === route.name}
                     >
@@ -714,17 +729,13 @@ function SearchForTransportContent() {
                       </div>
                       <i
                         className={`bi bi-chevron-${
-                          selectedRoute.number === route.number
-                            ? "up"
-                            : "down"
+                          selectedRoute.number === route.number ? "up" : "down"
                         } text-secondary`}
                       ></i>
                     </ListGroup.Item>
 
                     {/* Collapse Details */}
-                    <Collapse
-                      in={selectedRoute.name === route.name}
-                    >
+                    <Collapse in={selectedRoute.name === route.name}>
                       <div className="bg-light border-bottom p-4">
                         <div className="d-flex justify-content-between align-items-center mb-3">
                           <h6 className="mb-0 text-info">
@@ -734,7 +745,9 @@ function SearchForTransportContent() {
                           <Button
                             variant="outline-danger"
                             size="sm"
-                            onClick={() => setSelectedRoute({ number: null, name: null })}
+                            onClick={() =>
+                              setSelectedRoute({ number: null, name: null })
+                            }
                           >
                             <i className="bi bi-x-circle me-1"></i>Close
                           </Button>
