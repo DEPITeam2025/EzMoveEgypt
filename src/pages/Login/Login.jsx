@@ -1,16 +1,22 @@
 // src/components/Login.jsx
 import "./Login.css";
-
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { login, loadUserFromStorage } from "@/features/auth/authSlice";
+import {
+  login,
+  loadUserFromStorage,
+  fetchUserExtraData,
+} from "@/features/auth/authSlice";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { Form, Button, Card, Container, Row, Col } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import logo from "@/assets/images/Container.png";
+
 const Login = () => {
+  console.log("Online:", navigator.onLine);
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
@@ -21,22 +27,22 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [remember, setRemember] = useState(true);
-  // ✅ خزّن اختيار "Remember me" في localStorage علشان authSlice يعرف يخزن في المكان الصح
+
   useEffect(() => {
     localStorage.setItem("rememberMe", JSON.stringify(remember));
   }, [remember]);
 
-  // عند تحميل الـ app — استرجاع لو في بيانات مخزنة
   useEffect(() => {
     dispatch(loadUserFromStorage());
   }, [dispatch]);
 
-  // عند نجاح الدخول — خزّن في storage و اعمل redirect
   useEffect(() => {
     if (auth.token) {
+      // 🔹 جلب البيانات الثقيلة في الخلفية بعد نجاح login
+      dispatch(fetchUserExtraData(auth.user.uid));
       navigate(from, { replace: true });
     }
-  }, [auth.token, auth.user, remember, navigate, from]);
+  }, [auth.token, auth.user, navigate, from, dispatch]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -57,7 +63,7 @@ const Login = () => {
             </p>
           </div>
 
-          <Card className="p-3 shadow-sm ">
+          <Card className="p-3 shadow-sm">
             <Card.Body>
               <h4>Login</h4>
               <p className="text-muted">
@@ -126,6 +132,18 @@ const Login = () => {
                   {auth.status === "loading" ? "Logging in..." : "Login"}
                 </Button>
               </Form>
+
+              <div style={{ marginTop: "15px", textAlign: "center" }}>
+                <span style={{ fontSize: "14px", color: "#555" }}>
+                  Don’t have an account?{" "}
+                </span>
+                <Link
+                  to="/auth/signup"
+                  style={{ color: "#007bff", textDecoration: "none" }}
+                >
+                  Sign up
+                </Link>
+              </div>
             </Card.Body>
           </Card>
         </Col>

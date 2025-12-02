@@ -18,6 +18,8 @@ function TheHeader() {
   // ✅ خدي بيانات المستخدم من Redux
   const { user, token } = useSelector((state) => state.auth);
   const isLoggedIn = Boolean(token);
+  const displayName =
+    user?.fullName || localStorage.getItem("username") || "User";
 
   const linkClass = ({ isActive }) =>
     isActive ? `${styles.navLink} ${styles.active}` : styles.navLink;
@@ -103,7 +105,7 @@ function TheHeader() {
                 style={{ display: "flex", alignItems: "center", gap: "10px" }}
               >
                 <span style={{ color: "black" }}>
-                  👋 Hello, <strong>{user?.name || "User"}</strong>
+                  👋 Hello, <strong>{displayName}</strong>
                 </span>
                 <Button
                   variant="outline-danger"
