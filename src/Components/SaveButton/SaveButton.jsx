@@ -1,10 +1,10 @@
-// src/components/SaveButton.jsx
+// SaveButton.jsx
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { updateSavedItems, removeSavedItem } from "@/features/auth/authSlice";
 
-const SaveButton = ({ item, type }) => {
+const SaveButton = ({ item, type, startName, endName }) => {
   const { user, token } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -12,15 +12,25 @@ const SaveButton = ({ item, type }) => {
   const [saved, setSaved] = useState(false);
   const [anim, setAnim] = useState(false);
 
-  const itemWithId = { id: item.id, type, ...item };
+  //generating id for items without id (like routes)
+  const itemWithId = {
+    id: `${item.start || ""}-${item.end || ""}-${item.line || ""}-${
+      item.mode || ""
+    }`,
+    type,
+    from: startName, // الاسم اللي اليوزر عامل بيه البحث
+    to: endName,
+    ...item,
+  };
 
   useEffect(() => {
     if (!user) return;
-    const userKey = `user-${user.uid}`;
-    const savedItems =
-      JSON.parse(localStorage.getItem(userKey))?.savedItems || [];
-    setSaved(savedItems.some((i) => i.id === item.id));
-  }, [user, item]);
+
+    const userKey = `savedItems-${user.uid}`;
+    const savedItems = JSON.parse(localStorage.getItem(userKey)) || [];
+
+    setSaved(savedItems.some((i) => i.id === itemWithId.id));
+  }, [user, itemWithId.id]);
 
   const handleToggleSave = () => {
     if (!token) {
@@ -29,49 +39,38 @@ const SaveButton = ({ item, type }) => {
       return;
     }
 
+    const userKey = `savedItems-${user.uid}`;
+    const savedItems = JSON.parse(localStorage.getItem(userKey)) || [];
+
     setAnim(true);
     setTimeout(() => setAnim(false), 200);
 
-    const userKey = `user-${user.uid}`;
-    const storedUser = JSON.parse(localStorage.getItem(userKey)) || {
-      ...user,
-      savedItems: [],
-    };
-    let savedItems = storedUser.savedItems;
-
     if (!saved) {
-      savedItems.push(itemWithId);
+      const updated = [...savedItems, itemWithId];
+      localStorage.setItem(userKey, JSON.stringify(updated));
       dispatch(updateSavedItems(itemWithId));
       setSaved(true);
     } else {
-      savedItems = savedItems.filter((i) => i.id !== item.id);
-      dispatch(removeSavedItem(item.id));
+      const updated = savedItems.filter((i) => i.id !== itemWithId.id);
+      localStorage.setItem(userKey, JSON.stringify(updated));
+      dispatch(removeSavedItem(itemWithId.id));
       setSaved(false);
     }
-
-    // تحديث LocalStorage لكل يوزر
-    localStorage.setItem(
-      userKey,
-      JSON.stringify({ ...storedUser, savedItems })
-    );
-
-    // لوج لتأكيد العناصر
-    console.log(`Saved items for ${user.fullName}:`, savedItems);
   };
 
   return (
     <span
       onClick={handleToggleSave}
       style={{
-        fontSize: "24px",
+        fontSize: "22px",
         cursor: "pointer",
-        transition: "color 0.2s ease, transform 0.2s ease",
-        color: saved ? "green" : "red",
-        transform: anim ? "scale(1.3)" : "scale(1)",
-        marginLeft: "8px",
+        color: saved ? "#f4c542" : "gray",
+        transition: "0.2s",
+        transform: anim ? "scale(1.2)" : "scale(1)",
+        marginLeft: "6px",
       }}
     >
-      {saved ? "✔️" : "❤️"}
+      ★
     </span>
   );
 };

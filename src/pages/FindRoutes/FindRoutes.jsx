@@ -7,7 +7,7 @@ import { findShortestPath } from "../../utils/dijkstra";
 import styles from "./FindRoutes.module.css";
 import SaveButton from "@/Components/SaveButton/SaveButton";
 
-// --- Helpers to interact with localStorage ---
+// --- Helpers ---
 const getSavedRoutes = () => {
   return JSON.parse(localStorage.getItem("savedRoutes") || "[]");
 };
@@ -27,7 +27,7 @@ export default function FindRoutes() {
 
   const queryClient = useQueryClient();
 
-  // --- Load saved routes with React Query ---
+  // Load saved routes
   const { data: savedRoutes } = useQuery({
     queryKey: ["savedRoutes"],
     queryFn: getSavedRoutes,
@@ -82,7 +82,7 @@ export default function FindRoutes() {
     },
   });
 
-  // --- Select Options ---
+  // Select Options
   const stops = Object.values(graphData.nodes);
   const selectOptions = useMemo(() => {
     const map = new Map();
@@ -95,7 +95,6 @@ export default function FindRoutes() {
   const startValue = selectOptions.find((opt) => opt.value === start);
   const endValue = selectOptions.find((opt) => opt.value === end);
 
-  // --- Handlers ---
   const handleSearch = () => {
     if (!start || !end) return;
     const result = findShortestPath(graphData, start, end);
@@ -147,6 +146,7 @@ export default function FindRoutes() {
               isClearable
             />
           </Col>
+
           <Col xs={12} md={1} lg={1} className="text-center">
             <Button
               onClick={() => {
@@ -159,6 +159,7 @@ export default function FindRoutes() {
               ⇅
             </Button>
           </Col>
+
           <Col xs={12} md lg={4}>
             <Select
               value={endValue}
@@ -168,6 +169,7 @@ export default function FindRoutes() {
               isClearable
             />
           </Col>
+
           <Col xs={12} lg={3}>
             <Button
               variant="primary"
@@ -181,16 +183,41 @@ export default function FindRoutes() {
         </Row>
       </Card>
 
-      {/* Main Routes */}
+      {/* Main Route Results */}
       {routes.map((route, idx) => (
         <Card key={idx} className="mb-3 shadow-sm p-3 border-success">
-          <h5>Main Route</h5>
+          <h5 className="mb-3">Main Route</h5>
+
           {route.summary.map((seg, i) => (
-            <Row key={i} className="align-items-center mb-1">
-              <Col xs="auto">{seg.mode === "metro" ? "🚇" : "🚌"}</Col>
-              <Col>
-                Take {seg.line.replace(/ - | → |–/g, " → ")}
-                {seg.stops ? ` for ${seg.stops} stops` : ""}
+            <Row
+              key={i}
+              className="align-items-center mb-2 p-2 rounded"
+              style={{
+                background: "#f8f9fa",
+                border: "1px solid #e3e3e3",
+              }}
+            >
+              <Col xs={10} className="d-flex align-items-center">
+                <span style={{ marginRight: "10px" }}>
+                  {seg.mode === "metro" ? "🚇" : "🚌"}
+                </span>
+                <span>
+                  Take {seg.line.replace(/ - | → |–/g, " → ")}
+                  {seg.stops ? ` for ${seg.stops} stops` : ""}
+                </span>
+              </Col>
+
+              {/* زرار السيف لكل خطوة */}
+              <Col
+                xs={2}
+                className="d-flex justify-content-end align-items-center"
+              >
+                <SaveButton
+                  item={seg}
+                  type="routeSegment"
+                  startName={graphData.nodes[start]?.name}
+                  endName={graphData.nodes[end]?.name}
+                />
               </Col>
             </Row>
           ))}
@@ -208,6 +235,7 @@ export default function FindRoutes() {
               <Col>
                 <h5>User Route {idx + 1}</h5>
               </Col>
+
               <Col className="text-end">
                 <Button
                   variant="outline-secondary"
@@ -220,6 +248,7 @@ export default function FindRoutes() {
                 >
                   Edit
                 </Button>
+
                 <Button
                   variant="outline-danger"
                   size="sm"
@@ -246,6 +275,7 @@ export default function FindRoutes() {
                   value={editSummary}
                   onChange={(e) => setEditSummary(e.target.value)}
                 />
+
                 <Button
                   className="mt-2 w-100 btn-primary"
                   onClick={() => saveEditedRoute(route.id)}
@@ -257,9 +287,10 @@ export default function FindRoutes() {
           </Card>
         ))}
 
-      {/* Add New Route */}
+      {/* Add Custom Route */}
       <Card className="mt-4 p-3 shadow-sm border-success">
         <h4 className="text-center mb-3">Add Custom Route for This Trip</h4>
+
         <Row className="g-2 mb-2">
           <Col>
             <input
@@ -268,6 +299,7 @@ export default function FindRoutes() {
               disabled
             />
           </Col>
+
           <Col>
             <input
               className="form-control"
@@ -276,6 +308,7 @@ export default function FindRoutes() {
             />
           </Col>
         </Row>
+
         <textarea
           className="form-control mt-2"
           rows={5}
@@ -283,6 +316,7 @@ export default function FindRoutes() {
           value={newSummary}
           onChange={(e) => setNewSummary(e.target.value)}
         />
+
         <Button
           className="w-100 mt-3 btn-success"
           onClick={addNewRoute}

@@ -1,16 +1,15 @@
-// src/components/SavedItems.jsx
 import React, { useState, useEffect } from "react";
 import { Container, Row, Col, Card, Button } from "react-bootstrap";
 import { Trash, HeartFill } from "react-bootstrap-icons";
 import { useSelector } from "react-redux";
 
 const SavedItems = () => {
-  const { user } = useSelector((state) => state.auth); // نجيب بيانات اليوزر الحالي
+  const { user } = useSelector((state) => state.auth);
   const [savedItems, setSavedItems] = useState([]);
 
   useEffect(() => {
     if (!user) return;
-    const userKey = `savedItems-${user.uid}`; // key مرتبط باليوزر الحالي
+    const userKey = `savedItems-${user.uid}`;
     const items = JSON.parse(localStorage.getItem(userKey)) || [];
     setSavedItems(items);
   }, [user]);
@@ -23,6 +22,14 @@ const SavedItems = () => {
     localStorage.setItem(userKey, JSON.stringify(updatedItems));
   };
 
+  // Grouping by route: "from → to"
+  const groupedItems = savedItems.reduce((acc, item) => {
+    const key = `${item.from} → ${item.to}`;
+    if (!acc[key]) acc[key] = [];
+    acc[key].push(item);
+    return acc;
+  }, {});
+
   const stats = {
     total: savedItems.length,
     transport: savedItems.filter((i) => i.type === "stop").length,
@@ -32,68 +39,63 @@ const SavedItems = () => {
 
   return (
     <Container className="my-4">
+      {" "}
       <h5 className="text-danger fw-bold mb-1">
-        <HeartFill className="me-2" /> Saved Items
-      </h5>
+        {" "}
+        <HeartFill className="me-2" /> Saved Items{" "}
+      </h5>{" "}
       <p className="text-muted">
-        Your saved transport lines and routes for quick access
+        Your saved transport lines and routes for quick access{" "}
       </p>
-
       {savedItems.length === 0 ? (
         <p className="text-muted">You have no saved items yet.</p>
       ) : (
         <>
-          <Row className="g-3 mb-4">
-            {savedItems.map((item) => (
-              <Col md={12} key={item.id}>
-                <Card className="shadow-sm border-0">
-                  <Card.Body>
-                    <div className="d-flex justify-content-between">
-                      <div>
-                        <h6 className="fw-bold mb-1">{item.name}</h6>
-                        {item.from && item.to && (
-                          <p className="text-muted mb-1">
-                            {item.from} → {item.to}
-                          </p>
-                        )}
-                        <div className="d-flex gap-3 flex-wrap mb-2">
-                          {item.duration && <span>🕒 {item.duration} min</span>}
-                          {item.distance && <span>📏 {item.distance} km</span>}
-                          {item.price && <span>💲{item.price} EGP</span>}
-                        </div>
-                        {item.line && (
-                          <span
-                            className={`badge ${
-                              item.mode === "bus"
-                                ? "bg-primary"
-                                : item.mode === "metro"
-                                ? "bg-danger"
-                                : "bg-success"
-                            }`}
-                          >
-                            {item.line}
-                          </span>
-                        )}
-                        <small className="text-muted d-block mt-2">
-                          Saved on{" "}
-                          {item.savedAt || new Date().toLocaleDateString()}
-                        </small>
+          {Object.entries(groupedItems).map(([route, items]) => (
+            <div key={route} className="mb-4">
+              <h6 className="fw-bold mb-2">{route}</h6>
+              {items.map((item) => (
+                <Card key={item.id} className="mb-2 shadow-sm border-0">
+                  <Card.Body className="d-flex justify-content-between">
+                    <div>
+                      <h6 className="mb-1">{item.name}</h6>
+                      <div className="d-flex gap-3 flex-wrap">
+                        {item.duration && <span>🕒 {item.duration} min</span>}
+                        {item.distance && <span>📏 {item.distance} km</span>}
+                        {item.price && <span>💲{item.price} EGP</span>}
                       </div>
-                      <Button
-                        variant="light"
-                        className="text-danger"
-                        onClick={() => handleDelete(item.id)}
-                      >
-                        <Trash />
-                      </Button>
+                      {item.line && (
+                        <span
+                          className={`badge ${
+                            item.mode === "bus"
+                              ? "bg-primary"
+                              : item.mode === "metro"
+                              ? "bg-danger"
+                              : "bg-success"
+                          }`}
+                        >
+                          {item.line}
+                        </span>
+                      )}
+                      <small className="text-muted d-block mt-2">
+                        Saved on{" "}
+                        {item.savedAt || new Date().toLocaleDateString()}
+                      </small>
                     </div>
+                    <Button
+                      variant="light"
+                      className="text-danger"
+                      onClick={() => handleDelete(item.id)}
+                    >
+                      <Trash />
+                    </Button>
                   </Card.Body>
                 </Card>
-              </Col>
-            ))}
-          </Row>
+              ))}
+            </div>
+          ))}
 
-          {/* الإحصائيات */}
+          {/* Statistics */}
           <div className="mt-4">
             <h6 className="fw-bold mb-3">Statistics</h6>
             <Row className="g-3">

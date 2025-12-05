@@ -87,8 +87,8 @@ const SignUp = () => {
     else if (!EMAIL_REGEX.test(email))
       newErrors.email = "Please enter a valid email address.";
     if (!password) newErrors.password = "Password is required.";
-    else if (password.length < 8)
-      newErrors.password = "Password must be at least 8 characters.";
+    else if (password.length < 6)
+      newErrors.password = "Password must be at least 6 characters.";
     if (confirmPassword !== password)
       newErrors.confirmPassword = "Passwords must match.";
     if (!terms) newErrors.terms = "You must agree to the terms.";
@@ -110,8 +110,8 @@ const SignUp = () => {
         break;
       case "password":
         if (!form.password) msg = "Password is required.";
-        else if (form.password.length < 8)
-          msg = "Password must be at least 8 characters.";
+        else if (form.password.length < 6)
+          msg = "Password must be at least 6 characters.";
         break;
       case "confirmPassword":
         if (form.confirmPassword !== form.password)
@@ -220,7 +220,7 @@ const SignUp = () => {
               <InputGroup hasValidation>
                 <Form.Control
                   type={passwordShown ? "text" : "password"}
-                  placeholder="Create a password (min. 8 characters)"
+                  placeholder="Create a password (min. 6 characters)"
                   className={styles.formControlCustom}
                   value={form.password}
                   onChange={(e) => setField("password", e.target.value)}
