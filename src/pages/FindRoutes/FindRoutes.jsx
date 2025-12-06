@@ -1,26 +1,89 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo } from "react";
 import Select from "react-select";
 import { Container, Row, Col, Card, Button } from "react-bootstrap";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import graphData from "../../Data/graph.json";
 import { findShortestPath } from "../../utils/dijkstra";
 import styles from "./FindRoutes.module.css";
+import SaveButton from "@/Components/SaveButton/SaveButton";
 
+// --- Helpers ---
+const getSavedRoutes = () => {
+  return JSON.parse(localStorage.getItem("savedRoutes") || "[]");
+};
+
+const saveRoutesToLocalStorage = (routes) => {
+  localStorage.setItem("savedRoutes", JSON.stringify(routes));
+};
+
+// --- Component ---
 export default function FindRoutes() {
   const [start, setStart] = useState("");
   const [end, setEnd] = useState("");
   const [routes, setRoutes] = useState([]);
-  const [savedRoutes, setSavedRoutes] = useState([]);
   const [editRouteId, setEditRouteId] = useState(null);
   const [editSummary, setEditSummary] = useState("");
   const [newSummary, setNewSummary] = useState("");
 
+  const queryClient = useQueryClient();
+
+  // Load saved routes
+  const { data: savedRoutes } = useQuery({
+    queryKey: ["savedRoutes"],
+    queryFn: getSavedRoutes,
+  });
+
+  // --- Mutations ---
+  const addRouteMutation = useMutation({
+    mutationFn: (route) => {
+      const current = getSavedRoutes();
+      const updated = [...current, route];
+      saveRoutesToLocalStorage(updated);
+      return updated;
+    },
+    onSuccess: (data) => {
+      queryClient.setQueryData(["savedRoutes"], data);
+      setNewSummary("");
+      alert("Custom route added!");
+    },
+  });
+
+  const editRouteMutation = useMutation({
+    mutationFn: ({ id, summary }) => {
+      const updatedRoutes = savedRoutes.map((r) => {
+        if (r.id === id) {
+          return { ...r, summary };
+        }
+        return r;
+      });
+      saveRoutesToLocalStorage(updatedRoutes);
+      return updatedRoutes;
+    },
+    onSuccess: (data) => {
+      queryClient.setQueryData(["savedRoutes"], data);
+      setEditRouteId(null);
+      setEditSummary("");
+      alert("Route updated successfully!");
+    },
+  });
+
+  const deleteRouteMutation = useMutation({
+    mutationFn: (id) => {
+      const updated = savedRoutes.filter((r) => r.id !== id);
+      saveRoutesToLocalStorage(updated);
+      return updated;
+    },
+    onSuccess: (data) => {
+      queryClient.setQueryData(["savedRoutes"], data);
+      if (editRouteId && !data.find((r) => r.id === editRouteId)) {
+        setEditRouteId(null);
+        setEditSummary("");
+      }
+    },
+  });
+
+  // Select Options
   const stops = Object.values(graphData.nodes);
-
-  useEffect(() => {
-    const saved = localStorage.getItem("savedRoutes");
-    if (saved) setSavedRoutes(JSON.parse(saved));
-  }, []);
-
   const selectOptions = useMemo(() => {
     const map = new Map();
     stops.forEach((s) => {
@@ -35,21 +98,12 @@ export default function FindRoutes() {
   const handleSearch = () => {
     if (!start || !end) return;
     const result = findShortestPath(graphData, start, end);
-    if (result) {
-      setRoutes([result]);
-    }
+    if (result) setRoutes([result]);
   };
 
-  // Save custom route
   const addNewRoute = () => {
-    if (!start || !end) {
-      alert("Search for a route first!");
-      return;
-    }
-    if (!newSummary.trim()) {
-      alert("Enter route info first");
-      return;
-    }
+    if (!start || !end) return alert("Search for a route first!");
+    if (!newSummary.trim()) return alert("Enter route info first");
 
     const routeObject = {
       id: Date.now(),
@@ -64,33 +118,16 @@ export default function FindRoutes() {
         .filter(Boolean),
     };
 
-    const existing = JSON.parse(localStorage.getItem("savedRoutes") || "[]");
-    const updated = [...existing, routeObject];
-    localStorage.setItem("savedRoutes", JSON.stringify(updated));
-    setSavedRoutes(updated);
-    setNewSummary("");
-    alert("Custom route added!");
+    addRouteMutation.mutate(routeObject);
   };
 
-  // Save edited route
   const saveEditedRoute = (id) => {
-    const updatedRoutes = savedRoutes.map((r) => {
-      if (r.id === id) {
-        return {
-          ...r,
-          summary: editSummary
-            .split("\n")
-            .map((line) => line.trim())
-            .filter(Boolean),
-        };
-      }
-      return r;
-    });
-    localStorage.setItem("savedRoutes", JSON.stringify(updatedRoutes));
-    setSavedRoutes(updatedRoutes);
-    setEditRouteId(null);
-    setEditSummary("");
-    alert("Route updated successfully!");
+    const summary = editSummary
+      .split("\n")
+      .map((line) => line.trim())
+      .filter(Boolean);
+
+    editRouteMutation.mutate({ id, summary });
   };
 
   return (
@@ -109,6 +146,7 @@ export default function FindRoutes() {
               isClearable
             />
           </Col>
+
           <Col xs={12} md={1} lg={1} className="text-center">
             <Button
               onClick={() => {
@@ -121,6 +159,7 @@ export default function FindRoutes() {
               ⇅
             </Button>
           </Col>
+
           <Col xs={12} md lg={4}>
             <Select
               value={endValue}
@@ -130,6 +169,7 @@ export default function FindRoutes() {
               isClearable
             />
           </Col>
+
           <Col xs={12} lg={3}>
             <Button
               variant="primary"
@@ -143,30 +183,50 @@ export default function FindRoutes() {
         </Row>
       </Card>
 
-      {/* Main Route */}
+      {/* Main Route Results */}
       {routes.map((route, idx) => (
         <Card key={idx} className="mb-3 shadow-sm p-3 border-success">
-          <Card className="border-0">
-            <h5>Main Route</h5>
-            <div>
-              {route.summary.map((seg, i) => (
-                <Row key={i} className="align-items-center mb-1">
-                  <Col xs="auto">{seg.mode === "metro" ? "🚇" : "🚌"}</Col>
-                  <Col>
-                    Take {seg.line.replace(/ - | → |–/g, " → ")}{" "}
-                    {/* ← هنا بنبدل أي شرط بـ سهم */}
-                    {seg.stops ? `for ${seg.stops} stops` : ""}
-                  </Col>
-                </Row>
-              ))}
-            </div>
-          </Card>
+          <h5 className="mb-3">Main Route</h5>
+
+          {route.summary.map((seg, i) => (
+            <Row
+              key={i}
+              className="align-items-center mb-2 p-2 rounded"
+              style={{
+                background: "#f8f9fa",
+                border: "1px solid #e3e3e3",
+              }}
+            >
+              <Col xs={10} className="d-flex align-items-center">
+                <span style={{ marginRight: "10px" }}>
+                  {seg.mode === "metro" ? "🚇" : "🚌"}
+                </span>
+                <span>
+                  Take {seg.line.replace(/ - | → |–/g, " → ")}
+                  {seg.stops ? ` for ${seg.stops} stops` : ""}
+                </span>
+              </Col>
+
+              {/* زرار السيف لكل خطوة */}
+              <Col
+                xs={2}
+                className="d-flex justify-content-end align-items-center"
+              >
+                <SaveButton
+                  item={seg}
+                  type="routeSegment"
+                  startName={graphData.nodes[start]?.name}
+                  endName={graphData.nodes[end]?.name}
+                />
+              </Col>
+            </Row>
+          ))}
         </Card>
       ))}
 
       {/* User Routes */}
       {savedRoutes
-        .filter(
+        ?.filter(
           (r) => r.userGenerated && r.startId === start && r.endId === end
         )
         .map((route, idx) => (
@@ -175,6 +235,7 @@ export default function FindRoutes() {
               <Col>
                 <h5>User Route {idx + 1}</h5>
               </Col>
+
               <Col className="text-end">
                 <Button
                   variant="outline-secondary"
@@ -187,36 +248,17 @@ export default function FindRoutes() {
                 >
                   Edit
                 </Button>
+
                 <Button
                   variant="outline-danger"
                   size="sm"
-                  onClick={() => {
-                    if (
-                      !window.confirm(
-                        "Are you sure you want to delete this route?"
-                      )
-                    )
-                      return;
-                    const updatedRoutes = savedRoutes.filter(
-                      (r) => r.id !== route.id
-                    );
-                    localStorage.setItem(
-                      "savedRoutes",
-                      JSON.stringify(updatedRoutes)
-                    );
-                    setSavedRoutes(updatedRoutes);
-                    if (editRouteId === route.id) {
-                      setEditRouteId(null);
-                      setEditSummary("");
-                    }
-                  }}
+                  onClick={() => deleteRouteMutation.mutate(route.id)}
                 >
                   Delete
                 </Button>
               </Col>
             </Row>
 
-            {/* Display each line */}
             <div>
               {route.summary.map((line, i) => (
                 <Row key={i} className="align-items-center mb-1">
@@ -225,7 +267,6 @@ export default function FindRoutes() {
               ))}
             </div>
 
-            {/* Edit Section */}
             {editRouteId === route.id && (
               <div className="mt-2">
                 <textarea
@@ -234,6 +275,7 @@ export default function FindRoutes() {
                   value={editSummary}
                   onChange={(e) => setEditSummary(e.target.value)}
                 />
+
                 <Button
                   className="mt-2 w-100 btn-primary"
                   onClick={() => saveEditedRoute(route.id)}
@@ -245,9 +287,10 @@ export default function FindRoutes() {
           </Card>
         ))}
 
-      {/* Add New Route */}
+      {/* Add Custom Route */}
       <Card className="mt-4 p-3 shadow-sm border-success">
         <h4 className="text-center mb-3">Add Custom Route for This Trip</h4>
+
         <Row className="g-2 mb-2">
           <Col>
             <input
@@ -256,6 +299,7 @@ export default function FindRoutes() {
               disabled
             />
           </Col>
+
           <Col>
             <input
               className="form-control"
@@ -264,6 +308,7 @@ export default function FindRoutes() {
             />
           </Col>
         </Row>
+
         <textarea
           className="form-control mt-2"
           rows={5}
@@ -271,7 +316,12 @@ export default function FindRoutes() {
           value={newSummary}
           onChange={(e) => setNewSummary(e.target.value)}
         />
-        <Button className="w-100 mt-3 btn-success" onClick={addNewRoute}>
+
+        <Button
+          className="w-100 mt-3 btn-success"
+          onClick={addNewRoute}
+          disabled={addRouteMutation.isLoading}
+        >
           Save Custom Route
         </Button>
       </Card>
