@@ -1,5 +1,3 @@
-// src/components/Login.jsx
-import "./Login.css";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -7,16 +5,14 @@ import {
   loadUserFromStorage,
   fetchUserExtraData,
 } from "@/features/auth/authSlice";
-import { useNavigate, useLocation } from "react-router-dom";
-import { Link } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import { Form, Button, Card, Container, Row, Col } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import EzmoveLogo from "@/assets/logo/ezmoveLogo.svg";
+import styles from "./Login.module.css";
 
 const Login = () => {
-  console.log("Online:", navigator.onLine);
-
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
@@ -38,7 +34,6 @@ const Login = () => {
 
   useEffect(() => {
     if (auth.token) {
-      // 🔹 جلب البيانات الثقيلة في الخلفية بعد نجاح login
       dispatch(fetchUserExtraData(auth.user.uid));
       navigate(from, { replace: true });
     }
@@ -50,16 +45,12 @@ const Login = () => {
   };
 
   return (
-    <Container className="login-page d-flex align-items-center justify-content-center min-vh-100">
+    <Container className={styles.loginPage}>
       <Row className="w-100 justify-content-center">
         <Col xs={12} md={6}>
           <div className="text-center mb-3">
-            <div className="logo-circle mb-2">
-              <img
-                src={EzmoveLogo}
-                alt="Ezmove Logo"
-                style={{ width: 50, height: 50 }}
-              />
+            <div className={styles.logoCircle + " mb-2"}>
+              <img src={EzmoveLogo} alt="Ezmove Logo" />
             </div>
             <h5>Ezmove</h5>
             <p className="text-muted">
@@ -67,7 +58,7 @@ const Login = () => {
             </p>
           </div>
 
-          <Card className="p-3 shadow-sm">
+          <Card className={styles.cardCustom + " p-3 shadow-sm"}>
             <Card.Body>
               <h4>Login</h4>
               <p className="text-muted">
@@ -79,7 +70,7 @@ const Login = () => {
                   <Form.Label>Email</Form.Label>
                   <Form.Control
                     type="email"
-                    className="login-input"
+                    className={styles.loginInput}
                     placeholder="your.email@example.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
@@ -92,7 +83,7 @@ const Login = () => {
                   <div className="position-relative">
                     <Form.Control
                       type={showPassword ? "text" : "password"}
-                      className="login-input"
+                      className={styles.loginInput}
                       placeholder="Enter your password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
@@ -130,7 +121,7 @@ const Login = () => {
 
                 <Button
                   type="submit"
-                  className="w-100 login-button"
+                  className={styles.loginButton + " w-100"}
                   disabled={auth.status === "loading"}
                 >
                   {auth.status === "loading" ? "Logging in..." : "Login"}
@@ -141,11 +132,7 @@ const Login = () => {
                 <span style={{ fontSize: "14px", color: "#555" }}>
                   Don’t have an account?{" "}
                 </span>
-                <Link
-                  to="/auth/signup"
-                  className="text-btn-signUp"
-                  // style={{ color: "#007bff", textDecoration: "none" }}
-                >
+                <Link to="/auth/signup" className={styles.textBtnSignUp}>
                   Sign up
                 </Link>
               </div>

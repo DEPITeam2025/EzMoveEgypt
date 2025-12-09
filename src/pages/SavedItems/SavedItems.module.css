@@ -1,0 +1,33 @@
+.cardHover {
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+.cardHover:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.expandBox {
+  max-height: 160px;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+.expandBox::-webkit-scrollbar {
+  width: 6px;
+}
+
+.expandBox::-webkit-scrollbar-thumb {
+  background: #cfcfcf;
+  border-radius: 20px;
+}
+
+.expandBox::-webkit-scrollbar-thumb:hover {
+  background: #b5b5b5;
+}
+
+.statCard {
+  background: #f8f9fa;
+  border-radius: 14px;
+}

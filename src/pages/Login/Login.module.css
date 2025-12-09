@@ -34,9 +34,18 @@ body {
 
 .text-btn-signUp {
   color: #007bff;
-  text-Decoration: none;
+  text-decoration: none;
 }
 
 .text-btn-signUp:hover {
   color: #0060c7;
+}
+@media (max-width: 768px) {
+  .loginPage {
+    padding-top: 40px;
+  }
+
+  .cardCustom {
+    padding: 20px !important;
+  }
 }
