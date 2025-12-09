@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState } from "react";
 import {
   useQuery,
   QueryClient,
@@ -506,7 +506,7 @@ function SearchForTransportContent() {
                 </Form.Label>
                 <Form.Control
                   type="text"
-                  placeholder="e.g., M1, 354, 100"
+                  placeholder="e.g., M1, CTA 354"
                   value={lineNumber}
                   onChange={(e) => setLineNumber(e.target.value)}
                   size="lg"
