@@ -17,9 +17,26 @@ body {
 .card {
   border-radius: 20px;
 }
+
 .card .login-button {
   background: linear-gradient(to right, #8a2be2, #4169e1);
+  transition: opacity 0.2s, box-shadow 0.2s;
 }
+
+.login-button:hover {
+  opacity: 0.95;
+  box-shadow: 0 6px 20px rgba(65, 105, 225, 0.5);
+}
+
 .login-input {
   background: #f9f9f9;
+}
+
+.text-btn-signUp {
+  color: #007bff;
+  text-Decoration: none;
+}
+
+.text-btn-signUp:hover {
+  color: #0060c7;
 }

@@ -3,7 +3,7 @@ import { Navbar, Nav, Container, Button } from "react-bootstrap";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import styles from "./TheHeader.module.css";
 
-import EzmoveLogo from "./Icons/EzmoveLogo.svg";
+import EzmoveLogo from "@/assets/logo/ezmoveLogo.svg";
 import FindRoutesIcon from "./Icons/FindRoutesIcon.svg";
 import SearchTransportIcon from "./Icons/SearchTransportIcon.svg";
 import MetroGuideIcon from "./Icons/MetroGuideIcon.svg";
@@ -37,7 +37,7 @@ function TheHeader() {
           className={`${styles.logoBrand} d-flex align-items-center`}
         >
           <img
-            src="ezmove-logo.svg"
+            src={EzmoveLogo}
             alt="Ezmove Logo"
             width="30"
             height="30"

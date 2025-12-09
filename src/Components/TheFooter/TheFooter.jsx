@@ -1,8 +1,9 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { Container, Row, Col, ListGroup } from "react-bootstrap";
 import { Envelope, GeoAlt, Github, Translate } from "react-bootstrap-icons";
 import styles from "./TheFooter.module.css";
-import { Link } from "react-router-dom";
+import EzmoveLogo from "@/assets/logo/ezmoveLogo.svg";
 
 const getLinkPath = (text) => {
   switch (text) {
@@ -27,10 +28,10 @@ const getLinkPath = (text) => {
   }
 };
 
-const EzmoveLogo = () => (
+const EzmoveLogoFooter = () => (
   <div className={styles.logoContainer}>
     <div className={styles.iconBox}>
-      <img src="/src/assets/images/LogoFooter.png" alt="Ezmove Logo" />
+      <img src={EzmoveLogo} alt="Ezmove Logo" />
     </div>
     <span className={styles.logoText}>Ezmove</span>
   </div>
@@ -61,7 +62,7 @@ const TheFooter = () => {
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
-      behavior: "smooth",  
+      behavior: "smooth",
     });
   };
 
@@ -71,7 +72,7 @@ const TheFooter = () => {
         <Row>
           {/* Column 1 */}
           <Col md={4} sm={12} className="mb-4 mb-md-0">
-            <EzmoveLogo />
+            <EzmoveLogoFooter />
             <p className={styles.description}>
               Your smart companion for public transportation.
               <br />
