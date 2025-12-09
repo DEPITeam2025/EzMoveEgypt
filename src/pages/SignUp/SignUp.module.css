@@ -27,17 +27,12 @@
 .signupCard {
   width: 100%;
   max-width: 500px;
-  /* Custom shadow to match the light, modern look */
-  /* box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08); */
   border: 1px solid hsla(0, 0%, 0%, 0.1);
-  /* Remove default Bootstrap border */
   border-radius: 16px;
 }
 
 /* --- Form Control Customization --- */
 .formControlCustom {
-  /* Custom padding and border-radius to match the design */
-  padding: 12px 15px;
   border: 1px solid #e0e0e0;
   border-radius: 8px;
   background-color: #f9f9f9;
@@ -68,7 +63,7 @@
 }
 
 /* Ensure the input group looks cohesive */
-.input-group > .form-control:not(:last-child) {
+.input-group>.form-control:not(:last-child) {
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
 }
@@ -76,20 +71,25 @@
 /* --- Button Styling (Gradient) --- */
 .createAccountBtn {
   width: 100%;
-  padding: 15px;
   border: none;
   border-radius: 8px;
   font-size: 1rem;
-  font-weight: 600;
   color: white;
   /* Gradient from the image */
   background: linear-gradient(to right, #8a2be2, #4169e1);
-  /* Custom shadow for the button */
-  box-shadow: 0 4px 15px rgba(65, 105, 225, 0.4);
   transition: opacity 0.2s, box-shadow 0.2s;
 }
 
 .createAccountBtn:hover {
   opacity: 0.95;
   box-shadow: 0 6px 20px rgba(65, 105, 225, 0.5);
+}
+
+.textButton {
+  color: #007bff;
+  text-Decoration: none;
+}
+
+.textButton:hover {
+  color: #0060c7;
 }

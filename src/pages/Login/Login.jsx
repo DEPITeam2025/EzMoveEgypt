@@ -12,7 +12,7 @@ import { Link } from "react-router-dom";
 import { Form, Button, Card, Container, Row, Col } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
-import logo from "@/assets/images/Container.png";
+import EzmoveLogo from "@/assets/logo/ezmoveLogo.svg";
 
 const Login = () => {
   console.log("Online:", navigator.onLine);
@@ -52,12 +52,16 @@ const Login = () => {
   return (
     <Container className="login-page d-flex align-items-center justify-content-center min-vh-100">
       <Row className="w-100 justify-content-center">
-        <Col xs={12} md={6} lg={4}>
+        <Col xs={12} md={6}>
           <div className="text-center mb-3">
             <div className="logo-circle mb-2">
-              <img src={logo} alt="logo" style={{ width: 64, height: 64 }} />
+              <img
+                src={EzmoveLogo}
+                alt="Ezmove Logo"
+                style={{ width: 50, height: 50 }}
+              />
             </div>
-            <h5>EZmove</h5>
+            <h5>Ezmove</h5>
             <p className="text-muted">
               Welcome back! Please login to your account.
             </p>
@@ -139,7 +143,8 @@ const Login = () => {
                 </span>
                 <Link
                   to="/auth/signup"
-                  style={{ color: "#007bff", textDecoration: "none" }}
+                  className="text-btn-signUp"
+                  // style={{ color: "#007bff", textDecoration: "none" }}
                 >
                   Sign up
                 </Link>

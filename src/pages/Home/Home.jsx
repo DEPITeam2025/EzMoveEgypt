@@ -1,6 +1,6 @@
 import React from "react";
 import styles from "./Home.module.css";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   ArrowRight,
   MapPin,
@@ -22,8 +22,8 @@ const fetchFeatures = async () => [
     title: "Find Routes",
     description:
       "Discover the best routes between any two locations with multiple transport options.",
-    color: "bg-blue",
-    link: "Get Started →",
+    linkText: "Get Started →",
+    link: "/findroutes",
   },
   {
     id: 2,
@@ -32,7 +32,8 @@ const fetchFeatures = async () => [
     description:
       "Look up specific transport lines, schedules, and real-time arrival information.",
     color: "bg-purple",
-    link: "Get Started →",
+    linkText: "Get Started →",
+    link: "/searchfortransport",
   },
   {
     id: 3,
@@ -41,7 +42,8 @@ const fetchFeatures = async () => [
     description:
       "Complete metro network map with all lines, stations, and operating hours.",
     color: "bg-red",
-    link: "Get Started →",
+    linkText: "Get Started →",
+    link: "/metroguide",
   },
   {
     id: 4,
@@ -50,7 +52,8 @@ const fetchFeatures = async () => [
     description:
       "Save your favorite routes and transport lines for quick access.",
     color: "bg-pink",
-    link: "Sign In to Access",
+    linkText: "Sign In to Access",
+    link: "/saveditems",
     disabled: true,
   },
 ];
@@ -161,14 +164,14 @@ function FeaturesSection() {
                 <p className={styles["feature-description"]}>
                   {feature.description}
                 </p>
-                <a
-                  href="#"
+                <Link
+                  to={feature.link}
                   className={`${styles["feature-link"]} ${
                     feature.disabled ? styles.disabled : ""
                   }`}
                 >
-                  {feature.link}
-                </a>
+                  {feature.linkText}
+                </Link>
               </div>
             );
           })}
@@ -224,7 +227,7 @@ function WhyChooseUsSection() {
 }
 
 // --- CTA Section ---
-function CTASection({ onFindRoutes }) {
+function CTASection({ onFindRoutes, onMetroGuide }) {
   return (
     <section className={styles["cta-section"]}>
       <div className={styles["cta-container"]}>
@@ -245,7 +248,10 @@ function CTASection({ onFindRoutes }) {
               Route
             </span>
           </button>
-          <button className={`${styles.btn} ${styles["btn-outline"]}`}>
+          <button
+            className={`${styles.btn} ${styles["btn-outline"]}`}
+            onClick={onMetroGuide}
+          >
             <span className={styles["btn-content"]}>
               <Map size={18} style={{ marginRight: "8px" }} /> View Metro Guide
             </span>
@@ -261,6 +267,7 @@ export default function Home() {
   const navigate = useNavigate();
 
   const handleFindRoutes = () => navigate("/findroutes");
+  const handleMetroGuide = () => navigate("/metroguide");
   const handleLogin = () => navigate("/auth/login");
 
   return (
@@ -269,7 +276,10 @@ export default function Home() {
         <HeroSection onFindRoutes={handleFindRoutes} onLogin={handleLogin} />
         <FeaturesSection />
         <WhyChooseUsSection />
-        <CTASection onFindRoutes={handleFindRoutes} />
+        <CTASection
+          onFindRoutes={handleFindRoutes}
+          onMetroGuide={handleMetroGuide}
+        />
       </main>
     </div>
   );

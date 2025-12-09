@@ -5,7 +5,7 @@ import { confirmPasswordReset, verifyPasswordResetCode } from "firebase/auth";
 import { firebaseAuth } from "@/firebase";
 import { Form, Button, Card, Container, Row, Col } from "react-bootstrap";
 import { Link, useSearchParams } from "react-router-dom";
-import logo from "@/assets/images/Container.png";
+import EzmoveLogo from "@/assets/logo/ezmoveLogo.svg";
 
 function ResetPassword() {
   const [searchParams] = useSearchParams();
@@ -45,9 +45,13 @@ function ResetPassword() {
         <Col xs={12} md={6} lg={4}>
           <div className="text-center mb-3">
             <div className="logo-circle mb-2">
-              <img src={logo} alt="logo" style={{ width: 64, height: 64 }} />
+              <img
+                src={EzmoveLogo}
+                alt="logo"
+                style={{ width: 50, height: 50 }}
+              />
             </div>
-            <h4>EZmove</h4>
+            <h4>Ezmove</h4>
           </div>
 
           <Card className="p-3 shadow-sm">

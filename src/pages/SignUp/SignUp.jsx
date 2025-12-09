@@ -8,21 +8,13 @@ import {
   Spinner,
 } from "react-bootstrap";
 import styles from "./SignUp.module.css";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { firebaseAuth } from "../../firebase";
+import EzmoveLogo from "@/assets/logo/ezmoveLogo.svg";
 
 // Simple email validation regex
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-// Bus SVG Icon
-const BusIcon = () => (
-  <div className={styles.iconPlaceholder}>
-    <svg width="39" height="39" viewBox="0 0 39 39" fill="none">
-      {/* ... icon paths ... */}
-    </svg>
-  </div>
-);
 
 // Eye Open Icon
 const EyeIcon = ({ onClick }) => (
@@ -47,7 +39,13 @@ const EyeIcon = ({ onClick }) => (
 const Eye2Icon = ({ onClick }) => (
   <InputGroup.Text className={styles.eyeIcon} onClick={onClick}>
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-      <path d="M10.73 5.073C11.1516 5.02419 11.5756 4.99982 12 5C16.664 5 20.4 7.903 22 12C21.6126 12.9966 21.0893 13.9348 20.445 14.788M6.52 6.519C4.48 7.764 2.9 9.693 2 12C3.6 16.097 7.336 19 12 19C13.9321 19.0102 15.8292 18.484 17.48 17.48M9.88 9.88C9.6014 10.1586 9.3804 10.4893 9.22963 10.8534C9.07885 11.2174 9.00125 11.6075 9.00125 12.0015C9.00125 12.3955 9.07885 12.7856 9.22963 13.1496C9.3804 13.5137 9.6014 13.8444 9.88 14.123C10.1586 14.4016 10.4893 14.6226 10.8534 14.7734C11.2174 14.9242 11.6075 15.0018 12.0015 15.0018C12.3955 15.0018 12.7856 14.9242 13.1496 14.7734C13.5137 14.6226 13.8444 14.4016 14.123 14.123" />
+      <path
+        d="M10.73 5.073C11.1516 5.02419 11.5756 4.99982 12 5C16.664 5 20.4 7.903 22 12C21.6126 12.9966 21.0893 13.9348 20.445 14.788M6.52 6.519C4.48 7.764 2.9 9.693 2 12C3.6 16.097 7.336 19 12 19C13.9321 19.0102 15.8292 18.484 17.48 17.48M9.88 9.88C9.6014 10.1586 9.3804 10.4893 9.22963 10.8534C9.07885 11.2174 9.00125 11.6075 9.00125 12.0015C9.00125 12.3955 9.07885 12.7856 9.22963 13.1496C9.3804 13.5137 9.6014 13.8444 9.88 14.123C10.1586 14.4016 10.4893 14.6226 10.8534 14.7734C11.2174 14.9242 11.6075 15.0018 12.0015 15.0018C12.3955 15.0018 12.7856 14.9242 13.1496 14.7734C13.5137 14.6226 13.8444 14.4016 14.123 14.123"
+        stroke="#717182"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
       <path
         d="M4 4L20 20"
         stroke="#717182"
@@ -62,6 +60,7 @@ const SignUp = () => {
   const [form, setForm] = useState({
     fullName: "",
     email: "",
+    phone: "",
     password: "",
     confirmPassword: "",
     terms: false,
@@ -78,7 +77,7 @@ const SignUp = () => {
   };
 
   const findFormErrors = () => {
-    const { fullName, email, password, confirmPassword, terms } = form;
+    const { fullName, email, phone, password, confirmPassword, terms } = form;
     let newErrors = {};
     if (!fullName.trim()) newErrors.fullName = "Full Name is required.";
     else if (fullName.trim().length < 2)
@@ -86,6 +85,9 @@ const SignUp = () => {
     if (!email.trim()) newErrors.email = "Email is required.";
     else if (!EMAIL_REGEX.test(email))
       newErrors.email = "Please enter a valid email address.";
+    if (!phone) newErrors.phone = "Phone number is required.";
+    else if (phone.length < 11)
+      newErrors.phone = "Phone must be at least 11 numbers";
     if (!password) newErrors.password = "Password is required.";
     else if (password.length < 6)
       newErrors.password = "Password must be at least 6 characters.";
@@ -107,6 +109,11 @@ const SignUp = () => {
         if (!form.email.trim()) msg = "Email is required.";
         else if (!EMAIL_REGEX.test(form.email))
           msg = "Please enter a valid email address.";
+        break;
+      case "phone":
+        if (!form.phone) msg = "Phone number is required.";
+        else if (form.phone.length < 11)
+          msg = "Phone must be at least 11 numbers.";
         break;
       case "password":
         if (!form.password) msg = "Password is required.";
@@ -149,6 +156,7 @@ const SignUp = () => {
       const localUserData = {
         uid: userCredential.user.uid,
         email: form.email,
+        phone: form.phone,
         fullName: form.fullName,
         savedItems: [],
         createdAt: new Date().toISOString(),
@@ -163,13 +171,18 @@ const SignUp = () => {
     } catch (err) {
       console.error("SignUp Error:", err);
       setLoading(false);
+      setErrors(err);
     }
   };
 
   return (
     <Container fluid className={styles.signupPage}>
       <header className="text-center mb-4">
-        <BusIcon />
+        <img
+          src={EzmoveLogo}
+          alt="Ezmove Logo"
+          style={{ width: 50, height: 50 }}
+        />
         <h1 className="h5 fw-bold mb-0">Ezmove</h1>
         <p className="text-muted small">Create an account to get started</p>
       </header>
@@ -211,6 +224,23 @@ const SignUp = () => {
               />
               <Form.Control.Feedback type="invalid">
                 {errors.email}
+              </Form.Control.Feedback>
+            </Form.Group>
+
+            {/* Phone */}
+            <Form.Group className="mb-3">
+              <Form.Label className="fw-semibold">Phone</Form.Label>
+              <Form.Control
+                type="phone"
+                placeholder="01*********"
+                className={styles.formControlCustom}
+                value={form.phone}
+                onChange={(e) => setField("phone", e.target.value)}
+                onBlur={() => handleBlur("phone")}
+                isInvalid={!!errors.phone}
+              />
+              <Form.Control.Feedback type="invalid">
+                {errors.phone}
               </Form.Control.Feedback>
             </Form.Group>
 
@@ -302,17 +332,14 @@ const SignUp = () => {
             </Button>
           </Form>
 
-          <p className="text-center mt-4 mb-0 small text-muted">
-            Already have an account?{" "}
-            <Button
-              variant="text"
-              className="fw-bold"
-              style={{ color: "#8A2BE2" }}
-              onClick={() => navigate("/auth/login")}
-            >
+          <div style={{ marginTop: "15px", textAlign: "center" }}>
+            <span style={{ fontSize: "14px", color: "#555" }}>
+              Already have an account?{" "}
+            </span>
+            <Link to="/auth/login" className={styles.textButton}>
               Login
-            </Button>
-          </p>
+            </Link>
+          </div>
         </Card.Body>
       </Card>
     </Container>
