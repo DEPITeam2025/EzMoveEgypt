@@ -456,7 +456,7 @@ function SearchForTransportContent() {
           </ListGroup>
 
           {/* Daily Schedule */}
-          <h6 className="fw-bold mb-3">
+          {/* <h6 className="fw-bold mb-3">
             <i className="bi bi-clock-history me-2"></i>
             Today's Schedule
           </h6>
@@ -479,7 +479,7 @@ function SearchForTransportContent() {
                   </Badge>
                 </OverlayTrigger>
               ))}
-          </div>
+          </div> */}
         </Card.Body>
       </Card>
     );
@@ -838,7 +838,7 @@ function SearchForTransportContent() {
                             </div>
 
                             {/* Daily Schedule */}
-                            <h6 className="fw-bold mt-3 mb-2">
+                            {/* <h6 className="fw-bold mt-3 mb-2">
                               <i className="bi bi-clock-history me-2"></i>
                               Today's Schedule
                             </h6>
@@ -869,7 +869,7 @@ function SearchForTransportContent() {
                                     </OverlayTrigger>
                                   )
                                 )}
-                            </div>
+                            </div> */}
                           </>
                         ) : null}
                       </div>
