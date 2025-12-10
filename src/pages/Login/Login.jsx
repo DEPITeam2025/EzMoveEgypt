@@ -1,15 +1,25 @@
-// src/components/Login.jsx
-import "./Login.css";
-
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { login, loadUserFromStorage } from "@/features/auth/authSlice";
-import { useNavigate, useLocation } from "react-router-dom";
-import { Link } from "react-router-dom";
-import { Form, Button, Card, Container, Row, Col } from "react-bootstrap";
+import {
+  login,
+  loadUserFromStorage,
+  fetchUserExtraData,
+} from "@/features/auth/authSlice";
+import { useNavigate, useLocation, Link } from "react-router-dom";
+import {
+  Form,
+  Button,
+  Card,
+  Container,
+  Row,
+  Col,
+  InputGroup,
+} from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
-import logo from "@/assets/images/Container.png";
+import EzmoveLogo from "@/assets/logo/ezmoveLogo.svg";
+import styles from "./Login.module.css";
+
 const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -21,43 +31,64 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [remember, setRemember] = useState(true);
-  // ✅ خزّن اختيار "Remember me" في localStorage علشان authSlice يعرف يخزن في المكان الصح
+  const [errors, setErrors] = useState({ email: "", password: "" });
+  const [invalidCred, setInvalidCred] = useState(false);
+
   useEffect(() => {
     localStorage.setItem("rememberMe", JSON.stringify(remember));
   }, [remember]);
 
-  // عند تحميل الـ app — استرجاع لو في بيانات مخزنة
   useEffect(() => {
     dispatch(loadUserFromStorage());
   }, [dispatch]);
 
-  // عند نجاح الدخول — خزّن في storage و اعمل redirect
   useEffect(() => {
     if (auth.token) {
+      dispatch(fetchUserExtraData(auth.user.uid));
       navigate(from, { replace: true });
     }
-  }, [auth.token, auth.user, remember, navigate, from]);
+  }, [auth.token, auth.user, navigate, from, dispatch]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    dispatch(login({ email, password }));
+
+    // Reset previous errors
+    setErrors({ email: "", password: "" });
+    setInvalidCred(false);
+
+    let newErrors = {};
+    if (!email.trim()) newErrors.email = "Required";
+    if (!password) newErrors.password = "Required";
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    // Dispatch login
+    dispatch(login({ email, password }))
+      .unwrap()
+      .catch(() => {
+        // Invalid credentials: don't mark fields red, just show message
+        setInvalidCred(true);
+      });
   };
 
   return (
-    <Container className="login-page d-flex align-items-center justify-content-center min-vh-100">
+    <Container className={styles.loginPage}>
       <Row className="w-100 justify-content-center">
-        <Col xs={12} md={6} lg={4}>
+        <Col xs={12} md={6}>
           <div className="text-center mb-3">
-            <div className="logo-circle mb-2">
-              <img src={logo} alt="logo" style={{ width: 64, height: 64 }} />
+            <div className={styles.logoCircle + " mb-2"}>
+              <img src={EzmoveLogo} alt="Ezmove Logo" />
             </div>
-            <h5>EZmove</h5>
+            <h5>Ezmove</h5>
             <p className="text-muted">
               Welcome back! Please login to your account.
             </p>
           </div>
 
-          <Card className="p-3 shadow-sm ">
+          <Card className={styles.cardCustom + " p-3 shadow-sm"}>
             <Card.Body>
               <h4>Login</h4>
               <p className="text-muted">
@@ -65,44 +96,57 @@ const Login = () => {
               </p>
 
               <Form onSubmit={handleSubmit}>
+                {/* Email */}
                 <Form.Group className="mb-3" controlId="email">
                   <Form.Label>Email</Form.Label>
                   <Form.Control
                     type="email"
-                    className="login-input"
+                    className={styles.loginInput}
                     placeholder="your.email@example.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    required
+                    isInvalid={!!errors.email}
                   />
+                  <Form.Control.Feedback type="invalid">
+                    {errors.email}
+                  </Form.Control.Feedback>
                 </Form.Group>
 
+                {/* Password */}
                 <Form.Group className="mb-3" controlId="password">
                   <Form.Label>Password</Form.Label>
-                  <div className="position-relative">
+                  <InputGroup hasValidation>
                     <Form.Control
                       type={showPassword ? "text" : "password"}
-                      className="login-input"
+                      className={styles.loginInput}
                       placeholder="Enter your password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      required
+                      isInvalid={!!errors.password}
                     />
-                    <span
+                    <InputGroup.Text
                       onClick={() => setShowPassword((s) => !s)}
-                      style={{
-                        position: "absolute",
-                        right: "12px",
-                        top: "9px",
-                        cursor: "pointer",
-                      }}
+                      style={{ cursor: "pointer" }}
                     >
                       <FontAwesomeIcon
                         icon={showPassword ? faEyeSlash : faEye}
                       />
-                    </span>
-                  </div>
+                    </InputGroup.Text>
+                    <Form.Control.Feedback type="invalid">
+                      {errors.password}
+                    </Form.Control.Feedback>
+                  </InputGroup>
                 </Form.Group>
+
+                {/* Invalid credentials message */}
+                {invalidCred && (
+                  <div
+                    className="text-danger mb-2"
+                    style={{ fontSize: "0.9rem" }}
+                  >
+                    Invalid email or password
+                  </div>
+                )}
 
                 <div className="d-flex justify-content-between align-items-center mb-3">
                   <Form.Check
@@ -114,18 +158,23 @@ const Login = () => {
                   <Link to="/auth/forgot-password"> Forgot password?</Link>
                 </div>
 
-                {auth.error && (
-                  <div className="text-danger mb-2">{auth.error}</div>
-                )}
-
                 <Button
                   type="submit"
-                  className="w-100 login-button"
+                  className={styles.loginButton + " w-100"}
                   disabled={auth.status === "loading"}
                 >
                   {auth.status === "loading" ? "Logging in..." : "Login"}
                 </Button>
               </Form>
+
+              <div style={{ marginTop: "15px", textAlign: "center" }}>
+                <span style={{ fontSize: "14px", color: "#555" }}>
+                  Don’t have an account?{" "}
+                </span>
+                <Link to="/auth/signup" className={styles.textBtnSignUp}>
+                  Sign up
+                </Link>
+              </div>
             </Card.Body>
           </Card>
         </Col>

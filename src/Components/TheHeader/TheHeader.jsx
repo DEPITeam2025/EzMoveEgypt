@@ -1,13 +1,11 @@
 import React from "react";
 import { Navbar, Nav, Container, Button } from "react-bootstrap";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import styles from "./TheHeader.module.css";
-
-import EzmoveLogo from "./Icons/EzmoveLogo.svg";
+import EzmoveLogo from "@/assets/logo/ezmoveLogo.svg";
 import FindRoutesIcon from "./Icons/FindRoutesIcon.svg";
 import SearchTransportIcon from "./Icons/SearchTransportIcon.svg";
 import MetroGuideIcon from "./Icons/MetroGuideIcon.svg";
-
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "@/features/auth/authSlice";
 
@@ -15,14 +13,23 @@ function TheHeader() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // ✅ خدي بيانات المستخدم من Redux
   const { user, token } = useSelector((state) => state.auth);
   const isLoggedIn = Boolean(token);
+  const storedAuth = JSON.parse(localStorage.getItem("ezMove_auth") || "{}");
+
+  const fullName = user?.fullName || storedAuth.user?.fullName || "User";
+
+  const displayName =
+    fullName.length > 15 ? fullName.slice(0, 15) + "…" : fullName;
+
+  const linkClass = ({ isActive }) =>
+    isActive ? `${styles.navLink} ${styles.active}` : styles.navLink;
 
   function handleLogout() {
     dispatch(logout());
     navigate("/");
   }
+
   return (
     <Navbar expand="lg" className={styles.header}>
       <Container fluid>
@@ -34,8 +41,8 @@ function TheHeader() {
           <img
             src={EzmoveLogo}
             alt="Ezmove Logo"
-            width="40"
-            height="40"
+            width="30"
+            height="30"
             className={styles.logoImg}
           />
           <span className={styles.logoText}>Ezmove</span>
@@ -48,7 +55,7 @@ function TheHeader() {
 
         <Navbar.Collapse id="main-navbar" className="justify-content-between">
           <Nav className={styles.navList}>
-            <Nav.Link as={Link} to="/findroutes" className={styles.navLink}>
+            <NavLink to="/findroutes" className={linkClass}>
               <img
                 src={FindRoutesIcon}
                 alt="Find Routes"
@@ -57,13 +64,9 @@ function TheHeader() {
                 className={styles.icon}
               />
               find routes
-            </Nav.Link>
+            </NavLink>
 
-            <Nav.Link
-              as={Link}
-              to="/searchfortransport"
-              className={styles.navLink}
-            >
+            <NavLink to="/searchfortransport" className={linkClass}>
               <img
                 src={SearchTransportIcon}
                 alt="Search Transport"
@@ -72,9 +75,9 @@ function TheHeader() {
                 className={styles.icon}
               />
               search transport
-            </Nav.Link>
+            </NavLink>
 
-            <Nav.Link as={Link} to="/metroguide" className={styles.navLink}>
+            <NavLink to="/metroguide" className={linkClass}>
               <img
                 src={MetroGuideIcon}
                 alt="Metro Guide"
@@ -83,18 +86,18 @@ function TheHeader() {
                 className={styles.icon}
               />
               metro guide
-            </Nav.Link>
+            </NavLink>
 
-            <Nav.Link as={Link} to="/saveditems" className={styles.navLink}>
+            <NavLink to="/saveditems" className={linkClass}>
               <img
                 src={MetroGuideIcon}
-                alt="Metro Guide"
+                alt="Saved Items"
                 width="18"
                 height="18"
                 className={styles.icon}
               />
               saved items
-            </Nav.Link>
+            </NavLink>
           </Nav>
 
           <div className={styles.buttonContainer}>
@@ -103,7 +106,7 @@ function TheHeader() {
                 style={{ display: "flex", alignItems: "center", gap: "10px" }}
               >
                 <span style={{ color: "black" }}>
-                  👋 Hello, <strong>{user?.name || "User"}</strong>
+                  👋 Hello, <strong>{displayName}</strong>
                 </span>
                 <Button
                   variant="outline-danger"

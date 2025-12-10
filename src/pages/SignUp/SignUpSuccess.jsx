@@ -1,10 +1,13 @@
 import React from "react";
 import { Container, Card, Button } from "react-bootstrap";
 import styles from "./SignUp.module.css";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
+
+console.log("SUCCESS PAGE RENDERED");
 
 const SignUpSuccess = () => {
   const navigate = useNavigate();
+
   return (
     <Container fluid className={styles.signupPage}>
       <Card className={styles.signupCard}>
@@ -36,9 +39,9 @@ const SignUpSuccess = () => {
           <Button
             variant="primary"
             className={styles.createAccountBtn}
-            onClick={() => navigate("/login")}
+            onClick={() => navigate("/auth/login")}
           >
-            Proceed to Login
+            Proceed to Log In
           </Button>
         </Card.Body>
       </Card>

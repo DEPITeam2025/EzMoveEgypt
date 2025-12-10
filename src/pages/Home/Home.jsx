@@ -1,6 +1,6 @@
 import React from "react";
 import styles from "./Home.module.css";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   ArrowRight,
   MapPin,
@@ -12,8 +12,84 @@ import {
   Zap,
   Shield,
 } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 
-// Hero Section Component
+// --- Mock API Data Functions ---
+const fetchFeatures = async () => [
+  {
+    id: 1,
+    icon: "MapPin",
+    title: "Find Routes",
+    description:
+      "Discover the best routes between any two locations with multiple transport options.",
+    color: "bg-blue",
+    linkText: "Get Started →",
+    link: "/findroutes",
+  },
+  {
+    id: 2,
+    icon: "Search",
+    title: "Search Transport",
+    description:
+      "Look up specific transport lines, schedules, and real-time arrival information.",
+    color: "bg-purple",
+    linkText: "Get Started →",
+    link: "/searchfortransport",
+  },
+  {
+    id: 3,
+    icon: "Map",
+    title: "Metro Guide",
+    description:
+      "Complete metro network map with all lines, stations, and operating hours.",
+    color: "bg-red",
+    linkText: "Get Started →",
+    link: "/metroguide",
+  },
+  {
+    id: 4,
+    icon: "Heart",
+    title: "Saved List",
+    description:
+      "Save your favorite routes and transport lines for quick access.",
+    color: "bg-pink",
+    linkText: "Sign In to Access",
+    link: "/saveditems",
+    disabled: true,
+  },
+];
+
+const fetchBenefits = async () => [
+  {
+    id: 1,
+    icon: "Clock",
+    title: "Save Time",
+    description: "Find the fastest routes with real-time updates",
+  },
+  {
+    id: 2,
+    icon: "DollarSign",
+    title: "Save Money",
+    description: "Compare costs and choose the most economical option",
+  },
+  {
+    id: 3,
+    icon: "Zap",
+    title: "Easy to Use",
+    description: "Simple, intuitive interface for everyone",
+  },
+  {
+    id: 4,
+    icon: "Shield",
+    title: "Reliable",
+    description: "Accurate, up-to-date transit information",
+  },
+];
+
+// --- Icon Mapping ---
+const iconMap = { MapPin, Search, Map, Heart, Clock, DollarSign, Zap, Shield };
+
+// --- Hero Section ---
 function HeroSection({ onFindRoutes, onLogin }) {
   return (
     <section className={styles["hero-section"]}>
@@ -33,7 +109,7 @@ function HeroSection({ onFindRoutes, onLogin }) {
             onClick={onFindRoutes}
           >
             <span className={styles["btn-content"]}>
-              Find Routes Now
+              Find Routes Now{" "}
               <ArrowRight size={18} style={{ marginLeft: "8px" }} />
             </span>
           </button>
@@ -49,47 +125,19 @@ function HeroSection({ onFindRoutes, onLogin }) {
   );
 }
 
-// Features Section Component
+// --- Features Section ---
 function FeaturesSection() {
-  const features = [
-    {
-      id: 1,
-      icon: MapPin,
-      title: "Find Routes",
-      description:
-        "Discover the best routes between any two locations with multiple transport options.",
-      color: "bg-blue",
-      link: "Get Started →",
-    },
-    {
-      id: 2,
-      icon: Search,
-      title: "Search Transport",
-      description:
-        "Look up specific transport lines, schedules, and real-time arrival information.",
-      color: "bg-purple",
-      link: "Get Started →",
-    },
-    {
-      id: 3,
-      icon: Map,
-      title: "Metro Guide",
-      description:
-        "Complete metro network map with all lines, stations, and operating hours.",
-      color: "bg-red",
-      link: "Get Started →",
-    },
-    {
-      id: 4,
-      icon: Heart,
-      title: "Saved List",
-      description:
-        "Save your favorite routes and transport lines for quick access.",
-      color: "bg-pink",
-      link: "Sign In to Access",
-      disabled: true,
-    },
-  ];
+  const {
+    data: features,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["features"],
+    queryFn: fetchFeatures,
+  });
+
+  if (isLoading) return <p>Loading features...</p>;
+  if (error) return <p>Error loading features</p>;
 
   return (
     <section className={styles["features-section"]}>
@@ -103,7 +151,7 @@ function FeaturesSection() {
 
         <div className={styles["features-grid"]}>
           {features.map((feature) => {
-            const IconComponent = feature.icon;
+            const IconComponent = iconMap[feature.icon];
             return (
               <div key={feature.id} className={styles["feature-card"]}>
                 <div
@@ -117,14 +165,14 @@ function FeaturesSection() {
                 <p className={styles["feature-description"]}>
                   {feature.description}
                 </p>
-                <a
-                  href="#"
+                <Link
+                  to={feature.link}
                   className={`${styles["feature-link"]} ${
                     feature.disabled ? styles.disabled : ""
                   }`}
                 >
-                  {feature.link}
-                </a>
+                  {feature.linkText}
+                </Link>
               </div>
             );
           })}
@@ -134,34 +182,19 @@ function FeaturesSection() {
   );
 }
 
-// Why Choose Us Section Component
+// --- Why Choose Us Section ---
 function WhyChooseUsSection() {
-  const benefits = [
-    {
-      id: 1,
-      icon: Clock,
-      title: "Save Time",
-      description: "Find the fastest routes with real-time updates",
-    },
-    {
-      id: 2,
-      icon: DollarSign,
-      title: "Save Money",
-      description: "Compare costs and choose the most economical option",
-    },
-    {
-      id: 3,
-      icon: Zap,
-      title: "Easy to Use",
-      description: "Simple, intuitive interface for everyone",
-    },
-    {
-      id: 4,
-      icon: Shield,
-      title: "Reliable",
-      description: "Accurate, up-to-date transit information",
-    },
-  ];
+  const {
+    data: benefits,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["benefits"],
+    queryFn: fetchBenefits,
+  });
+
+  if (isLoading) return <p>Loading benefits...</p>;
+  if (error) return <p>Error loading benefits</p>;
 
   return (
     <section className={styles["why-choose-section"]}>
@@ -175,7 +208,7 @@ function WhyChooseUsSection() {
 
         <div className={styles["benefits-grid"]}>
           {benefits.map((benefit) => {
-            const IconComponent = benefit.icon;
+            const IconComponent = iconMap[benefit.icon];
             return (
               <div key={benefit.id} className={styles["benefit-card"]}>
                 <div className={styles["benefit-icon"]}>
@@ -194,8 +227,8 @@ function WhyChooseUsSection() {
   );
 }
 
-// CTA Section Component
-function CTASection({ onFindRoutes }) {
+// --- CTA Section ---
+function CTASection({ onFindRoutes, onMetroGuide }) {
   return (
     <section className={styles["cta-section"]}>
       <div className={styles["cta-container"]}>
@@ -212,14 +245,16 @@ function CTASection({ onFindRoutes }) {
             onClick={onFindRoutes}
           >
             <span className={styles["btn-content"]}>
-              <MapPin size={18} style={{ marginRight: "8px" }} />
-              Find Your Route
+              <MapPin size={18} style={{ marginRight: "8px" }} /> Find Your
+              Route
             </span>
           </button>
-          <button className={`${styles.btn} ${styles["btn-outline"]}`}>
+          <button
+            className={`${styles.btn} ${styles["btn-outline"]}`}
+            onClick={onMetroGuide}
+          >
             <span className={styles["btn-content"]}>
-              <Map size={18} style={{ marginRight: "8px" }} />
-              View Metro Guide
+              <Map size={18} style={{ marginRight: "8px" }} /> View Metro Guide
             </span>
           </button>
         </div>
@@ -228,17 +263,13 @@ function CTASection({ onFindRoutes }) {
   );
 }
 
-// Main Home Component
+// --- Main Home Component ---
 export default function Home() {
   const navigate = useNavigate();
 
-  const handleFindRoutes = () => {
-    navigate("/findroutes");
-  };
-
-  const handleLogin = () => {
-    navigate("/login");
-  };
+  const handleFindRoutes = () => navigate("/findroutes");
+  const handleMetroGuide = () => navigate("/metroguide");
+  const handleLogin = () => navigate("/auth/login");
 
   return (
     <div className={styles.home}>
@@ -246,7 +277,10 @@ export default function Home() {
         <HeroSection onFindRoutes={handleFindRoutes} onLogin={handleLogin} />
         <FeaturesSection />
         <WhyChooseUsSection />
-        <CTASection onFindRoutes={handleFindRoutes} />
+        <CTASection
+          onFindRoutes={handleFindRoutes}
+          onMetroGuide={handleMetroGuide}
+        />
       </main>
     </div>
   );

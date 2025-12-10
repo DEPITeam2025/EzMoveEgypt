@@ -9,7 +9,6 @@ import BusIcon from "../../assets/icons/Icon2.png";
 const SavedRoutes = () => {
   return (
     <Container className="my-4">
-
       {/* Route Cards */}
       <Row className="g-3">
         <Col md={12}>
@@ -19,7 +18,8 @@ const SavedRoutes = () => {
                 <div>
                   <h6 className="fw-bold">
                     <img src={BusIcon} alt="Bus" width="18" className="me-1" />
-                    Downtown</h6>
+                    Downtown
+                  </h6>
                   <p className="text-muted mb-1">
                     <GeoAlt className="text-danger me-1" /> Airport
                   </p>

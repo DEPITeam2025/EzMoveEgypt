@@ -1,150 +1,310 @@
 import React, { useState, useMemo } from "react";
 import Select from "react-select";
+import { Container, Row, Col, Card, Button } from "react-bootstrap";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import graphData from "../../Data/graph.json";
 import { findShortestPath } from "../../utils/dijkstra";
 import styles from "./FindRoutes.module.css";
+import SaveButton from "@/Components/SaveButton/SaveButton";
+
+// --- Helpers ---
+const getSavedRoutes = () =>
+  JSON.parse(localStorage.getItem("savedRoutes") || "[]");
+const saveRoutesToLocalStorage = (routes) =>
+  localStorage.setItem("savedRoutes", JSON.stringify(routes));
 
 export default function FindRoutes() {
   const [start, setStart] = useState("");
   const [end, setEnd] = useState("");
-  const [result, setResult] = useState(null);
+  const [routes, setRoutes] = useState([]);
+  const [editRouteId, setEditRouteId] = useState(null);
+  const [editSummary, setEditSummary] = useState("");
+  const [newSummary, setNewSummary] = useState("");
 
+  const queryClient = useQueryClient();
+
+  // Load saved routes
+  const { data: savedRoutes } = useQuery({
+    queryKey: ["savedRoutes"],
+    queryFn: getSavedRoutes,
+  });
+
+  // --- Mutations ---
+  const addRouteMutation = useMutation({
+    mutationFn: (route) => {
+      const current = getSavedRoutes();
+      const updated = [...current, route];
+      saveRoutesToLocalStorage(updated);
+      return updated;
+    },
+    onSuccess: (data) => {
+      queryClient.setQueryData(["savedRoutes"], data);
+      setNewSummary("");
+      alert("Custom route added!");
+    },
+  });
+
+  const editRouteMutation = useMutation({
+    mutationFn: ({ id, summary }) => {
+      const updatedRoutes = savedRoutes.map((r) =>
+        r.id === id ? { ...r, summary } : r
+      );
+      saveRoutesToLocalStorage(updatedRoutes);
+      return updatedRoutes;
+    },
+    onSuccess: (data) => {
+      queryClient.setQueryData(["savedRoutes"], data);
+      setEditRouteId(null);
+      setEditSummary("");
+      alert("Route updated successfully!");
+    },
+  });
+
+  const deleteRouteMutation = useMutation({
+    mutationFn: (id) => {
+      const updated = savedRoutes.filter((r) => r.id !== id);
+      saveRoutesToLocalStorage(updated);
+      return updated;
+    },
+    onSuccess: (data) => {
+      queryClient.setQueryData(["savedRoutes"], data);
+      if (editRouteId && !data.find((r) => r.id === editRouteId)) {
+        setEditRouteId(null);
+        setEditSummary("");
+      }
+    },
+  });
+
+  // Select Options
   const stops = Object.values(graphData.nodes);
-
   const selectOptions = useMemo(() => {
-    return stops.map((s) => ({
-      value: s.id,
-      label: s.name,
-    }));
+    const map = new Map();
+    stops.forEach((s) => {
+      if (!map.has(s.name)) map.set(s.name, { value: s.id, label: s.name });
+    });
+    return Array.from(map.values());
   }, [stops]);
 
-  const startValue = selectOptions.find((option) => option.value === start);
-  const endValue = selectOptions.find((option) => option.value === end);
+  const startValue = selectOptions.find((opt) => opt.value === start);
+  const endValue = selectOptions.find((opt) => opt.value === end);
 
-
-
+  // --- Handle Search ---
   const handleSearch = () => {
     if (!start || !end) return;
-    const res = findShortestPath(graphData, start, end);
-    setResult(res);
+    const result = findShortestPath(graphData, start, end);
+    if (result) {
+      const routeItem = {
+        id: `${start}-${end}`,
+        type: "fullRoute",
+        from: graphData.nodes[start]?.name,
+        to: graphData.nodes[end]?.name,
+        steps: result.summary,
+        savedAt: new Date().toLocaleDateString(),
+      };
+      setRoutes([{ ...result, routeItem }]);
+    }
   };
 
-  const getLineColor = (line) => {
-    if (!line) return styles.otherLine;
-    if (line.includes("Line 1")) return styles.line1;
-    if (line.includes("Line 2")) return styles.line2;
-    if (line.includes("Line 3")) return styles.line3;
-    return styles.otherLine;
+  const addNewRoute = () => {
+    if (!start || !end) return alert("Search for a route first!");
+    if (!newSummary.trim()) return alert("Enter route info first");
+
+    const routeObject = {
+      id: Date.now(),
+      startId: start,
+      endId: end,
+      startName: graphData.nodes[start]?.name,
+      endName: graphData.nodes[end]?.name,
+      userGenerated: true,
+      summary: newSummary
+        .split("\n")
+        .map((line) => line.trim())
+        .filter(Boolean),
+    };
+
+    addRouteMutation.mutate(routeObject);
+  };
+
+  const saveEditedRoute = (id) => {
+    const summary = editSummary
+      .split("\n")
+      .map((line) => line.trim())
+      .filter(Boolean);
+    editRouteMutation.mutate({ id, summary });
   };
 
   return (
-    <div className={`container mt-5 ${styles.container}`}>
-      <h2 className="text-center mb-4">🗺️ Cairo Route Finder</h2>
+    <Container className="py-4">
+      <h1 className="text-center mb-4">Cairo Transit Route Finder</h1>
 
-      <div className="row g-3 mb-4">
-        <div className="col-md-4">
-          <Select
-            classNamePrefix="react-select"
-            value={startValue}
-            onChange={(selectedOption) => setStart(selectedOption ? selectedOption.value : "")}
-            options={selectOptions}
-            placeholder="Select Start Stop"
-            isClearable={true}
-          />
-        </div>
+      {/* Search Section */}
+      <Card className="mb-4 p-3 shadow-sm">
+        <Row className="align-items-end g-2">
+          <Col xs={12} lg={4}>
+            <Select
+              value={startValue}
+              onChange={(opt) => setStart(opt ? opt.value : "")}
+              options={selectOptions}
+              placeholder="From: Choose starting point"
+              isClearable
+            />
+          </Col>
+          <Col xs={12} md={1} lg={1} className="text-center">
+            <Button
+              onClick={() => {
+                const t = start;
+                setStart(end);
+                setEnd(t);
+              }}
+              className={styles.swapBtn}
+            >
+              ⇅
+            </Button>
+          </Col>
+          <Col xs={12} md lg={4}>
+            <Select
+              value={endValue}
+              onChange={(opt) => setEnd(opt ? opt.value : "")}
+              options={selectOptions}
+              placeholder="To: Choose destination"
+              isClearable
+            />
+          </Col>
+          <Col xs={12} lg={3}>
+            <Button
+              variant="primary"
+              className={`w-100 ${styles.findButton}`}
+              onClick={handleSearch}
+              disabled={!start || !end}
+            >
+              Find Routes
+            </Button>
+          </Col>
+        </Row>
+      </Card>
 
-        <div className="col-md-4">
-          <Select
-            classNamePrefix="react-select"
-            value={endValue}
-            onChange={(selectedOption) => setEnd(selectedOption ? selectedOption.value : "")}
-            options={selectOptions}
-            placeholder="Select Destination Stop"
-            isClearable={true}
-          />
-        </div>
+      {/* Main Route Results */}
+      {routes.map((route, idx) => (
+        <Card key={idx} className="mb-3 shadow-sm p-3 border-success">
+          <div className="d-flex justify-content-between align-items-center mb-3">
+            <h5 className="mb-0">Main Route</h5>
+            <SaveButton item={route.routeItem} />
+          </div>
 
-        <div className="col-md-4">
-          <button
-            onClick={handleSearch}
-            className="btn btn-primary w-100 fw-bold"
-          >
-            Find Route
-          </button>
-        </div>
-      </div>
-
-      {result && (
-        <>
-          {/* --- Summary Section --- */}
-          <div className={styles.summary}>
-            <div className={styles.summaryIcons}>
-              {result.summary.map((seg, idx) => (
-                <div
-                  key={idx}
-                  className={`${styles.summaryIcon} ${getLineColor(seg.line)}`}
-                >
+          {route.summary.map((seg, i) => (
+            <Row
+              key={i}
+              className="align-items-center mb-2 p-2 rounded"
+              style={{ background: "#f8f9fa", border: "1px solid #e3e3e3" }}
+            >
+              <Col xs={12} className="d-flex align-items-center">
+                <span style={{ marginRight: "10px" }}>
                   {seg.mode === "metro" ? "🚇" : "🚌"}
-                </div>
-              ))}
-            </div>
-            <div className={styles.summaryText}>
-              {result.summary.map((seg, idx) => (
-                <span
-                  key={idx}
-                  className={`${styles.lineTag} ${getLineColor(seg.line)}`}
-                >
-                  {seg.mode === "metro"
-                    ? seg.line
-                    : seg.line
-                    ? `${seg.line}`
-                    : "Bus"}
                 </span>
+                <span>
+                  Take {seg.line.replace(/ - | → |–/g, " → ")}
+                  {seg.stops ? ` for ${seg.stops} stops` : ""}
+                </span>
+              </Col>
+            </Row>
+          ))}
+        </Card>
+      ))}
+
+      {/* User Routes */}
+      {savedRoutes
+        ?.filter(
+          (r) => r.userGenerated && r.startId === start && r.endId === end
+        )
+        .map((route, idx) => (
+          <Card key={route.id} className="mb-3 shadow-sm p-3 border-success">
+            <Row className="align-items-center mb-2">
+              <Col>
+                <h5>User Route {idx + 1}</h5>
+              </Col>
+              <Col className="text-end">
+                <Button
+                  variant="outline-secondary"
+                  size="sm"
+                  onClick={() => {
+                    setEditRouteId(route.id);
+                    setEditSummary(route.summary.join("\n"));
+                  }}
+                  className="me-2"
+                >
+                  Edit
+                </Button>
+                <Button
+                  variant="outline-danger"
+                  size="sm"
+                  onClick={() => deleteRouteMutation.mutate(route.id)}
+                >
+                  Delete
+                </Button>
+              </Col>
+            </Row>
+
+            <div>
+              {route.summary.map((line, i) => (
+                <Row key={i} className="align-items-center mb-1">
+                  <Col style={{ whiteSpace: "pre-wrap" }}>{line}</Col>
+                </Row>
               ))}
             </div>
-          </div>
 
-          {/* --- Detailed Route --- */}
-          <div className="mt-4">
-            {result.summary.map((seg, idx) => (
-              <div key={idx} className={styles.segment}>
-                <div className={`${styles.icon} ${getLineColor(seg.line)}`}>
-                  {seg.mode === "metro" ? "🚇" : "🚌"}
-                </div>
-                <div className={styles.segmentInfo}>
-                  <div className="fw-bold">
-                    {seg.mode === "metro" ? "Metro" : "Bus"}{" "}
-                    <span
-                      className={`${styles.lineName} ${getLineColor(seg.line)}`}
-                    >
-                      {seg.line}
-                    </span>{" "}
-                    • {seg.stops} stops
-                  </div>
-                  <div className="text-muted small">
-                    Take {seg.line} towards {seg.direction || "destination"}
-                  </div>
-                </div>
+            {editRouteId === route.id && (
+              <div className="mt-2">
+                <textarea
+                  className="form-control"
+                  rows={Math.max(route.summary.length, 3)}
+                  value={editSummary}
+                  onChange={(e) => setEditSummary(e.target.value)}
+                />
+                <Button
+                  className="mt-2 w-100 btn-primary"
+                  onClick={() => saveEditedRoute(route.id)}
+                >
+                  Save Changes
+                </Button>
               </div>
-            ))}
-          </div>
+            )}
+          </Card>
+        ))}
 
-          {/* --- Stop-by-stop List --- */}
-          <div className={`mt-4 ${styles.detailedList}`}>
-            {result.path.map((step, idx) => {
-              const lineColor = getLineColor(step.line_name);
-              return (
-                <div key={idx} className={styles.stopItem}>
-                  <div className={`${styles.stopBullet} ${lineColor}`}></div>
-                  <div className={styles.stopText}>
-                    {graphData.nodes[step.to]?.name}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </>
-      )}
-    </div>
+      {/* Add Custom Route */}
+      <Card className="mt-4 p-3 shadow-sm border-success">
+        <h4 className="text-center mb-3">Add Custom Route for This Trip</h4>
+        <Row className="g-2 mb-2">
+          <Col>
+            <input
+              className="form-control"
+              value={graphData.nodes[start]?.name || ""}
+              disabled
+            />
+          </Col>
+          <Col>
+            <input
+              className="form-control"
+              value={graphData.nodes[end]?.name || ""}
+              disabled
+            />
+          </Col>
+        </Row>
+        <textarea
+          className="form-control mt-2"
+          rows={5}
+          placeholder="Write your route freely, one line per segment"
+          value={newSummary}
+          onChange={(e) => setNewSummary(e.target.value)}
+        />
+        <Button
+          className="w-100 mt-3 btn-success"
+          onClick={addNewRoute}
+          disabled={addRouteMutation.isLoading}
+        >
+          Save Custom Route
+        </Button>
+      </Card>
+    </Container>
   );
 }

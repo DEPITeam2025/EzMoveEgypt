@@ -9,7 +9,7 @@ export const injectStore = (_store) => {
 };
 
 const api = axios.create({
-  baseURL: "https://6906e4d5b1879c890ed842fb.mockapi.io/api", // غيّريها للـ backend الحقيقي
+  baseURL: "https://6906e4d5b1879c890ed842fb.mockapi.io/api",
 });
 
 // interceptor لإضافة Authorization header تلقائياً لو في token

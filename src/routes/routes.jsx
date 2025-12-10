@@ -5,6 +5,7 @@ import Home from "@/pages/Home/Home";
 import MetroGuide from "@/pages/MetroGuide/MetroGuide";
 import Login from "@/pages/Login/Login";
 import SignUp from "@/pages/SignUp/SignUp";
+import SignUpSuccess from "@/pages/SignUp/SignUpSuccess";
 import FindRoutes from "@/pages/FindRoutes/FindRoutes";
 import SearchForTransport from "@/pages/SearchForTransport/SearchForTransport";
 import SavedItems from "@/pages/SavedItems/SavedItems";
@@ -46,6 +47,7 @@ const router = createBrowserRouter([
     children: [
       { path: "login", Component: Login },
       { path: "signup", Component: SignUp },
+      { path: "signup-success", Component: SignUpSuccess },
       { path: "forgot-password", Component: ForgotPassword },
       { path: "reset-password", Component: ResetPassword },
     ],

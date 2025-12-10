@@ -5,72 +5,20 @@ import {
   Form,
   Button,
   InputGroup,
-  Alert,
+  Spinner,
 } from "react-bootstrap";
 import styles from "./SignUp.module.css";
-import SignUpSuccess from "./SignUpSuccess";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { firebaseAuth } from "../../firebase";
+import EzmoveLogo from "@/assets/logo/ezmoveLogo.svg";
 
-// Simple email validation regex
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+// Strong email regex
+const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+// Egyptian phone regex
+const EGYPT_PHONE_REGEX = /^(010|011|012|015)[0-9]{8}$/;
 
-const BusIcon = () => (
-  <div className={styles.iconPlaceholder}>
-    {/* Placeholder for a stylized bus icon */}
-    <svg width="39" height="39" viewBox="0 0 39 39" fill="none">
-      <path
-        d="M12.9111 9.68348V19.367"
-        stroke="white"
-        strokeWidth="2.14936"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M24.2085 9.68348V19.367"
-        stroke="white"
-        strokeWidth="2.14936"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M3.22778 19.367H34.8605"
-        stroke="white"
-        strokeWidth="2.14936"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M29.0504 29.0504H33.8921C33.8921 29.0504 34.6991 26.3068 35.1833 24.5315C35.3446 23.8859 35.506 23.2403 35.506 22.5948C35.506 21.9492 35.3446 21.3036 35.1833 20.6581L32.9238 12.5885C32.4396 10.9746 30.8257 9.68348 29.0504 9.68348H6.45561C5.59954 9.68348 4.77853 10.0236 4.17319 10.6289C3.56786 11.2342 3.22778 12.0552 3.22778 12.9113V29.0504H8.06952"
-        stroke="white"
-        strokeWidth="2.14936"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M11.2974 32.2783C13.0801 32.2783 14.5252 30.8331 14.5252 29.0504C14.5252 27.2678 13.0801 25.8226 11.2974 25.8226C9.51473 25.8226 8.06958 27.2678 8.06958 29.0504C8.06958 30.8331 9.51473 32.2783 11.2974 32.2783Z"
-        stroke="white"
-        strokeWidth="2.14936"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M14.5251 29.0504H22.5947"
-        stroke="white"
-        strokeWidth="2.14936"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M25.8226 32.2783C27.6052 32.2783 29.0504 30.8331 29.0504 29.0504C29.0504 27.2678 27.6052 25.8226 25.8226 25.8226C24.0399 25.8226 22.5947 27.2678 22.5947 29.0504C22.5947 30.8331 24.0399 32.2783 25.8226 32.2783Z"
-        stroke="white"
-        strokeWidth="2.14936"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  </div>
-);
-
+// Eye Icons
 const EyeIcon = ({ onClick }) => (
   <InputGroup.Text className={styles.eyeIcon} onClick={onClick}>
     <svg
@@ -83,8 +31,8 @@ const EyeIcon = ({ onClick }) => (
       strokeLinecap="round"
       strokeLinejoin="round"
     >
-      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-      <circle cx="12" cy="12" r="3"></circle>
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+      <circle cx="12" cy="12" r="3" />
     </svg>
   </InputGroup.Text>
 );
@@ -113,141 +61,103 @@ const SignUp = () => {
   const [form, setForm] = useState({
     fullName: "",
     email: "",
+    phone: "",
     password: "",
     confirmPassword: "",
     terms: false,
   });
   const [errors, setErrors] = useState({});
   const [passwordShown, setPasswordShown] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [isSignedUp, setIsSignedUp] = useState(false);
-
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const togglePasswordVisibility = () => setPasswordShown(!passwordShown);
-
   const setField = (field, value) => {
-    setForm({
-      ...form,
-      [field]: value,
-    });
-    // Clear validation error on change
-    if (!errors[field]) {
-      setErrors({
-        ...errors,
-        [field]: null,
-      });
-    }
+    setForm((prev) => ({ ...prev, [field]: value }));
+    setErrors((prev) => ({ ...prev, [field]: "" }));
   };
 
   const findFormErrors = () => {
-    const { fullName, email, password, confirmPassword, terms } = form;
-    const newErrors = {};
+    const { fullName, email, phone, password, confirmPassword, terms } = form;
+    let newErrors = {};
+    if (!fullName.trim()) newErrors.fullName = "Full Name is required.";
+    else if (fullName.trim().length < 2)
+      newErrors.fullName = "Full Name must be at least 2 characters.";
 
-    // Full Name validation
-    if (!fullName) {
-      newErrors.fullName = "Full Name is required";
-    } else if (fullName.length < 2) {
-      newErrors.fullName = "Full Name must be at least 2 characters long.";
-    }
+    if (!email.trim()) newErrors.email = "Email is required.";
+    else if (!EMAIL_REGEX.test(email))
+      newErrors.email = "Please enter a valid email.";
 
-    // Email validation
-    if (!email) {
-      newErrors.email = "Email is required";
-    } else if (!EMAIL_REGEX.test(email)) {
-      newErrors.email = "Please enter a valid email address.";
-    }
-    const usersData = JSON.parse(localStorage.getItem("usersData"));
-    usersData.map((user) => {
-      if (user.email === email) {
-        newErrors.email = "This email already exist. Please go to login";
-      }
-    });
+    if (!phone.trim()) newErrors.phone = "Phone number is required.";
+    else if (!EGYPT_PHONE_REGEX.test(phone))
+      newErrors.phone = "Please enter a valid Egyptian phone number.";
 
-    // Password validation
-    if (!password) {
-      newErrors.password = "Password is required";
-    } else if (!password || password.length < 8) {
-      newErrors.password = "Password must be at least 8 characters.";
-    }
+    if (!password) newErrors.password = "Password is required.";
+    else if (password.length < 6)
+      newErrors.password = "Password must be at least 6 characters.";
 
-    // Confirm Password validation
-    if (confirmPassword !== password) {
-      newErrors.confirmPassword = "Passwords must match.";
-    }
-
-    // Terms validation (optional, but good practice)
-    if (!terms) {
-      newErrors.terms =
-        "You must agree to the Terms of Service and Privacy Policy.";
-    }
+    if (confirmPassword !== password)
+      newErrors.confirmPassword = "Passwords do not match.";
+    if (!terms) newErrors.terms = "You must agree to the terms.";
 
     return newErrors;
   };
 
-  const handleBlur = (field) => {
-    // Only validate the field that was blurred
-    const newErrors = findFormErrors();
-    setErrors({
-      ...errors,
-      [field]: newErrors[field] || null,
-    });
-  };
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setSuccess(false); // Reset success message
-
     const newErrors = findFormErrors();
-
-    if (Object.keys(newErrors).some((key) => newErrors[key])) {
-      // If there are errors, set them and stop submission
+    if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
-    } else {
-      // No errors, proceed with submission
-      setErrors({});
+      return;
+    }
 
-      // 1. Save data to local storage
-      const userData = {
-        fullName: form.fullName,
-        email: form.email,
-        // NOTE: In a real application, NEVER store plain passwords.
-        // This is for demonstration of local storage functionality only.
-        password: form.password,
-        signUpDate: new Date().toISOString(),
-      };
-      let usersData = JSON.parse(localStorage.getItem("usersData"));
-      if (usersData) {
-        usersData = [...usersData, userData];
+    try {
+      setLoading(true);
+
+      // إنشاء يوزر
+      const userCredential = await createUserWithEmailAndPassword(
+        firebaseAuth,
+        form.email,
+        form.password
+      );
+      const user = userCredential.user;
+
+      // تحديث displayName
+      await updateProfile(user, { displayName: form.fullName });
+
+      // حفظ بيانات اليوزر محلياً
+      // const authData = {
+      //   user: { uid: user.uid, email: user.email, fullName: user.displayName },
+      //   token: await user.getIdToken(),
+      // };
+      // localStorage.setItem("ezMove_auth", JSON.stringify(authData));
+
+      setLoading(false);
+      navigate("/auth/signup-success");
+    } catch (err) {
+      setLoading(false);
+      if (err.code === "auth/email-already-in-use") {
+        setErrors((prev) => ({
+          ...prev,
+          email: "This email is already registered.",
+        }));
       } else {
-        usersData = [userData];
+        setErrors((prev) => ({
+          ...prev,
+          email: "Something went wrong. Please try again.",
+        }));
       }
-      localStorage.setItem("usersData", JSON.stringify(usersData));
-
-      // 2. Show success message
-      setSuccess(true);
-
-      // 3. Optionally, reset the form
-      setForm({
-        fullName: "",
-        email: "",
-        password: "",
-        confirmPassword: "",
-        terms: false,
-      });
-
-      setIsSignedUp(true);
     }
   };
-
-  if (isSignedUp) {
-    return <SignUpSuccess />;
-  }
 
   return (
     <Container fluid className={styles.signupPage}>
       <header className="text-center mb-4">
-        <BusIcon />
+        <img
+          src={EzmoveLogo}
+          alt="Ezmove Logo"
+          style={{ width: 50, height: 50 }}
+        />
         <h1 className="h5 fw-bold mb-0">Ezmove</h1>
         <p className="text-muted small">Create an account to get started</p>
       </header>
@@ -259,12 +169,6 @@ const SignUp = () => {
             Enter your information to create an account
           </Card.Text>
 
-          {success && (
-            <Alert variant="success" className="mb-4">
-              Account created successfully! Data saved to Local Storage.
-            </Alert>
-          )}
-
           <Form onSubmit={handleSubmit}>
             {/* Full Name */}
             <Form.Group className="mb-3">
@@ -275,7 +179,6 @@ const SignUp = () => {
                 className={styles.formControlCustom}
                 value={form.fullName}
                 onChange={(e) => setField("fullName", e.target.value)}
-                onBlur={() => handleBlur("fullName")}
                 isInvalid={!!errors.fullName}
               />
               <Form.Control.Feedback type="invalid">
@@ -292,11 +195,26 @@ const SignUp = () => {
                 className={styles.formControlCustom}
                 value={form.email}
                 onChange={(e) => setField("email", e.target.value)}
-                onBlur={() => handleBlur("email")}
                 isInvalid={!!errors.email}
               />
               <Form.Control.Feedback type="invalid">
                 {errors.email}
+              </Form.Control.Feedback>
+            </Form.Group>
+
+            {/* Phone */}
+            <Form.Group className="mb-3">
+              <Form.Label className="fw-semibold">Phone</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="01*********"
+                className={styles.formControlCustom}
+                value={form.phone}
+                onChange={(e) => setField("phone", e.target.value)}
+                isInvalid={!!errors.phone}
+              />
+              <Form.Control.Feedback type="invalid">
+                {errors.phone}
               </Form.Control.Feedback>
             </Form.Group>
 
@@ -306,11 +224,10 @@ const SignUp = () => {
               <InputGroup hasValidation>
                 <Form.Control
                   type={passwordShown ? "text" : "password"}
-                  placeholder="Create a password (min. 8 characters)"
+                  placeholder="Create a password (min. 6 characters)"
                   className={styles.formControlCustom}
                   value={form.password}
                   onChange={(e) => setField("password", e.target.value)}
-                  onBlur={() => handleBlur("password")}
                   isInvalid={!!errors.password}
                 />
                 {passwordShown ? (
@@ -334,7 +251,6 @@ const SignUp = () => {
                   className={styles.formControlCustom}
                   value={form.confirmPassword}
                   onChange={(e) => setField("confirmPassword", e.target.value)}
-                  onBlur={() => handleBlur("confirmPassword")}
                   isInvalid={!!errors.confirmPassword}
                 />
                 {passwordShown ? (
@@ -348,14 +264,14 @@ const SignUp = () => {
               </InputGroup>
             </Form.Group>
 
-            {/* Terms and Policy Checkbox */}
+            {/* Terms */}
             <Form.Group className="mb-4">
               <Form.Check
                 type="checkbox"
                 id="terms-checkbox"
                 label={
                   <>
-                    I agree to the{" "}
+                    <span>I agree to the </span>
                     <a href="#" className="fw-bold text-decoration-none">
                       Terms of Service
                     </a>{" "}
@@ -370,26 +286,33 @@ const SignUp = () => {
                 onChange={(e) => setField("terms", e.target.checked)}
                 isInvalid={!!errors.terms}
                 feedback={errors.terms}
-              ></Form.Check>
+              />
             </Form.Group>
 
-            {/* Create Account Button */}
-            <Button type="submit" className={styles.createAccountBtn}>
-              Create Account
+            <Button
+              type="submit"
+              className={styles.createAccountBtn}
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  {" "}
+                  <Spinner animation="border" size="sm" /> Creating...{" "}
+                </>
+              ) : (
+                "Create Account"
+              )}
             </Button>
           </Form>
 
-          <p className="text-center mt-4 mb-0 small text-muted">
-            Already have an account?
-            <Button
-              variant="text"
-              className="fw-bold"
-              style={{ color: "#8A2BE2" }}
-              onClick={() => navigate("/auth/login")}
-            >
+          <div style={{ marginTop: "15px", textAlign: "center" }}>
+            <span style={{ fontSize: "14px", color: "#555" }}>
+              Already have an account?{" "}
+            </span>
+            <Link to="/auth/login" className={styles.textButton}>
               Login
-            </Button>
-          </p>
+            </Link>
+          </div>
         </Card.Body>
       </Card>
     </Container>

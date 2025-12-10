@@ -2,6 +2,10 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 18px;
+  line-height: 1.6;
+  color: #111827;
 }
 
 .main-content {
@@ -10,8 +14,7 @@
 
 /* ============================================
    HERO SECTION
-   ============================================ */
-
+============================================ */
 .hero-section {
   background: linear-gradient(135deg, #5b6ef5 0%, #8b5cf6 100%);
   color: #ffffff;
@@ -76,7 +79,6 @@
   }
 }
 
-/* Hero Buttons */
 .hero-buttons {
   display: flex;
   flex-direction: column;
@@ -92,8 +94,7 @@
 
 /* ============================================
    BUTTON STYLES
-   ============================================ */
-
+============================================ */
 .btn {
   padding: 0.75rem 2rem;
   border-radius: 0.5rem;
@@ -142,9 +143,9 @@
 
 /* ============================================
    FEATURES SECTION
-   ============================================ */
-
+============================================ */
 .features-section {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   padding: 5rem 1rem;
   background-color: #f9fafb;
 }
@@ -167,7 +168,6 @@
   }
 }
 
-/* Section Header */
 .section-header {
   text-align: center;
   margin-bottom: 4rem;
@@ -185,7 +185,10 @@
   text-align: center;
   color: #6b7280;
   margin-bottom: 3rem;
-  font-size: 1rem;
+  font-size: 1.05rem;
+  font-weight: 500;
+  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
 }
 
 /* Features Grid */
@@ -208,6 +211,7 @@
   border: 1px solid #e5e7eb;
   background-color: #ffffff;
   transition: box-shadow 0.3s ease;
+  text-align: center;
 }
 
 .feature-card:hover {
@@ -222,7 +226,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 1rem;
+  margin: 0 auto 1rem auto;
   color: #ffffff;
 }
 
@@ -242,22 +246,30 @@
   background-color: #ec4899;
 }
 
+/* Feature Title */
 .feature-title {
-  font-size: 1.25rem;
-  font-weight: bold;
+  font-size: 1.35rem;
+  font-weight: 700;
   color: #111827;
   margin-bottom: 0.75rem;
+  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.5;
 }
 
+/* Feature Description */
 .feature-description {
   color: #4b5563;
   margin-bottom: 1.5rem;
-  font-size: 0.95rem;
+  font-size: 1.05rem;
+  font-weight: 500;
+  text-align: center;
+  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.7;
 }
 
 .feature-link {
   display: inline-block;
-  font-weight: 500;
+  font-weight: 600;
   transition: color 0.3s ease;
   color: #ec4899;
 }
@@ -273,9 +285,9 @@
 
 /* ============================================
    WHY CHOOSE US SECTION
-   ============================================ */
-
+============================================ */
 .why-choose-section {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   padding: 5rem 1rem;
   background-color: #ffffff;
 }
@@ -298,27 +310,18 @@
   }
 }
 
-/* Benefits Grid */
+/* Benefits Grid - Horizontal Flex */
 .benefits-grid {
-  display: grid;
-  grid-template-columns: 1fr;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 2rem;
-}
-
-@media (min-width: 768px) {
-  .benefits-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (min-width: 1024px) {
-  .benefits-grid {
-    grid-template-columns: repeat(4, 1fr);
-  }
 }
 
 /* Benefit Card */
 .benefit-card {
+  flex: 1 1 200px;
+  max-width: 250px;
   text-align: center;
 }
 
@@ -340,21 +343,24 @@
 }
 
 .benefit-title {
-  font-size: 1.125rem;
+  font-size: 1.5rem;
   font-weight: bold;
   color: #111827;
   margin-bottom: 0.75rem;
+  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .benefit-description {
   color: #4b5563;
-  font-size: 0.875rem;
+  font-size: 1rem;
+  font-weight: 500;
+  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
 }
 
 /* ============================================
    CTA SECTION
-   ============================================ */
-
+============================================ */
 .cta-section {
   padding: 5rem 1rem;
   background-color: #f9fafb;
@@ -379,7 +385,6 @@
   }
 }
 
-/* CTA Buttons */
 .cta-buttons {
   display: flex;
   flex-direction: column;
@@ -395,8 +400,7 @@
 
 /* ============================================
    RESPONSIVE ADJUSTMENTS
-   ============================================ */
-
+============================================ */
 @media (max-width: 640px) {
   .hero-title {
     font-size: 1.875rem;
@@ -411,6 +415,19 @@
     font-size: 0.95rem;
   }
 
+  .features-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .feature-icon {
+    margin: 0 auto 1rem auto;
+  }
+
+  .feature-description {
+    font-size: 1rem;
+    text-align: center;
+  }
+
   .footer-grid {
     gap: 2rem;
   }
@@ -418,8 +435,7 @@
 
 /* ============================================
    UTILITY CLASSES
-   ============================================ */
-
+============================================ */
 .text-center {
   text-align: center;
 }
