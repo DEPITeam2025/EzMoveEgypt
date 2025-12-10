@@ -17,28 +17,28 @@ The Project Team members:
 
 ## KEY FEATURES
 
-• Smart trip planning and integrating all modes of transportation in one place.
-• Route search.
-• Saving favorite routes.
-• Search by transportation number.
-• Dedicated metro guide.
-• Ability for users to share new routes.
+- Smart trip planning and integrating all modes of transportation in one place.
+- Route search.
+- Saving favorite routes.
+- Search by transportation number.
+- Dedicated metro guide.
+- Ability for users to share new routes.
 
 ## WEBSITE PAGES
 
-• Home page
-• Login / Signup page
-• Find Routes page
-• Metro Guide page
-• Saved Routes page
-• Search For Transport page
+- Home page
+- Login / Signup page
+- Find Routes page
+- Metro Guide page
+- Saved Routes page
+- Search For Transport page
 
 ## TECHNOLOGIES AND TOOLS USED
 
-• Design: Figma Design
-• Frontend: React.js, React Bootstrap, CSS module, Redux, React Query, Axios
-• Backend: Firebase, Json files.
-• Hosting: Vercel
-• Version Control: GitHub
-• Data Source: GTFS data from Transport for Cairo
-• Collaboration Tools: Google Meet, WhatsApp.
+- **Design:** Figma Design
+- **Frontend:** React.js, React Bootstrap, CSS module, Redux, React Query, Axios
+- **Backend:** Firebase, JSON files
+- **Hosting:** Vercel
+- **Version Control:** GitHub
+- **Data Source:** GTFS data from Transport for Cairo
+- **Collaboration Tools:** Google Meet, WhatsApp
