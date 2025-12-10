@@ -1,16 +1,44 @@
-# React + Vite
+# Ezmove (Transportation web application for Egypt)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is the repo for our Depi final graduation project.
 
-Currently, two official plugins are available:
+The Project Team members:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+1. [Safaa Taher Eid Sayed](https://github.com/SafaaTaher)
+2. [Noura Mamdouh Sayed Ali](https://github.com/Noura201)
+3. [Sara Moselhy Gaber Elwaraky](https://github.com/saraElwaraky)
+4. [Aya Sherif Helmy Mohammed](https://github.com/ayaengsherif13200-commits)
+5. [Yasmin Hatem Hamdy Mohamed](https://github.com/Yasminasoliman)
+6. [Marem Khaled Farahat Maood](https://github.com/gitmariemkhaled/)
 
-## React Compiler
+## Project Live Demo
 
-The React Compiler is currently not compatible with SWC. See [this issue](https://github.com/vitejs/vite-plugin-react/issues/428) for tracking the progress.
+[Live Demo Link](https://ez-move-egypt-again.vercel.app/)
 
-## Expanding the ESLint configuration
+## KEY FEATURES
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+• Smart trip planning and integrating all modes of transportation in one place.
+• Route search.
+• Saving favorite routes.
+• Search by transportation number.
+• Dedicated metro guide.
+• Ability for users to share new routes.
+
+## WEBSITE PAGES
+
+• Home page
+• Login / Signup page
+• Find Routes page
+• Metro Guide page
+• Saved Routes page
+• Search For Transport page
+
+## TECHNOLOGIES AND TOOLS USED
+
+• Design: Figma Design
+• Frontend: React.js, React Bootstrap, CSS module, Redux, React Query, Axios
+• Backend: Firebase, Json files.
+• Hosting: Vercel
+• Version Control: GitHub
+• Data Source: GTFS data from Transport for Cairo
+• Collaboration Tools: Google Meet, WhatsApp.
