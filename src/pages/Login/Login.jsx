@@ -6,7 +6,15 @@ import {
   fetchUserExtraData,
 } from "@/features/auth/authSlice";
 import { useNavigate, useLocation, Link } from "react-router-dom";
-import { Form, Button, Card, Container, Row, Col } from "react-bootstrap";
+import {
+  Form,
+  Button,
+  Card,
+  Container,
+  Row,
+  Col,
+  InputGroup,
+} from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import EzmoveLogo from "@/assets/logo/ezmoveLogo.svg";
@@ -23,6 +31,8 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [remember, setRemember] = useState(true);
+  const [errors, setErrors] = useState({ email: "", password: "" });
+  const [invalidCred, setInvalidCred] = useState(false);
 
   useEffect(() => {
     localStorage.setItem("rememberMe", JSON.stringify(remember));
@@ -41,7 +51,27 @@ const Login = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    dispatch(login({ email, password }));
+
+    // Reset previous errors
+    setErrors({ email: "", password: "" });
+    setInvalidCred(false);
+
+    let newErrors = {};
+    if (!email.trim()) newErrors.email = "Required";
+    if (!password) newErrors.password = "Required";
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    // Dispatch login
+    dispatch(login({ email, password }))
+      .unwrap()
+      .catch(() => {
+        // Invalid credentials: don't mark fields red, just show message
+        setInvalidCred(true);
+      });
   };
 
   return (
@@ -66,6 +96,7 @@ const Login = () => {
               </p>
 
               <Form onSubmit={handleSubmit}>
+                {/* Email */}
                 <Form.Group className="mb-3" controlId="email">
                   <Form.Label>Email</Form.Label>
                   <Form.Control
@@ -74,36 +105,48 @@ const Login = () => {
                     placeholder="your.email@example.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    required
+                    isInvalid={!!errors.email}
                   />
+                  <Form.Control.Feedback type="invalid">
+                    {errors.email}
+                  </Form.Control.Feedback>
                 </Form.Group>
 
+                {/* Password */}
                 <Form.Group className="mb-3" controlId="password">
                   <Form.Label>Password</Form.Label>
-                  <div className="position-relative">
+                  <InputGroup hasValidation>
                     <Form.Control
                       type={showPassword ? "text" : "password"}
                       className={styles.loginInput}
                       placeholder="Enter your password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      required
+                      isInvalid={!!errors.password}
                     />
-                    <span
+                    <InputGroup.Text
                       onClick={() => setShowPassword((s) => !s)}
-                      style={{
-                        position: "absolute",
-                        right: "12px",
-                        top: "9px",
-                        cursor: "pointer",
-                      }}
+                      style={{ cursor: "pointer" }}
                     >
                       <FontAwesomeIcon
                         icon={showPassword ? faEyeSlash : faEye}
                       />
-                    </span>
-                  </div>
+                    </InputGroup.Text>
+                    <Form.Control.Feedback type="invalid">
+                      {errors.password}
+                    </Form.Control.Feedback>
+                  </InputGroup>
                 </Form.Group>
+
+                {/* Invalid credentials message */}
+                {invalidCred && (
+                  <div
+                    className="text-danger mb-2"
+                    style={{ fontSize: "0.9rem" }}
+                  >
+                    Invalid email or password
+                  </div>
+                )}
 
                 <div className="d-flex justify-content-between align-items-center mb-3">
                   <Form.Check
@@ -114,10 +157,6 @@ const Login = () => {
                   />
                   <Link to="/auth/forgot-password"> Forgot password?</Link>
                 </div>
-
-                {auth.error && (
-                  <div className="text-danger mb-2">{auth.error}</div>
-                )}
 
                 <Button
                   type="submit"

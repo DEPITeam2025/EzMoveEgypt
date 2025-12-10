@@ -3,12 +3,13 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { firebaseAuth } from "../../firebase";
 
-// خريطة الأخطاء لتسهيل الرسائل الودية
+// 🔹 خريطة رسائل الأخطاء بصيغة واضحة لليوزر
 const firebaseErrorMap = {
-  "auth/user-not-found": "No account found with this email.",
+  "auth/user-not-found": "This email is not registered.",
   "auth/wrong-password": "Incorrect password. Please try again.",
   "auth/invalid-email": "Invalid email format.",
   "auth/network-request-failed": "Network error. Please check your connection.",
+  "auth/invalid-credential": "Incorrect email or password.",
 };
 
 // 🔹 Login thunk (بيتعامل مع Firebase Auth فقط)
@@ -21,7 +22,9 @@ export const login = createAsyncThunk(
         email,
         password
       );
+
       const user = userCredential.user;
+
       return {
         user: {
           uid: user.uid,
@@ -31,9 +34,17 @@ export const login = createAsyncThunk(
         token: await user.getIdToken(),
       };
     } catch (err) {
-      return thunkAPI.rejectWithValue(
-        firebaseErrorMap[err.code] || "Login failed. Please try again."
-      );
+      let message = "Login failed. Please try again.";
+
+      if (err.code && firebaseErrorMap[err.code]) {
+        message = firebaseErrorMap[err.code];
+      } else if (err.code) {
+        message = err.code.replace("auth/", "").replaceAll("-", " ");
+      } else if (err.message) {
+        message = err.message;
+      }
+
+      return thunkAPI.rejectWithValue(message);
     }
   }
 );
@@ -71,6 +82,7 @@ const authSlice = createSlice({
       const stored =
         JSON.parse(localStorage.getItem("ezMove_auth")) ||
         JSON.parse(sessionStorage.getItem("ezMove_auth"));
+
       if (stored) {
         state.user = stored.user;
         state.token = stored.token;
@@ -81,7 +93,6 @@ const authSlice = createSlice({
       if (!state.user.savedItems) state.user.savedItems = [];
       state.user.savedItems.push(action.payload);
 
-      // مزامنة LocalStorage مباشرة
       const savedItemsKey = `savedItems-${state.user.uid}`;
       localStorage.setItem(
         savedItemsKey,
@@ -90,11 +101,11 @@ const authSlice = createSlice({
     },
     removeSavedItem(state, action) {
       if (!state.user.savedItems) return;
+
       state.user.savedItems = state.user.savedItems.filter(
         (item) => item.id !== action.payload
       );
 
-      // مزامنة LocalStorage مباشرة
       const savedItemsKey = `savedItems-${state.user.uid}`;
       localStorage.setItem(
         savedItemsKey,
@@ -117,6 +128,7 @@ const authSlice = createSlice({
           user: action.payload.user,
           token: action.payload.token,
         };
+
         const remember = JSON.parse(localStorage.getItem("rememberMe")) ?? true;
 
         if (remember)
@@ -139,4 +151,5 @@ export const {
   updateSavedItems,
   removeSavedItem,
 } = authSlice.actions;
+
 export default authSlice.reducer;

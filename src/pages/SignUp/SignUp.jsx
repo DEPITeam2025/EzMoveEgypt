@@ -13,8 +13,11 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 import { firebaseAuth } from "../../firebase";
 import EzmoveLogo from "@/assets/logo/ezmoveLogo.svg";
 
-// Simple email validation regex
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+// Strong email regex
+const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+// Egyptian phone regex
+const EGYPT_PHONE_REGEX = /^(010|011|012|015)[0-9]{8}$/;
 
 // Eye Open Icon
 const EyeIcon = ({ onClick }) => (
@@ -71,71 +74,46 @@ const SignUp = () => {
 
   const navigate = useNavigate();
   const togglePasswordVisibility = () => setPasswordShown(!passwordShown);
+
   const setField = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }));
     setErrors((prev) => ({ ...prev, [field]: "" }));
   };
 
+  // Validation function
   const findFormErrors = () => {
     const { fullName, email, phone, password, confirmPassword, terms } = form;
     let newErrors = {};
+
     if (!fullName.trim()) newErrors.fullName = "Full Name is required.";
     else if (fullName.trim().length < 2)
-      newErrors.fullName = "Full Name must be at least 2 characters.";
+      newErrors.fullName = "Full Name must be at least 2 characters long.";
+
     if (!email.trim()) newErrors.email = "Email is required.";
     else if (!EMAIL_REGEX.test(email))
-      newErrors.email = "Please enter a valid email address.";
-    if (!phone) newErrors.phone = "Phone number is required.";
-    else if (phone.length < 11)
-      newErrors.phone = "Phone must be at least 11 numbers";
+      newErrors.email = "Please enter a valid email.";
+
+    if (!phone.trim()) newErrors.phone = "Phone number is required.";
+    else if (!EGYPT_PHONE_REGEX.test(phone))
+      newErrors.phone = "Please enter a valid Egyptian phone number.";
+
     if (!password) newErrors.password = "Password is required.";
     else if (password.length < 6)
       newErrors.password = "Password must be at least 6 characters.";
+
     if (confirmPassword !== password)
-      newErrors.confirmPassword = "Passwords must match.";
+      newErrors.confirmPassword = "Passwords do not match.";
+
     if (!terms) newErrors.terms = "You must agree to the terms.";
+
     return newErrors;
   };
 
-  const handleBlur = (field) => {
-    let msg = "";
-    switch (field) {
-      case "fullName":
-        if (!form.fullName.trim()) msg = "Full Name is required.";
-        else if (form.fullName.trim().length < 2)
-          msg = "Full Name must be at least 2 characters.";
-        break;
-      case "email":
-        if (!form.email.trim()) msg = "Email is required.";
-        else if (!EMAIL_REGEX.test(form.email))
-          msg = "Please enter a valid email address.";
-        break;
-      case "phone":
-        if (!form.phone) msg = "Phone number is required.";
-        else if (form.phone.length < 11)
-          msg = "Phone must be at least 11 numbers.";
-        break;
-      case "password":
-        if (!form.password) msg = "Password is required.";
-        else if (form.password.length < 6)
-          msg = "Password must be at least 6 characters.";
-        break;
-      case "confirmPassword":
-        if (form.confirmPassword !== form.password)
-          msg = "Passwords must match.";
-        break;
-      case "terms":
-        if (!form.terms) msg = "You must agree to the terms.";
-        break;
-      default:
-        break;
-    }
-    setErrors((prev) => ({ ...prev, [field]: msg }));
-  };
-
+  // Submit handler
   const handleSubmit = async (e) => {
     e.preventDefault();
     const newErrors = findFormErrors();
+
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
@@ -144,34 +122,28 @@ const SignUp = () => {
     try {
       setLoading(true);
 
-      // 🔹 إنشاء يوزر فقط باستخدام Firebase Auth
-      const userCredential = await createUserWithEmailAndPassword(
+      await createUserWithEmailAndPassword(
         firebaseAuth,
         form.email,
         form.password
-      );
-      console.log("Firebase user created:", userCredential.user);
-
-      // 🔹 تهيئة البيانات الأساسية في LocalStorage
-      const localUserData = {
-        uid: userCredential.user.uid,
-        email: form.email,
-        phone: form.phone,
-        fullName: form.fullName,
-        savedItems: [],
-        createdAt: new Date().toISOString(),
-      };
-      localStorage.setItem(
-        `user-${userCredential.user.uid}`,
-        JSON.stringify(localUserData)
       );
 
       setLoading(false);
       navigate("/auth/signup-success");
     } catch (err) {
-      console.error("SignUp Error:", err);
       setLoading(false);
-      setErrors(err);
+
+      if (err.code === "auth/email-already-in-use") {
+        setErrors((prev) => ({
+          ...prev,
+          email: "This email is already registered.",
+        }));
+      } else {
+        setErrors((prev) => ({
+          ...prev,
+          email: "Something went wrong. Please try again.",
+        }));
+      }
     }
   };
 
@@ -186,12 +158,14 @@ const SignUp = () => {
         <h1 className="h5 fw-bold mb-0">Ezmove</h1>
         <p className="text-muted small">Create an account to get started</p>
       </header>
+
       <Card className={styles.signupCard}>
         <Card.Body className="p-4">
           <Card.Title className="h4 fw-bold">Sign Up</Card.Title>
           <Card.Text className="text-muted mb-4">
             Enter your information to create an account
           </Card.Text>
+
           <Form onSubmit={handleSubmit}>
             {/* Full Name */}
             <Form.Group className="mb-3">
@@ -202,7 +176,6 @@ const SignUp = () => {
                 className={styles.formControlCustom}
                 value={form.fullName}
                 onChange={(e) => setField("fullName", e.target.value)}
-                onBlur={() => handleBlur("fullName")}
                 isInvalid={!!errors.fullName}
               />
               <Form.Control.Feedback type="invalid">
@@ -219,7 +192,6 @@ const SignUp = () => {
                 className={styles.formControlCustom}
                 value={form.email}
                 onChange={(e) => setField("email", e.target.value)}
-                onBlur={() => handleBlur("email")}
                 isInvalid={!!errors.email}
               />
               <Form.Control.Feedback type="invalid">
@@ -231,12 +203,11 @@ const SignUp = () => {
             <Form.Group className="mb-3">
               <Form.Label className="fw-semibold">Phone</Form.Label>
               <Form.Control
-                type="phone"
+                type="text"
                 placeholder="01*********"
                 className={styles.formControlCustom}
                 value={form.phone}
                 onChange={(e) => setField("phone", e.target.value)}
-                onBlur={() => handleBlur("phone")}
                 isInvalid={!!errors.phone}
               />
               <Form.Control.Feedback type="invalid">
@@ -254,7 +225,6 @@ const SignUp = () => {
                   className={styles.formControlCustom}
                   value={form.password}
                   onChange={(e) => setField("password", e.target.value)}
-                  onBlur={() => handleBlur("password")}
                   isInvalid={!!errors.password}
                 />
                 {passwordShown ? (
@@ -278,7 +248,6 @@ const SignUp = () => {
                   className={styles.formControlCustom}
                   value={form.confirmPassword}
                   onChange={(e) => setField("confirmPassword", e.target.value)}
-                  onBlur={() => handleBlur("confirmPassword")}
                   isInvalid={!!errors.confirmPassword}
                 />
                 {passwordShown ? (

@@ -1,5 +1,5 @@
 // src/pages/ResetPassword.jsx
-import "./ForgotPassword.css"; // ✅ نفس الستايل
+import "./ForgotPassword.css";
 import { useState } from "react";
 import { confirmPasswordReset, verifyPasswordResetCode } from "firebase/auth";
 import { firebaseAuth } from "@/firebase";
@@ -9,20 +9,37 @@ import EzmoveLogo from "@/assets/logo/ezmoveLogo.svg";
 
 function ResetPassword() {
   const [searchParams] = useSearchParams();
-  const oobCode = searchParams.get("oobCode"); // كود الريسيت جاي من اللينك
+  const oobCode = searchParams.get("oobCode");
+
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [errors, setErrors] = useState({});
   const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const validate = () => {
+    const newErrors = {};
+    if (!newPassword) newErrors.newPassword = "Password is required.";
+    else if (newPassword.length < 6)
+      newErrors.newPassword = "Password must be at least 6 characters.";
+
+    if (!confirmPassword)
+      newErrors.confirmPassword = "Confirm password is required.";
+    else if (confirmPassword !== newPassword)
+      newErrors.confirmPassword = "Passwords do not match.";
+
+    return newErrors;
+  };
 
   const handleResetPassword = async (e) => {
     e.preventDefault();
     setMessage("");
-    setError("");
+    setErrors({});
 
-    if (newPassword !== confirmPassword) {
-      return setError("❌ Passwords do not match.");
+    const validationErrors = validate();
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
     }
 
     setLoading(true);
@@ -32,9 +49,11 @@ function ResetPassword() {
       setMessage(
         "✅ Password has been reset successfully. You can now log in."
       );
+      setNewPassword("");
+      setConfirmPassword("");
     } catch (err) {
       console.error(err);
-      setError("❌ Invalid or expired reset link.");
+      setErrors({ general: "❌ Invalid or expired reset link." });
     }
     setLoading(false);
   };
@@ -60,6 +79,7 @@ function ResetPassword() {
               <p className="text-muted">Enter your new password below.</p>
 
               <Form onSubmit={handleResetPassword}>
+                {/* New Password */}
                 <Form.Group className="mb-3">
                   <Form.Label className="fw-bold">New Password</Form.Label>
                   <Form.Control
@@ -68,10 +88,14 @@ function ResetPassword() {
                     placeholder="Enter new password"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    required
+                    isInvalid={!!errors.newPassword}
                   />
+                  <Form.Control.Feedback type="invalid">
+                    {errors.newPassword}
+                  </Form.Control.Feedback>
                 </Form.Group>
 
+                {/* Confirm Password */}
                 <Form.Group className="mb-3">
                   <Form.Label className="fw-bold">Confirm Password</Form.Label>
                   <Form.Control
@@ -80,12 +104,18 @@ function ResetPassword() {
                     placeholder="Confirm password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    required
+                    isInvalid={!!errors.confirmPassword}
                   />
+                  <Form.Control.Feedback type="invalid">
+                    {errors.confirmPassword}
+                  </Form.Control.Feedback>
                 </Form.Group>
 
+                {/* General error */}
+                {errors.general && (
+                  <p className="text-danger">{errors.general}</p>
+                )}
                 {message && <p className="text-success">{message}</p>}
-                {error && <p className="text-danger">{error}</p>}
 
                 <Button
                   type="submit"

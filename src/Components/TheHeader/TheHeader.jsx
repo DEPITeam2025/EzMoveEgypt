@@ -15,11 +15,15 @@ function TheHeader() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // ✅ خدي بيانات المستخدم من Redux
   const { user, token } = useSelector((state) => state.auth);
   const isLoggedIn = Boolean(token);
+  const storedAuth = JSON.parse(localStorage.getItem("ezMove_auth") || "{}");
+  const fullName = user?.fullName || storedAuth.user?.fullName || "User";
+
+  const maxLength = 15;
+
   const displayName =
-    user?.fullName || localStorage.getItem("username") || "User";
+    fullName.length > maxLength ? fullName.slice(0, maxLength) + "…" : fullName;
 
   const linkClass = ({ isActive }) =>
     isActive ? `${styles.navLink} ${styles.active}` : styles.navLink;
