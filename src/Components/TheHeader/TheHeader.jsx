@@ -8,7 +8,6 @@ import SearchTransportIcon from "./Icons/SearchTransportIcon.svg";
 import MetroGuideIcon from "./Icons/MetroGuideIcon.svg";
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "@/features/auth/authSlice";
-import { firebaseAuth } from "../../firebase";
 
 function TheHeader() {
   const dispatch = useDispatch();
@@ -18,11 +17,7 @@ function TheHeader() {
   const isLoggedIn = Boolean(token);
   const storedAuth = JSON.parse(localStorage.getItem("ezMove_auth") || "{}");
 
-  const fullName =
-    user?.fullName ||
-    storedAuth.user?.fullName ||
-    firebaseAuth.currentUser?.displayName ||
-    "User";
+  const fullName = user?.fullName || storedAuth.user?.fullName || "User";
 
   const displayName =
     fullName.length > 15 ? fullName.slice(0, 15) + "…" : fullName;
