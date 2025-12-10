@@ -9,17 +9,16 @@ import {
 } from "react-bootstrap";
 import styles from "./SignUp.module.css";
 import { Link, useNavigate } from "react-router-dom";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { firebaseAuth } from "../../firebase";
 import EzmoveLogo from "@/assets/logo/ezmoveLogo.svg";
 
 // Strong email regex
 const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-
 // Egyptian phone regex
 const EGYPT_PHONE_REGEX = /^(010|011|012|015)[0-9]{8}$/;
 
-// Eye Open Icon
+// Eye Icons
 const EyeIcon = ({ onClick }) => (
   <InputGroup.Text className={styles.eyeIcon} onClick={onClick}>
     <svg
@@ -38,7 +37,6 @@ const EyeIcon = ({ onClick }) => (
   </InputGroup.Text>
 );
 
-// Eye Closed Icon
 const Eye2Icon = ({ onClick }) => (
   <InputGroup.Text className={styles.eyeIcon} onClick={onClick}>
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -71,23 +69,20 @@ const SignUp = () => {
   const [errors, setErrors] = useState({});
   const [passwordShown, setPasswordShown] = useState(false);
   const [loading, setLoading] = useState(false);
-
   const navigate = useNavigate();
-  const togglePasswordVisibility = () => setPasswordShown(!passwordShown);
 
+  const togglePasswordVisibility = () => setPasswordShown(!passwordShown);
   const setField = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }));
     setErrors((prev) => ({ ...prev, [field]: "" }));
   };
 
-  // Validation function
   const findFormErrors = () => {
     const { fullName, email, phone, password, confirmPassword, terms } = form;
     let newErrors = {};
-
     if (!fullName.trim()) newErrors.fullName = "Full Name is required.";
     else if (fullName.trim().length < 2)
-      newErrors.fullName = "Full Name must be at least 2 characters long.";
+      newErrors.fullName = "Full Name must be at least 2 characters.";
 
     if (!email.trim()) newErrors.email = "Email is required.";
     else if (!EMAIL_REGEX.test(email))
@@ -103,17 +98,14 @@ const SignUp = () => {
 
     if (confirmPassword !== password)
       newErrors.confirmPassword = "Passwords do not match.";
-
     if (!terms) newErrors.terms = "You must agree to the terms.";
 
     return newErrors;
   };
 
-  // Submit handler
   const handleSubmit = async (e) => {
     e.preventDefault();
     const newErrors = findFormErrors();
-
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
@@ -122,17 +114,28 @@ const SignUp = () => {
     try {
       setLoading(true);
 
-      await createUserWithEmailAndPassword(
+      // إنشاء يوزر
+      const userCredential = await createUserWithEmailAndPassword(
         firebaseAuth,
         form.email,
         form.password
       );
+      const user = userCredential.user;
+
+      // تحديث displayName
+      await updateProfile(user, { displayName: form.fullName });
+
+      // حفظ بيانات اليوزر محلياً
+      // const authData = {
+      //   user: { uid: user.uid, email: user.email, fullName: user.displayName },
+      //   token: await user.getIdToken(),
+      // };
+      // localStorage.setItem("ezMove_auth", JSON.stringify(authData));
 
       setLoading(false);
       navigate("/auth/signup-success");
     } catch (err) {
       setLoading(false);
-
       if (err.code === "auth/email-already-in-use") {
         setErrors((prev) => ({
           ...prev,
@@ -293,7 +296,8 @@ const SignUp = () => {
             >
               {loading ? (
                 <>
-                  <Spinner animation="border" size="sm" /> Creating...
+                  {" "}
+                  <Spinner animation="border" size="sm" /> Creating...{" "}
                 </>
               ) : (
                 "Create Account"

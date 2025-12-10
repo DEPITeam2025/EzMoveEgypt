@@ -12,7 +12,6 @@ const firebaseErrorMap = {
   "auth/invalid-credential": "Incorrect email or password.",
 };
 
-// 🔹 Login thunk (بيتعامل مع Firebase Auth فقط)
 export const login = createAsyncThunk(
   "auth/login",
   async ({ email, password }, thunkAPI) => {
@@ -29,7 +28,7 @@ export const login = createAsyncThunk(
         user: {
           uid: user.uid,
           email: user.email,
-          fullName: email.split("@")[0], // fallback للاسم
+          fullName: user.displayName || email.split("@")[0],
         },
         token: await user.getIdToken(),
       };

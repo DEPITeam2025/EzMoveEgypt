@@ -7,6 +7,14 @@ console.log("SUCCESS PAGE RENDERED");
 
 const SignUpSuccess = () => {
   const navigate = useNavigate();
+
+  const tempData = JSON.parse(localStorage.getItem("ezMove_tempAuth") || "{}");
+
+  const handleGoToLogin = () => {
+    localStorage.removeItem("ezMove_tempAuth"); // إزالة البيانات المؤقتة
+    navigate("/auth/login");
+  };
+
   return (
     <Container fluid className={styles.signupPage}>
       <Card className={styles.signupCard}>
@@ -40,7 +48,7 @@ const SignUpSuccess = () => {
             className={styles.createAccountBtn}
             onClick={() => navigate("/auth/login")}
           >
-            Proceed to Login
+            Proceed to Log In
           </Button>
         </Card.Body>
       </Card>

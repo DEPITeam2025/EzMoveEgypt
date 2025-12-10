@@ -2,14 +2,13 @@ import React from "react";
 import { Navbar, Nav, Container, Button } from "react-bootstrap";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import styles from "./TheHeader.module.css";
-
 import EzmoveLogo from "@/assets/logo/ezmoveLogo.svg";
 import FindRoutesIcon from "./Icons/FindRoutesIcon.svg";
 import SearchTransportIcon from "./Icons/SearchTransportIcon.svg";
 import MetroGuideIcon from "./Icons/MetroGuideIcon.svg";
-
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "@/features/auth/authSlice";
+import { firebaseAuth } from "../../firebase";
 
 function TheHeader() {
   const dispatch = useDispatch();
@@ -18,12 +17,15 @@ function TheHeader() {
   const { user, token } = useSelector((state) => state.auth);
   const isLoggedIn = Boolean(token);
   const storedAuth = JSON.parse(localStorage.getItem("ezMove_auth") || "{}");
-  const fullName = user?.fullName || storedAuth.user?.fullName || "User";
 
-  const maxLength = 15;
+  const fullName =
+    user?.fullName ||
+    storedAuth.user?.fullName ||
+    firebaseAuth.currentUser?.displayName ||
+    "User";
 
   const displayName =
-    fullName.length > maxLength ? fullName.slice(0, maxLength) + "…" : fullName;
+    fullName.length > 15 ? fullName.slice(0, 15) + "…" : fullName;
 
   const linkClass = ({ isActive }) =>
     isActive ? `${styles.navLink} ${styles.active}` : styles.navLink;
@@ -32,6 +34,7 @@ function TheHeader() {
     dispatch(logout());
     navigate("/");
   }
+
   return (
     <Navbar expand="lg" className={styles.header}>
       <Container fluid>
@@ -75,7 +78,6 @@ function TheHeader() {
                 width="18"
                 height="18"
                 className={styles.icon}
-                styles={{ color: "blue" }}
               />
               search transport
             </NavLink>
@@ -94,7 +96,7 @@ function TheHeader() {
             <NavLink to="/saveditems" className={linkClass}>
               <img
                 src={MetroGuideIcon}
-                alt="Metro Guide"
+                alt="Saved Items"
                 width="18"
                 height="18"
                 className={styles.icon}
