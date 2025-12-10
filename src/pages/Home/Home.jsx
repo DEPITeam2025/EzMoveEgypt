@@ -22,6 +22,7 @@ const fetchFeatures = async () => [
     title: "Find Routes",
     description:
       "Discover the best routes between any two locations with multiple transport options.",
+    color: "bg-blue",
     linkText: "Get Started →",
     link: "/findroutes",
   },
